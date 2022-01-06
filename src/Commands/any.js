@@ -4,7 +4,7 @@ const { allAdventurers } = require('../adventurers');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("any")
-    .setDescription("Picks a random character from the full pool")
+    .setDescription("Picks a random character"),
   execute: async (interaction, client) => {
     const element = interaction.data.options.find(option => option.name === 'element');
     console.log(element);

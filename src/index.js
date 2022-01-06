@@ -1,3 +1,4 @@
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest"); // Define REST.
 const { Routes } = require("discord-api-types/v9"); // Define Routes.
 const fs = require("fs"); // Define fs (file system).
@@ -22,10 +23,10 @@ client.once("ready", () => {
   }
 
   const elements = ['flame', 'water', 'wind', 'light', 'shadow'].map(element => {
-    return {name: element, value: element};
+    return [element, element];
   });
   const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'].map(weapon => {
-    return {name: weapon, value: weapon};
+    return [weapon, weapon];
   });
   for (const weapon in weapons) {
     const command = {
@@ -43,7 +44,7 @@ client.once("ready", () => {
         var item = allAdventurers[Math.floor(Math.random()*allAdventurers.length)];
         return interaction.reply(item);
       },
-    }
+    };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   }
