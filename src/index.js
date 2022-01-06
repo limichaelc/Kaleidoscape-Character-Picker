@@ -10,6 +10,11 @@ const client = new Client({
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandarray = []; // Array to store commands for sending to the REST API.
 const token = process.env.DISCORD_TOKEN; // Token from Railway Env Variable.
+
+function capitalize(input) {
+  return input.charAt(0).toUpperCase() + input.slice(1);
+}
+
 // Execute code when the "ready" client event is triggered.
 client.once("ready", () => {
   const commandFiles = fs
@@ -25,7 +30,7 @@ client.once("ready", () => {
 
   const elements = ['flame', 'water', 'wind', 'light', 'shadow'];
   const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'];
-  console.log(weapons);
+
   weapons.map(weapon => {
     const command = {
       data: new SlashCommandBuilder()
@@ -37,9 +42,32 @@ client.once("ready", () => {
             .setRequired(false)
             .addChoices(elements.map(element => [element, element]))),
       execute: async (interaction, client) => {
-        console.log(interaction);
-        // const element = interaction.data.options.find(option => option.name === 'element');
-        var item = allAdventurers[Math.floor(Math.random()*allAdventurers.length)];
+        const element = interaction.options.getString('element') ?? '';
+        const query = capitalize(element) + ", " + capitalize(weapon);
+        const filtered = allAdventurers.filter(adventurer => adventurer.includes(query));
+        var item = filtered[Math.floor(Math.random()*filtered.length)];
+        return interaction.reply(item);
+      },
+    };
+    commands.set(command.data.name, command); // Set the command name and file for handler to use.
+    commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
+});
+
+elements.map(element => {
+    const command = {
+      data: new SlashCommandBuilder()
+        .setName(element)
+        .setDescription("Picks a random character with the given element")
+        .addStringOption(option =>
+          option.setName('weapon')
+            .setDescription('Specify the character weapon type')
+            .setRequired(false)
+            .addChoices(weapons.map(weapon => [weapon, weapon]))),
+      execute: async (interaction, client) => {
+        const weapon = interaction.options.getString('weapon') ?? '';
+        const query = capitalize(element) + ", " + capitalize(weapon);
+        const filtered = allAdventurers.filter(adventurer => adventurer.includes(query));
+        var item = filtered[Math.floor(Math.random()*filtered.length)];
         return interaction.reply(item);
       },
     };
@@ -64,10 +92,10 @@ client.once("ready", () => {
   })();
   console.log(`Logged in as ${client.user.tag}!`);
 });
+
 // Command handler.
 client.on("interactionCreate", async interaction => {
   if (!interaction.isCommand()) return;
-
   const command = commands.get(interaction.commandName);
 
   if (!command) return;
