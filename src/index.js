@@ -51,9 +51,10 @@ client.once("ready", () => {
     };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
-});
+  });
 
-elements.map(element => {
+  elements.map(element => {
+    console.log(element);
     const command = {
       data: new SlashCommandBuilder()
         .setName(element)
@@ -73,7 +74,9 @@ elements.map(element => {
     };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
-});
+  });
+
+  console.log(commands);
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
