@@ -31,7 +31,7 @@ client.once("ready", () => {
   for (const weapon in weapons) {
     const command = {
       data: new SlashCommandBuilder()
-        .setName(weapon)
+        .setName(weapon[0])
         .setDescription("Picks a random character with the given weapon type")
         .addStringOption(option =>
           option.setName('element')
