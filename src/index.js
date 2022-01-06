@@ -21,8 +21,12 @@ client.once("ready", () => {
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   }
 
-  const elements = ['flame', 'water', 'wind', 'light', 'shadow'].map(element => {name: element, value: element});
-  const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'].map(weapon => {name: weapon, value: weapon});
+  const elements = ['flame', 'water', 'wind', 'light', 'shadow'].map(element => {
+    return {name: element, value: element};
+  });
+  const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'].map(weapon => {
+    return {name: weapon, value: weapon};
+  });
   for (const weapon in weapons) {
     const command = {
       data: new SlashCommandBuilder()
