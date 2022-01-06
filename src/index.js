@@ -44,6 +44,8 @@ client.once("ready", () => {
         return interaction.reply(item);
       },
     }
+    commands.set(command.data.name, command); // Set the command name and file for handler to use.
+    commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   }
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
