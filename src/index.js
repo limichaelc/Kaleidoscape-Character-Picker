@@ -76,8 +76,6 @@ client.once("ready", () => {
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   });
 
-  console.log(commands);
-
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
   ;(async () => {
@@ -100,6 +98,7 @@ client.once("ready", () => {
 client.on("interactionCreate", async interaction => {
   if (!interaction.isCommand()) return;
   const command = commands.get(interaction.commandName);
+  console.log(command);
 
   if (!command) return;
 
