@@ -23,22 +23,19 @@ client.once("ready", () => {
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   }
 
-  const elements = ['flame', 'water', 'wind', 'light', 'shadow'].map(element => {
-    return [element, element];
-  });
-  const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'].map(weapon => {
-    return [weapon, weapon];
-  });
-  for (const weapon in weapons) {
+  const elements = ['flame', 'water', 'wind', 'light', 'shadow'];
+  const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'];
+  console.log(weapons);
+  weapons.map(weapon => {
     const command = {
       data: new SlashCommandBuilder()
-        .setName(weapon[0])
+        .setName(weapon)
         .setDescription("Picks a random character with the given weapon type")
         .addStringOption(option =>
           option.setName('element')
             .setDescription('Specify the character element')
             .setRequired(false)
-            .addChoices(elements)),
+            .addChoices(elements.map(element => [element, element]))),
       execute: async (interaction, client) => {
         console.log(interaction);
         // const element = interaction.data.options.find(option => option.name === 'element');
@@ -48,7 +45,7 @@ client.once("ready", () => {
     };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
-  }
+});
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
