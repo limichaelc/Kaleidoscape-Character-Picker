@@ -302,6 +302,7 @@ module.exports = {
         "Gala Chelle, Shadow, Manacaster",
     ],
     dragonDrive: [
+        "Tiki, Water, Dagger",
         "Farren, Light, Dagger",
         "Nino, Wind, Sword",
         "Bellina, Shadow, Dagger",
@@ -310,5 +311,12 @@ module.exports = {
         "Summer Mym, Shadow, Manacaster",
         "Summer Leonidas, Shadow, Lance",
         "Izumo, Wind, Lance",
+        "Gala Notte, Wind, Dagger",
+        "Sandalphon, Water, Staff",
+        "Panther, Flame, Lance",
+        "Mona, Wind, Sword",
+        "Sophie (Persona), Light, Axe",
+        "Joker, Shadow, Dagger",
+        "Gala Zethia, Shadow, Blade",
     ],
 };
