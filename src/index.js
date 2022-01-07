@@ -1,4 +1,4 @@
-const { allAdventurers } = require('./adventurers');
+const { allAdventurers, dragonDrive, uniqueDragon } = require('./adventurers');
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest"); // Define REST.
 const { Routes } = require("discord-api-types/v9"); // Define Routes.
@@ -74,8 +74,33 @@ client.once("ready", () => {
       return interaction.reply(item);
     },
   };
-  commands.set(anyCommand.data.name, anyCommand);
-  commandarray.push(anyCommand.data.toJSON());
+
+  const uniqueDragonCommand = {
+    data: new SlashCommandBuilder()
+      .setName("dform")
+      .setDescription("Picks a random character with a unique shapeshift"),
+    execute: async (interaction, client) => {
+      const item = uniqueDragon[Math.floor(Math.random()*uniqueDragon.length)];
+      console.log(item);
+      return interaction.reply(item);
+    },
+  };
+
+  const dragonDriveCommand = {
+    data: new SlashCommandBuilder()
+      .setName("ddrive")
+      .setDescription("Picks a random character that uses dragon drive"),
+    execute: async (interaction, client) => {
+      const item = dragonDrive[Math.floor(Math.random()*dragonDrive.length)];
+      console.log(item);
+      return interaction.reply(item);
+    },
+  };
+  [anyCommand, uniqueDragonCommand, dragonDriveCommand].map(command => {
+    console.log(command);
+    commands.set(command.data.name, command);
+    commandarray.push(command.data.toJSON());
+  });
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
