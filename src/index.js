@@ -96,7 +96,27 @@ client.once("ready", () => {
       return interaction.reply(item);
     },
   };
-  [anyCommand, uniqueDragonCommand, dragonDriveCommand].map(command => {
+
+  const meleeCommand = {
+    data: new SlashCommandBuilder()
+      .setName("melee")
+      .setDescription("Picks a random melee character (axe, blade, dagger, lance, sword)"),
+    execute: async (interaction, client) => {
+      const filtered = allAdventurers.filter(adventurer => {
+        ['sword', 'blade', 'dagger', 'axe', 'lance'].map(weapon => {
+          if (adventurer.includes(capitalize(weapon))) {
+            return true;
+          }
+        });
+      });
+      console.log(filtered);
+      const item = filtered[Math.floor(Math.random()*filtered.length)];
+      console.log(item);
+      return interaction.reply(item);
+    },
+  };
+
+  [anyCommand, uniqueDragonCommand, dragonDriveCommand, meleeCommand].map(command => {
     console.log(command);
     commands.set(command.data.name, command);
     commandarray.push(command.data.toJSON());
