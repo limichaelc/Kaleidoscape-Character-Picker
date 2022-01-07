@@ -102,7 +102,8 @@ client.once("ready", () => {
       .setName("melee")
       .setDescription("Picks a random melee character (axe, blade, dagger, lance, sword)"),
     execute: async (interaction, client) => {
-      const checker = value => ['Sword', 'Blade', 'Dagger', 'Axe', 'Lance'].some(element => value.includes(element));
+      const checker = value => ['Sword', 'Blade', 'Dagger', 'Axe', 'Lance']
+        .some(element => value.includes(element));
       const filtered = allAdventurers.filter(checker);
       const item = filtered[Math.floor(Math.random()*filtered.length)];
       console.log(item);
@@ -115,7 +116,8 @@ client.once("ready", () => {
       .setName("ranged")
       .setDescription("Picks a random ranged character (wand, bow, staff, manacaster)"),
     execute: async (interaction, client) => {
-      const checker = value => ['Wand', 'Bow', 'Staff', 'Manacaster'].some(element => value.includes(element));
+      const checker = value => ['Wand', 'Bow', 'Staff', 'Manacaster']
+        .some(element => value.includes(element));
       const filtered = allAdventurers.filter(checker);
       const item = filtered[Math.floor(Math.random()*filtered.length)];
       console.log(item);
