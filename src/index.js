@@ -17,17 +17,6 @@ function capitalize(input) {
 
 // Execute code when the "ready" client event is triggered.
 client.once("ready", () => {
-  const commandFiles = fs
-    .readdirSync("src/Commands")
-    .filter(file => file.endsWith(".js")); // Get and filter all the files in the "Commands" Folder.
-
-  // Loop through the command files
-  for (const file of commandFiles) {
-    const command = require(`./Commands/${file}`); // Get and define the command file.
-    commands.set(command.data.name, command); // Set the command name and file for handler to use.
-    commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
-  }
-
   const elements = ['flame', 'water', 'wind', 'light', 'shadow'];
   const weapons = ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'];
 
@@ -54,7 +43,6 @@ client.once("ready", () => {
   });
 
   elements.map(element => {
-    console.log(element);
     const command = {
       data: new SlashCommandBuilder()
         .setName(element)
@@ -75,6 +63,19 @@ client.once("ready", () => {
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
     commandarray.push(command.data.toJSON()); // Push the command data to an array (for sending to the API).
   });
+
+  const anyCommand = {
+    data: new SlashCommandBuilder()
+      .setName("any")
+      .setDescription("Picks a random character"),
+    execute: async (interaction, client) => {
+      const item = allAdventurers[Math.floor(Math.random()*allAdventurers.length)];
+      console.log(item);
+      return interaction.reply(item);
+    },
+  };
+  commands.set(anyCommand.data.name, anyCommand);
+  commandarray.push(anyCommand.data.toJSON());
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
