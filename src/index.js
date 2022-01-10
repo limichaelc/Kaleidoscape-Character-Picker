@@ -15,6 +15,12 @@ function capitalize(input) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
+function pickRandom(interaction, input) {
+  const item = input[Math.floor(Math.random()*input.length)];
+  console.log(item);
+  return interaction.reply(item);
+}
+
 // Execute code when the "ready" client event is triggered.
 client.once("ready", () => {
   const elements = ['flame', 'water', 'wind', 'light', 'shadow'];
@@ -34,8 +40,7 @@ client.once("ready", () => {
         const element = interaction.options.getString('element') ?? '';
         const query = capitalize(element) + ", " + capitalize(weapon);
         const filtered = allAdventurers.filter(adventurer => adventurer.includes(query));
-        var item = filtered[Math.floor(Math.random()*filtered.length)];
-        return interaction.reply(item);
+        return pickRandom(interaction, filtered);
       },
     };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
@@ -56,8 +61,7 @@ client.once("ready", () => {
         const weapon = interaction.options.getString('weapon') ?? '';
         const query = capitalize(element) + ", " + capitalize(weapon);
         const filtered = allAdventurers.filter(adventurer => adventurer.includes(query));
-        var item = filtered[Math.floor(Math.random()*filtered.length)];
-        return interaction.reply(item);
+        return pickRandom(interaction, filtered);
       },
     };
     commands.set(command.data.name, command); // Set the command name and file for handler to use.
@@ -69,9 +73,7 @@ client.once("ready", () => {
       .setName("any")
       .setDescription("Picks a random character"),
     execute: async (interaction, client) => {
-      const item = allAdventurers[Math.floor(Math.random()*allAdventurers.length)];
-      console.log(item);
-      return interaction.reply(item);
+      return pickRandom(interaction, allAdventurers);
     },
   };
 
@@ -80,9 +82,7 @@ client.once("ready", () => {
       .setName("dform")
       .setDescription("Picks a random character with a unique shapeshift"),
     execute: async (interaction, client) => {
-      const item = uniqueDragon[Math.floor(Math.random()*uniqueDragon.length)];
-      console.log(item);
-      return interaction.reply(item);
+      return pickRandom(interaction, uniqueDragon);
     },
   };
 
@@ -91,9 +91,7 @@ client.once("ready", () => {
       .setName("ddrive")
       .setDescription("Picks a random character that uses dragon drive"),
     execute: async (interaction, client) => {
-      const item = dragonDrive[Math.floor(Math.random()*dragonDrive.length)];
-      console.log(item);
-      return interaction.reply(item);
+      return pickRandom(interaction, dragonDrive);
     },
   };
 
@@ -105,9 +103,7 @@ client.once("ready", () => {
       const checker = value => ['Sword', 'Blade', 'Dagger', 'Axe', 'Lance']
         .some(element => value.includes(element));
       const filtered = allAdventurers.filter(checker);
-      const item = filtered[Math.floor(Math.random()*filtered.length)];
-      console.log(item);
-      return interaction.reply(item);
+      return pickRandom(interaction, filtered);
     },
   };
 
@@ -119,13 +115,47 @@ client.once("ready", () => {
       const checker = value => ['Wand', 'Bow', 'Staff', 'Manacaster']
         .some(element => value.includes(element));
       const filtered = allAdventurers.filter(checker);
-      const item = filtered[Math.floor(Math.random()*filtered.length)];
-      console.log(item);
-      return interaction.reply(item);
+      return pickRandom(interaction, filtered);
     },
   };
 
-  [anyCommand, uniqueDragonCommand, dragonDriveCommand, meleeCommand, rangedCommand].map(command => {
+  const threeStarCommand = {
+    data: new SlashCommandBuilder()
+      .setName("3*")
+      .setDescription("Picks a random character with 3* rarity"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, threeStars);
+    },
+  };
+
+  const fourStarCommand = {
+    data: new SlashCommandBuilder()
+      .setName("4*")
+      .setDescription("Picks a random character with 4* rarity"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, fourStars);
+    },
+  };
+
+  const fiveStarCommand = {
+    data: new SlashCommandBuilder()
+      .setName("5*")
+      .setDescription("Picks a random character with 5* rarity"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, fiveStars);
+    },
+  };
+
+  [
+    anyCommand,
+    uniqueDragonCommand,
+    dragonDriveCommand,
+    meleeCommand,
+    rangedCommand,
+    threeStarCommand,
+    fourStarCommand,
+    fiveStarCommand,
+  ].map(command => {
     console.log(command);
     commands.set(command.data.name, command);
     commandarray.push(command.data.toJSON());
