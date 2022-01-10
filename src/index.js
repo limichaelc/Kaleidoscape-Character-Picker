@@ -121,7 +121,7 @@ client.once("ready", () => {
 
   const threeStarCommand = {
     data: new SlashCommandBuilder()
-      .setName("3*")
+      .setName("3star")
       .setDescription("Picks a random character with 3* rarity"),
     execute: async (interaction, client) => {
       return pickRandom(interaction, threeStars);
@@ -130,7 +130,7 @@ client.once("ready", () => {
 
   const fourStarCommand = {
     data: new SlashCommandBuilder()
-      .setName("4*")
+      .setName("4star")
       .setDescription("Picks a random character with 4* rarity"),
     execute: async (interaction, client) => {
       return pickRandom(interaction, fourStars);
@@ -139,7 +139,7 @@ client.once("ready", () => {
 
   const fiveStarCommand = {
     data: new SlashCommandBuilder()
-      .setName("5*")
+      .setName("5star")
       .setDescription("Picks a random character with 5* rarity"),
     execute: async (interaction, client) => {
       return pickRandom(interaction, fiveStars);
