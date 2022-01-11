@@ -146,6 +146,15 @@ client.once("ready", () => {
     },
   };
 
+  const threeOrFourStarCommand = {
+    data: new SlashCommandBuilder()
+      .setName("3or4star")
+      .setDescription("Picks a random character with either 3* or 4* rarity"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, threeStars.concat(fourStars));
+    },
+  };
+
   [
     anyCommand,
     uniqueDragonCommand,
@@ -155,6 +164,7 @@ client.once("ready", () => {
     threeStarCommand,
     fourStarCommand,
     fiveStarCommand,
+    threeOrFourStarCommand,
   ].map(command => {
     console.log(command);
     commands.set(command.data.name, command);
