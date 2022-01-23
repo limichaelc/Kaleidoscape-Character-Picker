@@ -164,7 +164,7 @@ client.once("ready", () => {
     execute: async (interaction, client) => {
       return pickRandom(interaction, allAdventurers.filter(x => limited.includes(x)););
     }
-  }
+  };
 
   const limitedCommand = {
     data: new SlashCommandBuilder()
@@ -173,7 +173,7 @@ client.once("ready", () => {
     execute: async (interaction, client) => {
       return pickRandom(interaction, limited);
     }
-  }
+  };
 
   [
     anyCommand,
