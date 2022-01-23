@@ -169,7 +169,7 @@ client.once("ready", () => {
   const limitedCommand = {
     data: new SlashCommandBuilder()
       .setName("limited")
-      .setDescription("Picks a random character from the limited pool, including Gala, seasonal, and non-compendium welfare units"),
+      .setDescription("Picks a random character from the limited (Gala, seasonal, and non-compendium welfare) pool"),
     execute: async (interaction, client) => {
       return pickRandom(interaction, limited);
     }
