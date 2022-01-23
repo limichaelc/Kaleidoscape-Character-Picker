@@ -1,4 +1,4 @@
-const { allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, fiveStars } = require('./adventurers');
+const { allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, limited } = require('./adventurers');
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest"); // Define REST.
 const { Routes } = require("discord-api-types/v9"); // Define Routes.
@@ -95,27 +95,27 @@ client.once("ready", () => {
     },
   };
 
+  const meleeChecker = value => ['Sword', 'Blade', 'Dagger', 'Axe', 'Lance']
+    .some(element => value.includes(element));
+  const melee = allAdventurers.filter(meleeChecker);
   const meleeCommand = {
     data: new SlashCommandBuilder()
       .setName("melee")
       .setDescription("Picks a random melee character (axe, blade, dagger, lance, sword)"),
     execute: async (interaction, client) => {
-      const checker = value => ['Sword', 'Blade', 'Dagger', 'Axe', 'Lance']
-        .some(element => value.includes(element));
-      const filtered = allAdventurers.filter(checker);
-      return pickRandom(interaction, filtered);
+      return pickRandom(interaction, melee);
     },
   };
 
+  const rangedChecker = value => ['Wand', 'Bow', 'Staff', 'Manacaster']
+    .some(element => value.includes(element));
+  const ranged = allAdventurers.filter(rangedChecker);
   const rangedCommand = {
     data: new SlashCommandBuilder()
       .setName("ranged")
       .setDescription("Picks a random ranged character (wand, bow, staff, manacaster)"),
     execute: async (interaction, client) => {
-      const checker = value => ['Wand', 'Bow', 'Staff', 'Manacaster']
-        .some(element => value.includes(element));
-      const filtered = allAdventurers.filter(checker);
-      return pickRandom(interaction, filtered);
+      return pickRandom(interaction, ranged);
     },
   };
 
@@ -137,6 +137,8 @@ client.once("ready", () => {
     },
   };
 
+  const threeOrFourStars = threeStars.concat(fourStars);
+  const fiveStars = allAdventurers.filter(x => threeOrFourStars.includes(x));
   const fiveStarCommand = {
     data: new SlashCommandBuilder()
       .setName("5star")
@@ -151,9 +153,27 @@ client.once("ready", () => {
       .setName("3or4star")
       .setDescription("Picks a random character with either 3* or 4* rarity"),
     execute: async (interaction, client) => {
-      return pickRandom(interaction, threeStars.concat(fourStars));
+      return pickRandom(interaction, threeOrFourStars);
     },
   };
+
+  const permaCommand = {
+    data: new SlashCommandBuilder()
+      .setName("perma")
+      .setDescription("Picks a random character from the permanent pool"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, allAdventurers.filter(x => limited.includes(x)););
+    }
+  }
+
+  const limitedCommand = {
+    data: new SlashCommandBuilder()
+      .setName("limited")
+      .setDescription("Picks a random character from the limited pool, including Gala, seasonal, and non-compendium welfare units"),
+    execute: async (interaction, client) => {
+      return pickRandom(interaction, limited);
+    }
+  }
 
   [
     anyCommand,
@@ -165,6 +185,8 @@ client.once("ready", () => {
     fourStarCommand,
     fiveStarCommand,
     threeOrFourStarCommand,
+    permaCommand,
+    limitedCommand,
   ].map(command => {
     console.log(command);
     commands.set(command.data.name, command);
