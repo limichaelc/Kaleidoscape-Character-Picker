@@ -162,7 +162,7 @@ client.once("ready", () => {
       .setName("perma")
       .setDescription("Picks a random character from the permanent pool"),
     execute: async (interaction, client) => {
-      return pickRandom(interaction, allAdventurers.filter(x => limited.includes(x)););
+      return pickRandom(interaction, allAdventurers.filter(x => limited.includes(x));
     }
   };
 
