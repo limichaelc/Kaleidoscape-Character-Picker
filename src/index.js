@@ -5,9 +5,7 @@ const {Routes} = require("discord-api-types/v9"); // Define Routes.
 const {
   setupTables,
   markCompleted,
-  markIncomplete,
   addToBlocklist,
-  removeFromBlocklist,
 } = require('./db');
 const {ACTION_TYPE} = require('./consts');
 const {Client, Intents, MessageButton, MessageActionRow} = require("discord.js"); // Define Client, Intents, and Collection.
@@ -35,14 +33,8 @@ async function handleButtonInteraction(interaction) {
     case ACTION_TYPE.BLOCK:
       addToBlocklist(interaction, adventurer);
       break;
-    case ACTION_TYPE.UNBLOCK:
-      removeFromBlocklist(interaction, adventurer);
-      break;
     case ACTION_TYPE.COMPLETE:
       markCompleted(interaction, adventurer);
-      break;
-    case ACTION_TYPE.INCOMPLETE:
-      markIncomplete(interaction, adventurer);
       break;
     default:
       return;

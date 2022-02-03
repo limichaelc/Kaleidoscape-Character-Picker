@@ -1,9 +1,7 @@
 module.exports = {
   ACTION_TYPE: {
     COMPLETE: 'complete',
-    INCOMPLETE: 'incomplete',
     BLOCK: 'block',
-    UNBLOCK: 'unblock',
   },
   ALL_WEAPONS: ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'],
   ALL_ELEMENTS: ['flame', 'water', 'wind', 'light', 'shadow'],
@@ -17,5 +15,14 @@ module.exports = {
     WIND: '#61d37c',
     LIGHT: '#f5b642',
     SHADOW: '#9a46d6',
-  }
+  },
+  MANAGE_COMMAND_GROUPS: {
+    COMPLETED: 'completed',
+    BLOCKED: 'blocked',
+  },
+  MANAGE_SUBCOMMANDS: {
+    ADD: 'add',
+    REMOVE: 'remove',
+    CLEAR: 'clear',
+  },
 }

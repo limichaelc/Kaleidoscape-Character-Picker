@@ -1,31 +1,37 @@
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS} = require('./consts');
-const {sql, getQuery, search} = require('./db');
+const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS} = require('./consts');
+const {
+  sql,
+  getQuery,
+  search,
+  batchAddCompleted,
+  batchAddBlocked,
+  batchRemoveCompleted,
+  batchRemoveBlocked,
+  clearCompleted,
+  clearBlocked,
+} = require('./db');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
 
-function sendMessage(interaction, concatResult) {
+function sendMessage(interaction, concatResult, isFollowUp = false) {
   if (concatResult == undefined) {
     return interaction.reply(`Could not find an adventurer with those restrictions... Try allowing completed adventurers or removing some from your blocklist`);
   }
   const item = concatResult.concat;
   console.log(concatResult, item);
-  const adventurerName = item.split(',')[0];
+  const [adventurerName, element, _] = item.split(', ');
+  const embed = new MessageEmbed()
+    .setColor(COLORS[element.toUpperCase()])
+    .setTitle(item);
   const row = new MessageActionRow()
     .addComponents(
       new MessageButton()
         .setCustomId(ACTION_TYPE.COMPLETE)
         .setLabel('Mark complete')
         .setEmoji('✅')
-        .setStyle('SECONDARY'),
-    )
-    .addComponents(
-      new MessageButton()
-        .setCustomId(ACTION_TYPE.INCOMPLETE)
-        .setLabel('Mark incomplete')
-        .setEmoji('☑️')
         .setStyle('SECONDARY'),
     )
     .addComponents(
@@ -37,18 +43,12 @@ function sendMessage(interaction, concatResult) {
     )
     .addComponents(
       new MessageButton()
-        .setCustomId(ACTION_TYPE.UNBLOCK)
-        .setLabel('Unblock')
-        .setEmoji('🆗')
-        .setStyle('SECONDARY'),
-    )
-    .addComponents(
-      new MessageButton()
         .setLabel('Wiki')
         .setStyle('LINK')
         .setURL(`https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`),
     );
-  return interaction.reply({ content: item, components: [row] });
+  const message = { embeds: [embed], components: [row] };
+  return isFollowUp ? interaction.followUp(message): interaction.reply(message);
 }
 
 function commandBuilderBase() {
@@ -73,20 +73,101 @@ function simpleCommand(name, description, vars) {
   };
 }
 
+const addQueryOption = option =>
+  option.setName('query')
+    .setDescription('The search query, names (exact match, case insensitive), as a comma separated list')
+    .setRequired(true);
+
 const searchCommand = {
   data: new SlashCommandBuilder()
     .setName('search')
-    .setDescription('Search for particular characters by name (exact match), as a comma separated list')
-    .addStringOption(option =>
-      option.setName('query')
-        .setDescription('The search query, names (exact match), as a comma separated list')
-        .setRequired(true)),
+    .setDescription('Search for particular characters by name (exact match, case insensitive), as a comma separated list')
+    .addStringOption(addQueryOption),
   execute: async (interaction, _) => {
-    const query = await search(interaction);
-    // const [result] = await query;
-    // return sendMessage(interaction, concatResult);
+    const results = await search(interaction);
+    console.log(results);
+    if (results.length == 0) {
+      return interaction.reply('Could not find any adventurers with those names');
+    }
+    sendMessage(interaction, results[0]);
+    results.slice(1).map(result => sendMessage(interaction, result, true));
   },
 };
+
+const manageCommand = {
+  data: new SlashCommandBuilder()
+    .setName('manage')
+    .setDescription('Managed your personal adventurer database, including your completed and block lists')
+    .addSubcommandGroup(subcommandGroup =>
+      subcommandGroup
+        .setName(MANAGE_COMMAND_GROUPS.COMPLETED)
+        .setDescription('Managed your completed list')
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.ADD)
+            .setDescription('Add adventurers to your completed list')
+            .addStringOption(addQueryOption)
+        )
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.REMOVE)
+            .setDescription('Remove adventurers from your completed list')
+            .addStringOption(addQueryOption)
+        )
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.CLEAR)
+            .setDescription('Clear your completed list')
+        )
+    )
+    .addSubcommandGroup(subcommandGroup =>
+      subcommandGroup
+        .setName(MANAGE_COMMAND_GROUPS.BLOCKED)
+        .setDescription('Managed your blocklist')
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.ADD)
+            .setDescription('Add adventurers to your blocklist')
+            .addStringOption(addQueryOption)
+        )
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.REMOVE)
+            .setDescription('Remove adventurers from your blocklist')
+            .addStringOption(addQueryOption)
+        )
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName(MANAGE_SUBCOMMANDS.CLEAR)
+            .setDescription('Clear your blocklist')
+        )
+    ),
+  execute: async (interaction, _) => {
+    console.log(interaction);
+    const group = interaction.options.getSubcommandGroup();
+    const subcommand = interaction.options.getSubcommand();
+    switch (group) {
+      case MANAGE_COMMAND_GROUPS.COMPLETED:
+        switch (subcommand) {
+          case MANAGE_SUBCOMMANDS.ADD:
+            return await batchAddCompleted(interaction);
+          case MANAGE_SUBCOMMANDS.REMOVE:
+            return await batchRemoveCompleted(interaction);
+          case MANAGE_SUBCOMMANDS.CLEAR:
+            return await clearCompleted(interaction);
+        }
+      case MANAGE_COMMAND_GROUPS.BLOCKED:
+        switch (subcommand) {
+          case MANAGE_SUBCOMMANDS.ADD:
+            return await batchAddBlocked(interaction);
+          case MANAGE_SUBCOMMANDS.REMOVE:
+            return await batchRemoveBlocked(interaction);
+          case MANAGE_SUBCOMMANDS.CLEAR:
+            return await clearBlocked(interaction);
+        }
+    }
+  }
+}
 
 ALL_WEAPONS.map(weapon => {
   const command = {
@@ -287,6 +368,7 @@ function formatCounts(completedCount, totalCount) {
   completedCommand,
   blockedCommand,
   searchCommand,
+  manageCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
