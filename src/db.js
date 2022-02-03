@@ -182,6 +182,18 @@ async function markIncomplete(interaction, adventurer) {
   return interaction.reply(`Marked ${name} as incomplete (${numCompleted.count} completed)`);
 }
 
+async function search(interaction) {
+  const userID = interaction.user.id;
+  const query = interaction.options.getString('query').split(',').map(entry => entry.toLowerCase().trim())
+  console.log(query);
+  const completed = await sql`
+    SELECT * FROM adventurers
+    WHERE LOWER(name) = ANY(ARRAY[${query}])
+  `;
+  console.log(completed);
+  return interaction.reply(completed[0]);
+}
+
 module.exports = {
   sql,
   getQuery,
@@ -190,4 +202,5 @@ module.exports = {
   markIncomplete,
   addToBlocklist,
   removeFromBlocklist,
+  search,
 }

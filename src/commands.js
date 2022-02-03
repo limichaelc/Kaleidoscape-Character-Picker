@@ -1,7 +1,7 @@
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS} = require('./consts');
-const {sql, getQuery} = require('./db');
+const {sql, getQuery, search} = require('./db');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -72,6 +72,21 @@ function simpleCommand(name, description, vars) {
     }
   };
 }
+
+const searchCommand = {
+  data: new SlashCommandBuilder()
+    .setName('search')
+    .setDescription('Search for particular characters by name (exact match), as a comma separated list')
+    .addStringOption(option =>
+      option.setName('query')
+        .setDescription('The search query, names (exact match), as a comma separated list')
+        .setRequired(true)),
+  execute: async (interaction, _) => {
+    const query = await search(interaction);
+    // const [result] = await query;
+    // return sendMessage(interaction, concatResult);
+  },
+};
 
 ALL_WEAPONS.map(weapon => {
   const command = {
@@ -271,6 +286,7 @@ function formatCounts(completedCount, totalCount) {
   ),
   completedCommand,
   blockedCommand,
+  searchCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());

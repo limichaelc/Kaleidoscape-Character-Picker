@@ -51,9 +51,10 @@ async function handleButtonInteraction(interaction) {
 
 // Execute code when the "ready" client event is triggered.
 client.once("ready", async () => {
-  if (process.env.SETUP_TABLES) {
-    await setupTables();
-  }
+  console.log(process.env.SETUP_TABLES, Boolean(process.env.SETUP_TABLES));
+  // if (Boolean(process.env.SETUP_TABLES)) {
+  //   await setupTables();
+  // }
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.
