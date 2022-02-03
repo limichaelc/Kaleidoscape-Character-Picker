@@ -21,6 +21,7 @@ function getQuery(
       isLimited: ALL_BOOLEAN_OPTIONS,
       isDragonDrive: ALL_BOOLEAN_OPTIONS,
       hasUniqueDragon: ALL_BOOLEAN_OPTIONS,
+      limit: 1,
     },
     varOverrides,
   )
@@ -49,7 +50,7 @@ function getQuery(
         END
       )
     ) t
-      ORDER BY random() LIMIT 1
+      ORDER BY random() LIMIT ${vars.limit}
   `;
 }
 

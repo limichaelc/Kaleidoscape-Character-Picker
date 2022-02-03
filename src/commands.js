@@ -72,6 +72,22 @@ function simpleCommand(name, description, vars) {
     }
   };
 }
+
+const dailyCommand = {
+  data: commandBuilderBase()
+    .setName('daily')
+    .setDescription('Picks 3 random characters for daily skips',),
+  execute: async (interaction, _) => {
+    const query = getQuery(interaction, { limit: 3 });
+    const results = await query;
+    if (results.length == 0) {
+      return interaction.reply('Could not pick any adventurers');
+    }
+    sendMessage(interaction, results[0]);
+    results.slice(1).map(result => sendMessage(interaction, result, true));
+  }
+};
+
 const searchCommand = {
   data: new SlashCommandBuilder()
     .setName('search')
@@ -270,6 +286,10 @@ function statsCommand(name, description) {
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
       });
+      if (totalNumerator == 0) {
+        return;
+      }
+
       ALL_ELEMENTS.map(element => {
         const elementFilter = entry => entry.element.toLowerCase() == element.toLowerCase();
         const fields = ALL_WEAPONS.map(weapon => {
@@ -373,6 +393,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   blockedCommand,
   searchCommand,
   manageCommand,
+  dailyCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
