@@ -24,8 +24,13 @@ client.login(token).then().catch(reason => {
 async function handleButtonInteraction(interaction) {
   console.log(interaction);
   const buttonType = interaction.customId;
-  const adventurer = interaction.message.content;
+  const [embed] = interaction.embeds;
+  console.log(embed);
+  const adventurer = embed.message.content;
 
+  if (!allAdventurers.includes(adventurer)) {
+    return interaction.reply(`Could not find adventurer ${adventurer}`);
+  }
   switch (buttonType) {
     case ACTION_TYPE.BLOCK:
       addToBlocklist(interaction, adventurer);
