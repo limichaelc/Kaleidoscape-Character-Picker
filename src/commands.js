@@ -310,7 +310,8 @@ function formatPercentage(numerator, denominator) {
 }
 
 function formatCounts(completedCount, totalCount, isCompleted = false) {
-  return `${completedCount}/${totalCount} (${formatPercentage(completedCount, totalCount)})` + ((completedCount == totalCount && isCompleted) ? ' 🎖' : '');
+  console.log(completedCount, totalCount, isCompleted, completedCount == totalCount);
+  return (`${completedCount}/${totalCount} (${formatPercentage(completedCount, totalCount)})` + (completedCount == totalCount && isCompleted) ? ' 🎖' : '');
 }
 
 [
