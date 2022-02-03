@@ -26,9 +26,6 @@ async function handleButtonInteraction(interaction) {
   const buttonType = interaction.customId;
   const adventurer = interaction.message.content;
 
-  if (!allAdventurers.includes(adventurer)) {
-    return interaction.reply(`Could not find adventurer ${adventurer}`);
-  }
   switch (buttonType) {
     case ACTION_TYPE.BLOCK:
       addToBlocklist(interaction, adventurer);
