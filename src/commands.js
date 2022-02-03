@@ -265,7 +265,7 @@ function statsCommand(name, description) {
       const countReducer = (previousValue, currentValue) => previousValue + currentValue.count;
       const totalAdventurers = totalCounts.reduce(countReducer, 0);
       const totalNumerator = numeratorCounts.reduce(countReducer, 0);
-      const isCompleted = name == ACTION_TYPE.COMPLETE;
+      const isCompleted = name == 'completed';
 
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
