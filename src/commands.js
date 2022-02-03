@@ -293,7 +293,7 @@ function statsCommand(name, description) {
         const embed = new MessageEmbed()
           .setColor(COLORS[element.toUpperCase()])
           .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`)
-          .setAuthor(interaction.member.nickname ?? interaction.user.name)
+          .setAuthor(interaction.member?.nickname ?? interaction.user.name)
           .addFields(fields.filter(Boolean))
         interaction.followUp({ embeds: [embed] });
       });
