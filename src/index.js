@@ -22,11 +22,9 @@ client.login(token).then().catch(reason => {
 });
 
 async function handleButtonInteraction(interaction) {
-  console.log(interaction);
   const buttonType = interaction.customId;
-  const [embed] = interaction.embeds;
-  console.log(embed);
-  const adventurer = embed.message.content;
+  const [embed] = interaction.message.embeds;
+  const adventurer = embed.title;
 
   if (!allAdventurers.includes(adventurer)) {
     return interaction.reply(`Could not find adventurer ${adventurer}`);
