@@ -72,17 +72,14 @@ function simpleCommand(name, description, vars) {
     }
   };
 }
-
-const addQueryOption = option =>
-  option.setName('query')
-    .setDescription('The search query, names (exact match, case insensitive), as a comma separated list')
-    .setRequired(true);
-
 const searchCommand = {
   data: new SlashCommandBuilder()
     .setName('search')
-    .setDescription('Search for particular characters by name (exact match, case insensitive), as a comma separated list')
-    .addStringOption(addQueryOption),
+    .setDescription('Search for particular characters by name (case insensitive), as a comma separated list')
+    .addStringOption(option =>
+      option.setName('query')
+        .setDescription('The search query, names (fuzzy match, case insensitive), as a comma separated list')
+        .setRequired(true)),
   execute: async (interaction, _) => {
     const results = await search(interaction);
     console.log(results);
@@ -93,6 +90,12 @@ const searchCommand = {
     results.slice(1).map(result => sendMessage(interaction, result, true));
   },
 };
+
+
+const addQueryOption = option =>
+  option.setName('query')
+    .setDescription('The search query, names (exact match, case insensitive), as a comma separated list')
+    .setRequired(true);
 
 const manageCommand = {
   data: new SlashCommandBuilder()
@@ -262,6 +265,7 @@ function statsCommand(name, description) {
       const countReducer = (previousValue, currentValue) => previousValue + currentValue.count;
       const totalAdventurers = totalCounts.reduce(countReducer, 0);
       const totalNumerator = numeratorCounts.reduce(countReducer, 0);
+      const isCompleted = name == ACTION_TYPE.COMPLETE;
 
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
@@ -279,7 +283,7 @@ function statsCommand(name, description) {
           const numeratorCount = numeratorCounts.find(elementWeaponFinder)?.count ?? 0;
           const totalCount = totalCounts.find(elementWeaponFinder)?.count ?? 0;
           return {
-            name: `${capitalize(weapon)}: ${formatCounts(numeratorCount, totalCount)}`,
+            name: `${capitalize(weapon)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`,
             value: value.string_agg,
             inline: true,
           }
@@ -288,8 +292,8 @@ function statsCommand(name, description) {
         const totalCount = totalCounts.filter(elementFilter).reduce(countReducer, 0);
         const embed = new MessageEmbed()
           .setColor(COLORS[element.toUpperCase()])
-          .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount)}`)
-          .setAuthor(interaction.user.username)
+          .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`)
+          .setAuthor(interaction.member.nickname ?? interaction.user.name)
           .addFields(fields.filter(Boolean))
         interaction.followUp({ embeds: [embed] });
       });
@@ -305,8 +309,8 @@ function formatPercentage(numerator, denominator) {
   return `${(numerator / denominator * 100).toFixed(2)}%`;
 }
 
-function formatCounts(completedCount, totalCount) {
-  return `${completedCount}/${totalCount} (${formatPercentage(completedCount, totalCount)})`;
+function formatCounts(completedCount, totalCount, isCompleted = false) {
+  return `${completedCount}/${totalCount} (${formatPercentage(completedCount, totalCount)})` + ((completedCount == totalCount && isCompleted) ? ' 🎖' : '');
 }
 
 [
