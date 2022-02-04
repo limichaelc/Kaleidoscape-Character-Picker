@@ -13,6 +13,7 @@ const {
   clearBlocked,
   leaderboard,
 } = require('./db');
+const {helpCommand} = require('./help');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -457,6 +458,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   manageCommand,
   dailyCommand,
   leaderboardCommand,
+  helpCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
