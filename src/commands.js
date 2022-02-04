@@ -291,7 +291,15 @@ function statsCommand(name, description) {
   return {
     data: new SlashCommandBuilder()
       .setName(name)
-      .setDescription(description),
+      .setDescription(description)
+      .addStringOption(option =>
+        option.setName('visibility')
+          .setDescription('Whether to display the results to everyone or just yourself')
+          .addChoices([
+            ['everyone', 'everyone'],
+            ['me', 'me'],
+          ])
+      ),
     execute: async (interaction, _) => {
       const totalCounts = await sql`
         SELECT COUNT(*), element, weapon
@@ -328,9 +336,11 @@ function statsCommand(name, description) {
       const totalAdventurers = totalCounts.reduce(countReducer, 0);
       const totalNumerator = numeratorCounts.reduce(countReducer, 0);
       const isCompleted = name == 'completed';
+      const ephemeral = interaction.options.getString('visibility') !== 'everyone';
 
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
+        ephemeral,
       });
       if (totalNumerator == 0) {
         return;
@@ -355,13 +365,19 @@ function statsCommand(name, description) {
           }
         });
         const numeratorCount = numeratorCounts.filter(elementFilter).reduce(countReducer, 0);
+        if (numeratorCount == 0) {
+          return null;
+        }
         const totalCount = totalCounts.filter(elementFilter).reduce(countReducer, 0);
         const embed = new MessageEmbed()
           .setColor(COLORS[element.toUpperCase()])
           .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`)
           .setAuthor(interaction.member?.nickname ?? interaction.user.username)
           .addFields(fields.filter(Boolean))
-        interaction.followUp({ embeds: [embed] });
+        interaction.followUp({
+          embeds: [embed],
+          ephemeral,
+        });
       });
     }
   };
