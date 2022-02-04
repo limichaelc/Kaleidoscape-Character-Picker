@@ -349,14 +349,23 @@ async function fetchUser(interaction, id) {
   const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
   const guildID = interaction.guildId;
   if (guildID != null) {
-    const guildMember = await rest.get(Routes.guildMember(guildID, id));
-    const nickname = guildMember?.nick;
-    if (nickname != null) {
-      return nickname;
+    try {
+      const guildMember = await rest.get(Routes.guildMember(guildID, id));
+      const nickname = guildMember?.nick;
+      if (nickname != null) {
+        return nickname;
+      }
+    } catch (error) {
+      console.log(`Could not find guild member ${id} in ${guildID}`);
     }
   }
-  const user = await rest.get(Routes.user(id));
-  return user.username;
+  try {
+    const user = await rest.get(Routes.user(id));
+    return user.username;
+  } catch (error) {
+    console.log(`Could not find user ${id}`);
+    return null;
+  }
 }
 
 async function leaderboard(interaction) {

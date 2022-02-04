@@ -1053,7 +1053,7 @@ module.exports = {
       weapon: 'Lance',
     },
     {
-      id: ':100014_03',
+      id: '100014_03',
       name: 'Phares',
       element: 'Wind',
       weapon: 'Lance',
