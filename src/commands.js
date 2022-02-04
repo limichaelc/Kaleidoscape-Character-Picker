@@ -46,8 +46,20 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
     )
     .addComponents(
       new MessageButton()
+        .setCustomId(ACTION_TYPE.INCOMPLETE)
+        .setLabel('Mark incomplete')
+        .setStyle('SECONDARY'),
+    )
+    .addComponents(
+      new MessageButton()
         .setCustomId(ACTION_TYPE.BLOCK)
         .setLabel('Block')
+        .setStyle('SECONDARY'),
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId(ACTION_TYPE.UNBLOCK)
+        .setLabel('Unblock')
         .setStyle('SECONDARY'),
     );
   const message = { embeds: [embed], components: [row] };

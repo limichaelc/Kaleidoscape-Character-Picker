@@ -139,6 +139,26 @@ async function addToBlocklist(interaction, adventurer) {
   });
 }
 
+async function removeFromBlocklist(interaction, adventurer) {
+  const userID = interaction.user.id;
+  const [name, element, weapon] = adventurer.split(', ');
+  const [unblocked] = await sql`
+    DELETE FROM blocked
+    WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
+  `
+  console.log(unblocked);
+  const [numBlocked] = await sql`
+    SELECT COUNT(*)
+    FROM blocked
+    WHERE userID = ${userID}
+  `
+  console.log(numBlocked);
+  return interaction.reply({
+    content: `Removed ${name} from your blocklist (${numBlocked.count} blocked)`,
+    ephemeral: true,
+  });
+}
+
 async function markCompleted(interaction, adventurer) {
   const userID = interaction.user.id;
   const [name, element, weapon] = adventurer.split(', ');
@@ -157,6 +177,26 @@ async function markCompleted(interaction, adventurer) {
   console.log(numCompleted);
   return interaction.reply({
     content: `Marked ${name} as completed (${numCompleted.count} completed)`,
+    ephemeral: true,
+  });
+}
+
+async function markIncomplete(interaction, adventurer) {
+  const userID = interaction.user.id;
+  const [name, element, weapon] = adventurer.split(', ');
+  const [completed] = await sql`
+    DELETE FROM completed
+    WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
+  `
+  console.log(completed);
+  const [numCompleted] = await sql`
+    SELECT COUNT(*)
+    FROM completed
+    WHERE userID = ${userID}
+  `
+  console.log(numCompleted);
+  return interaction.reply({
+    content: `Marked ${name} as incomplete (${numCompleted.count} completed)`,
     ephemeral: true,
   });
 }
@@ -343,7 +383,9 @@ module.exports = {
   getQuery,
   setupTables,
   markCompleted,
+  markIncomplete,
   addToBlocklist,
+  removeFromBlocklist,
   search,
   batchAddCompleted,
   batchAddBlocked,

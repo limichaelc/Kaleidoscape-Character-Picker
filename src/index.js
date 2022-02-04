@@ -6,6 +6,8 @@ const {
   setupTables,
   markCompleted,
   addToBlocklist,
+  removeFromBlocklist,
+  markIncomplete,
 } = require('./db');
 const {ACTION_TYPE} = require('./consts');
 const {Client, Intents, MessageButton, MessageActionRow} = require("discord.js"); // Define Client, Intents, and Collection.
@@ -28,11 +30,13 @@ async function handleButtonInteraction(interaction) {
 
   switch (buttonType) {
     case ACTION_TYPE.BLOCK:
-      addToBlocklist(interaction, adventurer);
-      break;
+      return addToBlocklist(interaction, adventurer);
+    case ACTION_TYPE.UNBLOCK:
+      return removeFromBlocklist(interaction, adventurer);
     case ACTION_TYPE.COMPLETE:
-      markCompleted(interaction, adventurer);
-      break;
+      return markCompleted(interaction, adventurer);
+    case ACTION_TYPE.INCOMPLETE:
+      return markIncomplete(interaction, adventurer);
     default:
       return;
   }
