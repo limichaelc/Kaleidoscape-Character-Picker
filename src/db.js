@@ -156,7 +156,8 @@ function getSearchQuery(interaction, addWildcards = false) {
 }
 async function search(interaction) {
   return await sql`
-    SELECT CONCAT(name, ', ', element, ', ', weapon) FROM adventurers
+    SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
+    FROM adventurers
     WHERE name ILIKE ANY(ARRAY[${getSearchQuery(interaction, true)}])
   `;
 }
