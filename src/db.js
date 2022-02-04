@@ -1,5 +1,7 @@
 // db.js
-const postgres = require('postgres')
+const {REST} = require('@discordjs/rest')
+const {Routes} = require('discord-api-types/v9')
+const postgres = require('postgres');
 const {allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, limited} = require('./adventurers');
 const {
   ALL_WEAPONS,
@@ -160,6 +162,7 @@ function getSearchQuery(interaction, addWildcards = false) {
     return addWildcards ? `%${trimmed}%` : trimmed;
   });
 }
+
 async function search(interaction) {
   return await sql`
     SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
@@ -296,6 +299,39 @@ async function batchRemoveBlocked(interaction) {
   });
 }
 
+async function fetchUser(interaction, id) {
+  const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
+  const guildID = interaction.guildId;
+  if (guildID != null) {
+    const guildMember = await rest.get(Routes.guildMember(guildID, id));
+    const nickname = guildMember?.nick;
+    if (nickname != null) {
+      return nickname;
+    }
+  }
+  const user = await rest.get(Routes.user(id));
+  return user.username;
+}
+
+async function leaderboard(interaction) {
+  const leaderboard = await sql`
+    SELECT COUNT(*), userid FROM completed
+    GROUP BY userid
+    ORDER BY 1 DESC
+  `;
+  console.log(leaderboard);
+
+  const results = await Promise.all(leaderboard.map(async entry => {
+    const {count, userid} = entry;
+    const username = await fetchUser(interaction, userid);
+    if (username == null) {
+      return null;
+    }
+    return {count, username};
+  }));
+  return results.filter(Boolean);
+}
+
 module.exports = {
   sql,
   getQuery,
@@ -309,4 +345,5 @@ module.exports = {
   batchRemoveBlocked,
   clearCompleted,
   clearBlocked,
+  leaderboard,
 }

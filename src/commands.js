@@ -11,6 +11,7 @@ const {
   batchRemoveBlocked,
   clearCompleted,
   clearBlocked,
+  leaderboard,
 } = require('./db');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
@@ -109,6 +110,37 @@ const searchCommand = {
   },
 };
 
+const leaderboardCommand = {
+  data: new SlashCommandBuilder()
+    .setName('leaderboard')
+    .setDescription('Shows leaderboard by clears for all users of the bot'),
+  execute: async (interaction, _) => {
+    const entries = await leaderboard(interaction);
+    console.log(entries);
+    const fields = entries.map((entry, index) => {
+      var prefix = index + 1;
+      switch (index) {
+        case 0:
+          prefix = '🥇';
+          break;
+        case 1:
+          prefix = '🥈';
+          break;
+        case 2:
+          prefix = '🥉';
+          break;
+        default:
+          break;
+      }
+
+      return `${prefix}: ${entry.username} (${entry.count.toString()})`;
+    });
+    const embed = new MessageEmbed()
+      .setTitle('Leaderboard')
+      .setDescription(fields.join('\n'))
+    interaction.reply({ embeds: [embed] });
+  },
+};
 
 const addQueryOption = option =>
   option.setName('query')
@@ -396,6 +428,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   searchCommand,
   manageCommand,
   dailyCommand,
+  leaderboardCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
