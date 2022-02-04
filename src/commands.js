@@ -41,21 +41,13 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
       new MessageButton()
         .setCustomId(ACTION_TYPE.COMPLETE)
         .setLabel('Mark complete')
-        .setEmoji('✅')
         .setStyle('SECONDARY'),
     )
     .addComponents(
       new MessageButton()
         .setCustomId(ACTION_TYPE.BLOCK)
         .setLabel('Block')
-        .setEmoji('🚫')
         .setStyle('SECONDARY'),
-    )
-    .addComponents(
-      new MessageButton()
-        .setLabel('Wiki')
-        .setStyle('LINK')
-        .setURL(`https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`),
     );
   const message = { embeds: [embed], components: [row] };
   return isFollowUp ? interaction.followUp(message): interaction.reply(message);
