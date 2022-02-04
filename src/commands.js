@@ -102,11 +102,11 @@ const searchCommand = {
   execute: async (interaction, _) => {
     const results = await search(interaction);
     console.log(results);
+    interaction.reply(`Searching for *"${interaction.options.getString('query')}"*...`);
     if (results.length == 0) {
-      return interaction.reply('Could not find any adventurers with those names');
+      return interaction.followUp('Could not find any adventurers with those names');
     }
-    sendMessage(interaction, results[0]);
-    results.slice(1).map(result => sendMessage(interaction, result, true));
+    results.map(result => sendMessage(interaction, result, true));
   },
 };
 

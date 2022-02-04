@@ -5,6 +5,7 @@ module.exports = {
       name: 'Undercover Grace',
       element: 'Flame',
       weapon: 'Sword',
+      aliases: 'ugrace',
     },
     {
       id: '110359_01',
@@ -19,6 +20,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Sword',
       limited: true,
+      aliases: 'hberserker, hzerker',
     },
     {
       id: '110259_01',
@@ -59,6 +61,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Sword',
       rarity: 4,
+      aliases: 'euden, oof',
     },
     {
       id: '110052_03',
@@ -66,6 +69,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Sword',
       rarity: 3,
+      aliases: 'vorion',
     },
     {
       id: '110261_01',
@@ -79,6 +83,7 @@ module.exports = {
       name: 'Armored Yachiyo',
       element: 'Flame',
       weapon: 'Blade',
+      aliases: 'ayachiyo',
     },
     {
       id: '110346_01',
@@ -119,6 +124,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Dagger',
       limited: true,
+      aliases: 'smitsuhide',
     },
     {
       id: '100032_04',
@@ -126,6 +132,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Dagger',
       limited: true,
+      aliases: 'glaxi, galaxi',
     },
     {
       id: '110011_01',
@@ -167,6 +174,7 @@ module.exports = {
       name: 'Child Ranzal',
       element: 'Flame',
       weapon: 'Axe',
+      aliases: 'cranzal, crapzal',
     },
     {
       id: '100010_07',
@@ -175,6 +183,7 @@ module.exports = {
       weapon: 'Axe',
       uniqueDragon: true,
       limited: true,
+      aliases: 'hmym',
     },
     {
       id: '110263_01',
@@ -209,6 +218,7 @@ module.exports = {
       name: 'Kimono Elisanne',
       element: 'Flame',
       weapon: 'Lance',
+      aliases: 'kelly',
     },
     {
       id: '110357_01',
@@ -223,6 +233,7 @@ module.exports = {
       weapon: 'Lance',
       uniqueDragon: true,
       limited: true,
+      aliases: 'gmym',
     },
     {
       id: '110260_01',
@@ -251,6 +262,7 @@ module.exports = {
       name: 'Summer Alex',
       element: 'Flame',
       weapon: 'Bow',
+      aliases: 'salex',
     },
     {
       id: '110342_01',
@@ -271,6 +283,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Bow',
       rarity: 4,
+      aliases: 'vezelith',
     },
     {
       id: '110003_01',
@@ -284,6 +297,7 @@ module.exports = {
       name: 'Yukata Cleo',
       element: 'Flame',
       weapon: 'Wand',
+      aliases: 'ycleo',
     },
     {
       id: '110375_01',
@@ -297,6 +311,7 @@ module.exports = {
       name: 'Incognito Nefaria',
       element: 'Flame',
       weapon: 'Wand',
+      aliases: 'inefaria',
     },
     {
       id: '110354_01',
@@ -310,6 +325,7 @@ module.exports = {
       name: 'Student Maribelle',
       element: 'Flame',
       weapon: 'Wand',
+      aliases: 'smaribelle',
     },
     {
       id: '110009_01',
@@ -331,6 +347,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Staff',
       uniqueDragon: true,
+      aliases: 'twins, ayaoto',
     },
     {
       id: '110374_01',
@@ -344,12 +361,14 @@ module.exports = {
       name: 'Yukata Cassandra',
       element: 'Flame',
       weapon: 'Staff',
+      aliases: 'ycass',
     },
     {
       id: '110043_02',
       name: 'Valentine\'s Hildegarde',
       element: 'Flame',
       weapon: 'Staff',
+      aliases: 'vhildegarde',
     },
     {
       id: '110257_02',
@@ -358,6 +377,7 @@ module.exports = {
       weapon: 'Staff',
       rarity: 4,
       limited: true,
+      aliases: 'howen, hlowen',
     },
     {
       id: '110269_01',
@@ -379,6 +399,7 @@ module.exports = {
       element: 'Flame',
       weapon: 'Manacaster',
       limited: true,
+      aliases: 'dyilia',
     },
     {
       id: '110382_01',
@@ -393,6 +414,7 @@ module.exports = {
       weapon: 'Manacaster',
       uniqueDragon: true,
       limited: true,
+      aliases: 'gleonidas',
     },
     {
       id: '110313_03',
@@ -400,6 +422,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Sword',
       limited: true,
+      aliases: 'syasu',
     },
     {
       id: '110363_01',
@@ -412,6 +435,7 @@ module.exports = {
       name: 'Summer Celliera',
       element: 'Water',
       weapon: 'Sword',
+      aliases: 'scelly',
     },
     {
       id: '110022_01',
@@ -426,6 +450,7 @@ module.exports = {
       weapon: 'Sword',
       rarity: 4,
       limited: true,
+      aliases: 'hodetta',
     },
     {
       id: '110015_01',
@@ -446,6 +471,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Blade',
       limited: true,
+      aliases: 'gmascula',
     },
     {
       id: '110341_03',
@@ -453,6 +479,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Blade',
       limited: true,
+      aliases: 'hakasha, spooky bacon tits',
     },
     {
       id: '110295_01',
@@ -466,6 +493,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Blade',
       rarity: 4,
+      aliases: 'sranzal',
     },
     {
       id: '110252_01',
@@ -474,6 +502,7 @@ module.exports = {
       weapon: 'Blade',
       rarity: 4,
       limited: true,
+      aliases: 'celery',
     },
     {
       id: '110016_01',
@@ -488,6 +517,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Dagger',
       uniqueDragon: true,
+      aliases: 'hmercury',
     },
     {
       id: '110360_01',
@@ -509,6 +539,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Dagger',
       limited: true,
+      aliases: 'dycleo',
     },
     {
       id: '110265_01',
@@ -549,12 +580,14 @@ module.exports = {
       element: 'Water',
       weapon: 'Axe',
       limited: true,
+      aliases: 'gelly',
     },
     {
       id: '110042_02',
       name: 'Summer Julietta',
       element: 'Water',
       weapon: 'Axe',
+      aliases: 'sjuli',
     },
     {
       id: '110018_01',
@@ -582,6 +615,7 @@ module.exports = {
       name: 'Faeblessed Tobias',
       element: 'Water',
       weapon: 'Lance',
+      aliases: 'faebias',
     },
     {
       id: '110364_01',
@@ -615,6 +649,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Lance',
       rarity: 4,
+      aliases: 'elly',
     },
     {
       id: '110058_01',
@@ -642,6 +677,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Bow',
       limited: true,
+      aliases: 'hsarisse',
     },
     {
       id: '110317_01',
@@ -656,6 +692,7 @@ module.exports = {
       weapon: 'Bow',
       rarity: 4,
       limited: true,
+      aliases: 'dynefaria',
     },
     {
       id: '110013_01',
@@ -669,6 +706,7 @@ module.exports = {
       name: 'Forager Cleo',
       element: 'Water',
       weapon: 'Wand',
+      aliases: 'fleo, fcleo',
     },
     {
       id: '110362_01',
@@ -704,6 +742,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Wand',
       rarity: 4,
+      aliases: 'sestelle',
     },
     {
       id: '110022_02',
@@ -712,6 +751,7 @@ module.exports = {
       weapon: 'Wand',
       rarity: 4,
       limited: true,
+      aliases: 'dyxander',
     },
     {
       id: '110396_01',
@@ -726,12 +766,14 @@ module.exports = {
       element: 'Water',
       weapon: 'Staff',
       limited: true,
+      aliases: 'dylily',
     },
     {
       id: '110351_01',
       name: 'Jiang Ziya',
       element: 'Water',
       weapon: 'Staff',
+      aliases: 'jz',
     },
     {
       id: '110029_02',
@@ -739,6 +781,7 @@ module.exports = {
       element: 'Water',
       weapon: 'Staff',
       rarity: 4,
+      aliases: 'naeleen',
     },
     {
       id: '110019_01',
@@ -759,6 +802,7 @@ module.exports = {
       name: 'Sharpshooter Sarisse',
       element: 'Water',
       weapon: 'Manacaster',
+      aliases: 'fortnite',
     },
     {
       id: '110376_01',
@@ -794,12 +838,14 @@ module.exports = {
       element: 'Wind',
       weapon: 'Sword',
       limited: true,
+      aliases: 'gleif',
     },
     {
       id: '100002_06',
       name: 'Wedding Elisanne',
       element: 'Wind',
       weapon: 'Sword',
+      aliases: 'welly',
     },
     {
       id: '100003_07',
@@ -807,6 +853,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Sword',
       limited: true,
+      aliases: 'granzal',
     },
     {
       id: '110038_02',
@@ -814,6 +861,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Sword',
       rarity: 4,
+      aliases: 'thope',
     },
     {
       id: '110315_01',
@@ -833,12 +881,14 @@ module.exports = {
       name: 'Yukata Lathna',
       element: 'Wind',
       weapon: 'Blade',
+      aliases: 'ylathna',
     },
     {
       id: '110296_02',
       name: 'Forager Mitsuba',
       element: 'Wind',
       weapon: 'Blade',
+      aliases: 'fmitsuba',
     },
     {
       id: '110352_01',
@@ -880,6 +930,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Dagger',
       limited: true,
+      aliases: 'dynevin',
     },
     {
       id: '100007_07',
@@ -888,18 +939,21 @@ module.exports = {
       weapon: 'Dagger',
       dragonDrive: true,
       limited: true,
+      aliases: 'gnotte',
     },
     {
       id: '110066_02',
       name: 'Summer Norwin',
       element: 'Wind',
       weapon: 'Dagger',
+      aliases: 'snorwin',
     },
     {
       id: '110002_02',
       name: 'Wedding Aoi',
       element: 'Wind',
       weapon: 'Dagger',
+      aliases: 'waoi',
     },
     {
       id: '110314_01',
@@ -927,6 +981,7 @@ module.exports = {
       name: 'Kimono Luca',
       element: 'Wind',
       weapon: 'Axe',
+      aliases: 'kluca',
     },
     {
       id: '110041_02',
@@ -941,6 +996,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Axe',
       limited: true,
+      aliases: 'velody',
     },
     {
       id: '110268_01',
@@ -982,6 +1038,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Lance',
       limited: true,
+      aliases: 'hmelsa',
     },
     {
       id: '110353_01',
@@ -994,6 +1051,13 @@ module.exports = {
       name: 'Sylas',
       element: 'Wind',
       weapon: 'Lance',
+    },
+    {
+      id: ':100014_03',
+      name: 'Phares',
+      element: 'Wind',
+      weapon: 'Lance',
+      dragonDrive: true,
     },
     {
       id: '110302_01',
@@ -1016,6 +1080,7 @@ module.exports = {
       weapon: 'Bow',
       uniqueDragon: true,
       limited: true,
+      aliases: 'hmiddy, hmids',
     },
     {
       id: '110342_03',
@@ -1023,6 +1088,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Bow',
       limited: true,
+      aliases: 'vchelsea',
     },
     {
       id: '110368_01',
@@ -1080,6 +1146,7 @@ module.exports = {
       name: 'Summer Sinoa',
       element: 'Wind',
       weapon: 'Wand',
+      aliases: 'ssinoa',
     },
     {
       id: '110032_01',
@@ -1093,6 +1160,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Wand',
       limited: true,
+      aliases: 'dyxainfried',
     },
     {
       id: '110340_01',
@@ -1113,12 +1181,14 @@ module.exports = {
       name: 'Formal Noelle',
       element: 'Wind',
       weapon: 'Staff',
+      aliases: 'fnoelle',
     },
     {
       id: '110341_01',
       name: 'Akasha',
       element: 'Wind',
       weapon: 'Staff',
+      aliases: 'bacon tits',
     },
     {
       id: '110004_02',
@@ -1126,6 +1196,7 @@ module.exports = {
       element: 'Wind',
       weapon: 'Staff',
       rarity: 4,
+      aliases: 'wania',
     },
     {
       id: '110257_01',
@@ -1158,12 +1229,14 @@ module.exports = {
       name: 'Formal Joachim',
       element: 'Wind',
       weapon: 'Manacaster',
+      aliases: 'fjoachim',
     },
     {
       id: '100018_07',
       name: 'Civilian Leif',
       element: 'Light',
       weapon: 'Sword',
+      aliases: 'cleif',
     },
     {
       id: '110371_01',
@@ -1177,6 +1250,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Sword',
       limited: true,
+      aliases: 'goof, gala euden',
     },
     {
       id: '110327_01',
@@ -1210,12 +1284,14 @@ module.exports = {
       element: 'Light',
       weapon: 'Blade',
       uniqueDragon: true,
+      aliases: 'hjupiter',
     },
     {
       id: '110369_01',
       name: 'Mordecai',
       element: 'Light',
       weapon: 'Blade',
+      aliases: 'morty',
     },
     {
       id: '100006_09',
@@ -1223,12 +1299,14 @@ module.exports = {
       element: 'Light',
       weapon: 'Blade',
       limited: true,
+      aliases: 'gluca',
     },
     {
       id: '110015_02',
       name: 'Beautician Zardin',
       element: 'Light',
       weapon: 'Blade',
+      aliases: 'bardin',
     },
     {
       id: '110348_01',
@@ -1237,6 +1315,7 @@ module.exports = {
       weapon: 'Blade',
       rarity: 4,
       limited: true,
+      aliases: 'hanabussy',
     },
     {
       id: '110064_01',
@@ -1252,6 +1331,7 @@ module.exports = {
       weapon: 'Blade',
       rarity: 3,
       limited: true,
+      aliases: 'hedward',
     },
     {
       id: '110393_01',
@@ -1265,6 +1345,7 @@ module.exports = {
       name: 'Yukata Curran',
       element: 'Light',
       weapon: 'Dagger',
+      aliases: 'ycurran, ycurry',
     },
     {
       id: '110324_01',
@@ -1307,6 +1388,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Axe',
       limited: true,
+      aliases: 'gaudric',
     },
     {
       id: '110380_01',
@@ -1328,6 +1410,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Axe',
       limited: true,
+      aliases: 'dymalora',
     },
     {
       id: '110042_01',
@@ -1336,11 +1419,19 @@ module.exports = {
       weapon: 'Axe',
     },
     {
+      id: '100016_03',
+      name: 'Valyx',
+      element: 'Light',
+      weapon: 'Axe',
+      uniqueDragon: true,
+    },
+    {
       id: '100006_03',
       name: 'Summer Luca',
       element: 'Light',
       weapon: 'Axe',
       rarity: 4,
+      aliases: 'sluca',
     },
     {
       id: '110033_01',
@@ -1367,6 +1458,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Lance',
       limited: true,
+      aliases: 'hnessa, hvanesaa',
     },
     {
       id: '100002_02',
@@ -1374,6 +1466,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Lance',
       limited: true,
+      aliases: 'helly, helisanne',
     },
     {
       id: '110275_01',
@@ -1413,12 +1506,14 @@ module.exports = {
       name: 'Summer Mikoto',
       element: 'Light',
       weapon: 'Bow',
+      aliases: 'skoto',
     },
     {
       id: '100004_04',
       name: 'Summer Cleo',
       element: 'Light',
       weapon: 'Bow',
+      aliases: 'sleo',
     },
     {
       id: '110303_01',
@@ -1455,12 +1550,14 @@ module.exports = {
       element: 'Light',
       weapon: 'Wand',
       uniqueDragon: true,
+      aliases: 'schelle',
     },
     {
       id: '110299_02',
       name: 'Radiant Xuan Zang',
       element: 'Light',
       weapon: 'Wand',
+      aliases: 'rxz',
     },
     {
       id: '110361_01',
@@ -1482,6 +1579,7 @@ module.exports = {
       weapon: 'Wand',
       rarity: 4,
       limited: true,
+      aliases: 'cheetos',
     },
     {
       id: '110041_01',
@@ -1503,6 +1601,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Staff',
       limited: true,
+      aliases: 'gzena',
     },
     {
       id: '110043_01',
@@ -1516,6 +1615,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Staff',
       dragonDrive: true,
+      aliases: 'knotte, kimonotte',
     },
     {
       id: '110277_01',
@@ -1539,6 +1639,7 @@ module.exports = {
       weapon: 'Staff',
       rarity: 4,
       limited: true,
+      aliases: 'halthemia',
     },
     {
       id: '110063_01',
@@ -1560,6 +1661,7 @@ module.exports = {
       element: 'Light',
       weapon: 'Manacaster',
       limited: true,
+      aliases: 'hlaxi',
     },
     {
       id: '110384_01',
@@ -1592,6 +1694,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Sword',
       limited: true,
+      aliases: 'galex',
     },
     {
       id: '110325_01',
@@ -1612,6 +1715,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Sword',
       rarity: 4,
+      aliases: 'zerker',
     },
     {
       id: '110046_01',
@@ -1627,6 +1731,7 @@ module.exports = {
       weapon: 'Blade',
       dragonDrive: true,
       limited: true,
+      aliases: 'gethia',
     },
     {
       id: '110271_01',
@@ -1676,6 +1781,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Dagger',
       limited: true,
+      aliases: 'summer euden, soof',
     },
     {
       id: '110377_01',
@@ -1738,18 +1844,21 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Axe',
       limited: true,
+      aliases: 'dyvictor',
     },
     {
       id: '110335_02',
       name: 'Summer Patia',
       element: 'Shadow',
       weapon: 'Axe',
+      aliases: 'spatia',
     },
     {
       id: '110281_01',
       name: 'Curran',
       element: 'Shadow',
       weapon: 'Axe',
+      aliases: 'curry',
     },
     {
       id: '110311_01',
@@ -1779,6 +1888,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Lance',
       dragonDrive: true,
+      aliases: 'sleonidas',
     },
     {
       id: '110349_01',
@@ -1821,12 +1931,14 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Bow',
       limited: true,
+      aliases: 'hsylas',
     },
     {
       id: '110018_02',
       name: 'Opera Karina',
       element: 'Shadow',
       weapon: 'Bow',
+      aliases: 'okarina, operina',
     },
     {
       id: '100015_04',
@@ -1840,6 +1952,7 @@ module.exports = {
       name: 'Valentine\'s Addis',
       element: 'Shadow',
       weapon: 'Bow',
+      aliases: 'vaddis',
     },
     {
       id: '110053_01',
@@ -1878,6 +1991,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Wand',
       limited: true,
+      aliases: 'gleo',
     },
     {
       id: '110333_01',
@@ -1911,6 +2025,7 @@ module.exports = {
       name: 'Summer Verica',
       element: 'Shadow',
       weapon: 'Staff',
+      aliases: 'sverica',
     },
     {
       id: '110280_01',
@@ -1938,6 +2053,7 @@ module.exports = {
       element: 'Shadow',
       weapon: 'Manacaster',
       dragonDrive: true,
+      aliases: 'smym',
     },
     {
       id: '100015_05',
@@ -1946,6 +2062,7 @@ module.exports = {
       weapon: 'Manacaster',
       uniqueDragon: true,
       limited: true,
+      aliases: 'gchelle',
     },
   ],
 }

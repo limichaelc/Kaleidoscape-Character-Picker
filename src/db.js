@@ -87,29 +87,34 @@ async function setupTables() {
         rarity int,
         limited boolean,
         dragondrive boolean,
-        unique_shapeshift boolean
+        unique_shapeshift boolean,
+        aliases text
       );
     `,
   ]);
-
-  await Promise.all(
-    allAdventurers.map(adventurer => {
-      const {id, name, element, weapon, rarity, uniqueDragon, dragonDrive, limited} = adventurer;
-      return sql`
-        INSERT INTO adventurers(id, name, element, weapon, rarity, limited, dragondrive, unique_shapeshift)
-        VALUES(
-          ${id},
-          ${name},
-          ${element},
-          ${weapon},
-          ${rarity ?? 5},
-          ${limited ?? false},
-          ${dragonDrive ?? false},
-          ${uniqueDragon ?? false}
-        )
-      `;
-    }),
-  );
+  try {
+    await Promise.all(
+      allAdventurers.map(adventurer => {
+        const {id, name, element, weapon, rarity, limited, dragonDrive, uniqueDragon, aliases} = adventurer;
+        return sql`
+          INSERT INTO adventurers(id, name, element, weapon, rarity, limited, dragondrive, unique_shapeshift, aliases)
+          VALUES(
+            ${id},
+            ${name},
+            ${element},
+            ${weapon},
+            ${rarity ?? 5},
+            ${limited ?? false},
+            ${dragonDrive ?? false},
+            ${uniqueDragon ?? false},
+            ${aliases}
+          )
+        `;
+      }),
+    );
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function addToBlocklist(interaction, adventurer) {
@@ -164,10 +169,11 @@ function getSearchQuery(interaction, addWildcards = false) {
 }
 
 async function search(interaction) {
+  const query = getSearchQuery(interaction, true)
   return await sql`
     SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
     FROM adventurers
-    WHERE name ILIKE ANY(ARRAY[${getSearchQuery(interaction, true)}])
+    WHERE name ILIKE ANY(ARRAY[${query}]) OR aliases ILIKE ANY(ARRAY[${query}])
   `;
 }
 
