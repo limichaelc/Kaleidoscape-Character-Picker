@@ -126,7 +126,10 @@ async function addToBlocklist(interaction, adventurer) {
     WHERE userID = ${userID}
   `
   console.log(numBlocked);
-  return interaction.reply(`Added ${name} to your blocklist (${numBlocked.count} blocked)`);
+  return interaction.reply({
+    content: `Added ${name} to your blocklist (${numBlocked.count} blocked)`,
+    ephemeral: true,
+  });
 }
 
 async function markCompleted(interaction, adventurer) {
@@ -145,7 +148,10 @@ async function markCompleted(interaction, adventurer) {
     WHERE userID = ${userID}
   `
   console.log(numCompleted);
-  return interaction.reply(`Marked ${name} as completed (${numCompleted.count} completed)`);
+  return interaction.reply({
+    content: `Marked ${name} as completed (${numCompleted.count} completed)`,
+    ephemeral: true,
+  });
 }
 
 function getSearchQuery(interaction, addWildcards = false) {
@@ -172,7 +178,10 @@ async function clearCompleted(interaction) {
     )
     SELECT COUNT(*) FROM rows
   `;
-  return interaction.reply(`Cleared your completed list (${removed.count} removed)`);
+  return interaction.reply({
+    content: `Cleared your completed list (${removed.count} removed)`,
+    ephemeral: true
+  });
 }
 
 async function batchAddCompleted(interaction) {
@@ -193,7 +202,10 @@ async function batchAddCompleted(interaction) {
     FROM completed
     WHERE userID = ${userID}
   `;
-  return interaction.reply(`Marked ${added.count} new adventurers as complete (${numCompleted.count} completed total)`);
+  return interaction.reply({
+    content: `Marked ${added.count} new adventurers as complete (${numCompleted.count} completed total)`,
+    ephemeral: true
+  });
 }
 
 async function batchRemoveCompleted(interaction) {
@@ -214,7 +226,10 @@ async function batchRemoveCompleted(interaction) {
     FROM completed
     WHERE userID = ${userID}
   `;
-  return interaction.reply(`Removed ${removed.count} adventurers from completed list (${numCompleted.count} completed total)`);
+  return interaction.reply({
+    content: `Removed ${removed.count} adventurers from completed list (${numCompleted.count} completed total)`,
+    ephemeral: true
+  });
 }
 
 async function clearBlocked(interaction) {
@@ -227,7 +242,10 @@ async function clearBlocked(interaction) {
     )
     SELECT COUNT(*) FROM rows
   `;
-  return interaction.reply(`Cleared your blocklist (${removed.count} removed)`);
+  return interaction.reply({
+    content: `Cleared your blocklist (${removed.count} removed)`,
+    ephemeral: true
+  });
 }
 
 async function batchAddBlocked(interaction) {
@@ -248,7 +266,10 @@ async function batchAddBlocked(interaction) {
     FROM blocked
     WHERE userID = ${userID}
   `;
-  return interaction.reply(`Blocked ${added.count} new adventurers (${numBlocked.count} blocked total)`);
+  return interaction.reply({
+    content: `Blocked ${added.count} new adventurers (${numBlocked.count} blocked total)`,
+    ephemeral: true,
+  });
 }
 
 async function batchRemoveBlocked(interaction) {
@@ -269,7 +290,10 @@ async function batchRemoveBlocked(interaction) {
     FROM blocked
     WHERE userID = ${userID}
   `;
-  return interaction.reply(`Removed ${removed.count} adventurers from block list (${numBlocked.count} blocked total)`);
+  return interaction.reply({
+    content: `Removed ${removed.count} adventurers from block list (${numBlocked.count} blocked total)`,
+    ephemeral: true
+  });
 }
 
 module.exports = {
