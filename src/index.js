@@ -24,11 +24,8 @@ client.login(token).then().catch(reason => {
 async function handleButtonInteraction(interaction) {
   const buttonType = interaction.customId;
   const [embed] = interaction.message.embeds;
-  const adventurer = embed.title;
+  const adventurer = [embed.title, embed.description].join(', ');
 
-  if (!allAdventurers.includes(adventurer)) {
-    return interaction.reply(`Could not find adventurer ${adventurer}`);
-  }
   switch (buttonType) {
     case ACTION_TYPE.BLOCK:
       addToBlocklist(interaction, adventurer);
@@ -44,9 +41,9 @@ async function handleButtonInteraction(interaction) {
 // Execute code when the "ready" client event is triggered.
 client.once("ready", async () => {
   console.log(process.env.SETUP_TABLES, Boolean(process.env.SETUP_TABLES));
-  // if (Boolean(process.env.SETUP_TABLES)) {
-  //   await setupTables();
-  // }
+  if (process.env.SETUP_TABLES == 'true') {
+    await setupTables();
+  }
 
   const rest = new REST({ version: "9" }).setToken(token); // Define "rest" for use in registering commands
   // Register slash commands.

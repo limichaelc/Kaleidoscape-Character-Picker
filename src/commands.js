@@ -22,10 +22,20 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
   }
   const item = concatResult.concat;
   console.log(concatResult, item);
-  const [adventurerName, element, _] = item.split(', ');
-  const embed = new MessageEmbed()
-    .setColor(COLORS[element.toUpperCase()])
-    .setTitle(item);
+  const [id, rarity, adventurerName, element, weapon] = item.split(', ');
+  const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
+  const embed = {
+    "type": "rich",
+    "title": adventurerName,
+    "description": [element, weapon].join(', '),
+    "color": COLORS[element.toUpperCase()],
+    "thumbnail": {
+      "url": `https://dragalialost.wiki/thumb.php?f=${id}_r0${rarity}.png&width=140`,
+      "height": 0,
+      "width": 0,
+    },
+    "url": wikiURL,
+  }
   const row = new MessageActionRow()
     .addComponents(
       new MessageButton()

@@ -27,20 +27,11 @@ function getQuery(
   )
   const allowCompleted = interaction.options.getBoolean('allow_completed') ?? false;
   return sql`
-    SELECT * FROM (
-      SELECT CONCAT(name, ', ', element, ', ', weapon)
-      FROM adventurers
-      WHERE (${vars.element} = '' OR element ILIKE ${vars.element})
-      AND weapon ILIKE ANY(ARRAY[${vars.weapons}])
-      AND rarity = ANY(ARRAY[${vars.rarities}])
-      AND limited = ANY(ARRAY[${vars.isLimited}])
-      AND dragondrive = ANY(ARRAY[${vars.isDragonDrive}])
-      AND unique_shapeshift = ANY(ARRAY[${vars.hasUniqueDragon}])
-      EXCEPT
+    WITH exclude AS (
       SELECT CONCAT(name, ', ', element, ', ', weapon)
       FROM blocked
       WHERE userid = ${interaction.user.id}
-      EXCEPT
+      UNION ALL
       SELECT CONCAT(name, ', ', element, ', ', weapon)
       FROM completed
       WHERE userid = (
@@ -49,6 +40,17 @@ function getQuery(
           ELSE ${interaction.user.id}
         END
       )
+    )
+    SELECT * FROM (
+      SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
+      FROM adventurers
+      WHERE (${vars.element} = '' OR element ILIKE ${vars.element})
+      AND weapon ILIKE ANY(ARRAY[${vars.weapons}])
+      AND rarity = ANY(ARRAY[${vars.rarities}])
+      AND limited = ANY(ARRAY[${vars.isLimited}])
+      AND dragondrive = ANY(ARRAY[${vars.isDragonDrive}])
+      AND unique_shapeshift = ANY(ARRAY[${vars.hasUniqueDragon}])
+      AND CONCAT(name, ', ', element, ', ', weapon) NOT IN (SELECT * FROM exclude)
     ) t
       ORDER BY random() LIMIT ${vars.limit}
   `;
@@ -76,7 +78,8 @@ async function setupTables() {
     `,
     sql`
       CREATE TABLE IF NOT EXISTS adventurers(
-        name text PRIMARY KEY,
+        id text PRIMARY KEY,
+        name text,
         element text,
         weapon text,
         rarity int,
@@ -89,22 +92,18 @@ async function setupTables() {
 
   await Promise.all(
     allAdventurers.map(adventurer => {
-      const [name, element, weapon] = adventurer.split(', ');
-      const rarity = threeStars.includes(adventurer)
-        ? 3
-        : fourStars.includes(adventurer)
-        ? 4
-        : 5;
+      const {id, name, element, weapon, rarity, uniqueDragon, dragonDrive, limited} = adventurer;
       return sql`
-        INSERT INTO adventurers(name, element, weapon, rarity, limited, dragondrive, unique_shapeshift)
+        INSERT INTO adventurers(id, name, element, weapon, rarity, limited, dragondrive, unique_shapeshift)
         VALUES(
+          ${id},
           ${name},
           ${element},
           ${weapon},
-          ${rarity},
-          ${limited.includes(adventurer)},
-          ${dragonDrive.includes(adventurer)},
-          ${uniqueDragon.includes(adventurer)}
+          ${rarity ?? 5},
+          ${limited ?? false},
+          ${dragonDrive ?? false},
+          ${uniqueDragon ?? false}
         )
       `;
     }),
