@@ -118,7 +118,7 @@ const leaderboardCommand = {
     const entries = await leaderboard(interaction);
     console.log(entries);
     const fields = entries.map((entry, index) => {
-      var prefix = index + 1;
+      var prefix = prefix = `(${index + 1})`;
       switch (index) {
         case 0:
           prefix = '🥇';
