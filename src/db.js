@@ -132,7 +132,7 @@ async function setupTables() {
 async function logCommand(interaction, command, options = '') {
   const userID = interaction.user.id;
   const guildName = interaction.guild?.name;
-  const allowCompleted = interaction.options.getBoolean('allow_completed');
+  const allowCompleted = interaction.options?.getBoolean('allow_completed');
   await sql`
     INSERT INTO logging(timestamp, guildName, userid, command, options)
     VALUES(NOW(), ${guildName}, ${userID}, ${command}, ${options + (allowCompleted != null ? (' ' + allowCompleted) : '')})
