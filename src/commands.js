@@ -1,3 +1,5 @@
+// 'use strict';
+
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS} = require('./consts');
@@ -23,7 +25,6 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
     return interaction.reply(`Could not find an adventurer with those restrictions... Try allowing completed adventurers or removing some from your blocklist`);
   }
   const item = concatResult.concat;
-  console.log(concatResult, item);
   const [id, rarity, adventurerName, element, weapon] = item.split(', ');
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
   const embed = {
@@ -114,7 +115,6 @@ const searchCommand = {
         .setRequired(true)),
   execute: async (interaction, _) => {
     const results = await search(interaction);
-    console.log(results);
     interaction.reply(`Searching for *"${interaction.options.getString('query')}"*...`);
     if (results.length == 0) {
       return interaction.followUp('Could not find any adventurers with those names');
@@ -129,7 +129,6 @@ const leaderboardCommand = {
     .setDescription('Shows leaderboard by clears for all users of the bot'),
   execute: async (interaction, _) => {
     const entries = await leaderboard(interaction);
-    console.log(entries);
     const fields = entries.map((entry, index) => {
       var prefix = prefix = `(${index + 1})`;
       switch (index) {
@@ -209,7 +208,6 @@ const manageCommand = {
         )
     ),
   execute: async (interaction, _) => {
-    console.log(interaction);
     const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
     switch (group) {
@@ -268,7 +266,6 @@ ALL_ELEMENTS.map(element => {
           .addChoices(ALL_WEAPONS.map(weapon => [weapon, weapon]))),
     execute: async (interaction, _) => {
       const weapon = interaction.options.getString('weapon') ?? '';
-      console.log(weapon);
       const query = getQuery(interaction, { element, weapons: weapon != '' ? [weapon] : ALL_WEAPONS });
       const [concatResult] = await query;
       return sendMessage(interaction, concatResult);

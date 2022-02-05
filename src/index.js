@@ -1,3 +1,5 @@
+// 'use strict';
+
 const {allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, limited} = require('./adventurers');
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {REST} = require("@discordjs/rest"); // Define REST.
@@ -17,7 +19,6 @@ const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 }); // Connect to our discord bot.
 const token = process.env.DISCORD_TOKEN; // Token from Railway Env Variable.
-console.log("logging in");
 client.login(token).then().catch(reason => {
     console.log("Login failed: " + reason);
     console.log("Token used: " + token);
@@ -44,7 +45,6 @@ async function handleButtonInteraction(interaction) {
 
 // Execute code when the "ready" client event is triggered.
 client.once("ready", async () => {
-  console.log(process.env.SETUP_TABLES, Boolean(process.env.SETUP_TABLES));
   if (process.env.SETUP_TABLES == 'true') {
     await setupTables();
   }
@@ -69,14 +69,11 @@ client.once("ready", async () => {
 
 // Command handler.
 client.on("interactionCreate", async interaction => {
-  console.log('hello!', interaction);
   if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
   }
   if (!interaction.isCommand()) return;
   const command = commands.get(interaction.commandName);
-  console.log(command);
-  console.log(interaction);
 
   if (!command) return;
 

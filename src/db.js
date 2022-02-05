@@ -1,4 +1,5 @@
-// db.js
+// 'use strict';
+
 const {REST} = require('@discordjs/rest')
 const {Routes} = require('discord-api-types/v9')
 const postgres = require('postgres');
@@ -126,13 +127,11 @@ async function addToBlocklist(interaction, adventurer) {
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
-  console.log(blocked);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
     WHERE userID = ${userID}
   `
-  console.log(numBlocked);
   return interaction.reply({
     content: `Added ${name} to your blocklist (${numBlocked.count} blocked)`,
     ephemeral: true,
@@ -146,13 +145,11 @@ async function removeFromBlocklist(interaction, adventurer) {
     DELETE FROM blocked
     WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
   `
-  console.log(unblocked);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
     WHERE userID = ${userID}
   `
-  console.log(numBlocked);
   return interaction.reply({
     content: `Removed ${name} from your blocklist (${numBlocked.count} blocked)`,
     ephemeral: true,
@@ -168,13 +165,11 @@ async function markCompleted(interaction, adventurer) {
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
-  console.log(completed);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
     WHERE userID = ${userID}
   `
-  console.log(numCompleted);
   return interaction.reply({
     content: `Marked ${name} as completed (${numCompleted.count} completed)`,
     ephemeral: true,
@@ -188,13 +183,11 @@ async function markIncomplete(interaction, adventurer) {
     DELETE FROM completed
     WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
   `
-  console.log(completed);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
     WHERE userID = ${userID}
   `
-  console.log(numCompleted);
   return interaction.reply({
     content: `Marked ${name} as incomplete (${numCompleted.count} completed)`,
     ephemeral: true,
@@ -374,7 +367,6 @@ async function leaderboard(interaction) {
     GROUP BY userid
     ORDER BY 1 DESC
   `;
-  console.log(leaderboard);
 
   const results = await Promise.all(leaderboard.map(async entry => {
     const {count, userid} = entry;
