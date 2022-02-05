@@ -10,7 +10,7 @@ const {
   ALL_BOOLEAN_OPTIONS
 } = require('./consts');
 
-const sql = postgres() // will default to the same as psql
+const sql = postgres(); // will default to the same as psql
 
 function getQuery(
   interaction,
@@ -92,6 +92,16 @@ async function setupTables() {
         aliases text
       );
     `,
+    sql`
+      CREATE TABLE IF NOT EXISTS logging(
+        id serial PRIMARY KEY,
+        timestamp timestamp,
+        guildName text,
+        userid text,
+        command text,
+        options text
+      );
+    `,
   ]);
   try {
     await Promise.all(
@@ -118,6 +128,16 @@ async function setupTables() {
   }
 }
 
+async function logCommand(interaction, command, options = '') {
+  const userID = interaction.user.id;
+  const guildName = interaction.guild?.name;
+  const allowCompleted = interaction.options.getBoolean('allow_completed');
+  await sql`
+    INSERT INTO logging(timestamp, guildName, userid, command, options)
+    VALUES(NOW(), ${guildName}, ${userID}, ${command}, ${options + (allowCompleted != null ? (' ' + allowCompleted) : '')})
+  `;
+}
+
 async function addToBlocklist(interaction, adventurer) {
   const userID = interaction.user.id;
   const [name, element, weapon] = adventurer.split(', ');
@@ -127,6 +147,7 @@ async function addToBlocklist(interaction, adventurer) {
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
+  await logCommand(interaction, ACTION_TYPE.BLOCK, adventurer);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
@@ -145,6 +166,7 @@ async function removeFromBlocklist(interaction, adventurer) {
     DELETE FROM blocked
     WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
   `
+  await logCommand(interaction, ACTION_TYPE.UNBLOCK, adventurer);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
@@ -165,6 +187,7 @@ async function markCompleted(interaction, adventurer) {
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
+  await logCommand(interaction, ACTION_TYPE.COMPLETE, adventurer);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
@@ -183,6 +206,7 @@ async function markIncomplete(interaction, adventurer) {
     DELETE FROM completed
     WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
   `
+  await logCommand(interaction, ACTION_TYPE.INCOMPLETE, adventurer);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
@@ -203,6 +227,7 @@ function getSearchQuery(interaction, addWildcards = false) {
 
 async function search(interaction) {
   const query = getSearchQuery(interaction, true)
+  await logCommand(interaction, 'search', query);
   return await sql`
     SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
     FROM adventurers
@@ -220,6 +245,7 @@ async function clearCompleted(interaction) {
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage completed clear');
   return interaction.reply({
     content: `Cleared your completed list (${removed.count} removed)`,
     ephemeral: true
@@ -228,17 +254,19 @@ async function clearCompleted(interaction) {
 
 async function batchAddCompleted(interaction) {
   const userID = interaction.user.id;
+  const query = getSearchQuery(interaction);
   const [added] = await sql`
     WITH rows AS (
       INSERT INTO completed(userid, name, element, weapon)
       SELECT ${userID}, name, element, weapon FROM adventurers
-      WHERE LOWER(name) = ANY(ARRAY[${getSearchQuery(interaction)}])
+      WHERE LOWER(name) = ANY(ARRAY[${query}])
       ON CONFLICT(userid, name, element, weapon)
       DO NOTHING
       RETURNING *
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage completed add', query);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
@@ -252,17 +280,19 @@ async function batchAddCompleted(interaction) {
 
 async function batchRemoveCompleted(interaction) {
   const userID = interaction.user.id;
+  const query = getSearchQuery(interaction);
   const [removed] = await sql`
     WITH rows AS (
       DELETE FROM completed
       WHERE (userid, name, element, weapon) in (
         SELECT ${userID}, name, element, weapon FROM adventurers
-        WHERE LOWER(name) = ANY(ARRAY[${getSearchQuery(interaction)}])
+        WHERE LOWER(name) = ANY(ARRAY[${query}])
       )
       RETURNING *
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage completed remove', query);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
@@ -284,6 +314,7 @@ async function clearBlocked(interaction) {
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage blocked clear');
   return interaction.reply({
     content: `Cleared your blocklist (${removed.count} removed)`,
     ephemeral: true
@@ -292,17 +323,19 @@ async function clearBlocked(interaction) {
 
 async function batchAddBlocked(interaction) {
   const userID = interaction.user.id;
+  const query = getSearchQuery(interaction);
   const [added] = await sql`
     WITH rows AS (
       INSERT INTO blocked(userid, name, element, weapon)
       SELECT ${userID}, name, element, weapon FROM adventurers
-      WHERE LOWER(name) = ANY(ARRAY[${getSearchQuery(interaction)}])
+      WHERE LOWER(name) = ANY(ARRAY[${query}])
       ON CONFLICT(userid, name, element, weapon)
       DO NOTHING
       RETURNING *
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage blocked add', query);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
@@ -316,17 +349,19 @@ async function batchAddBlocked(interaction) {
 
 async function batchRemoveBlocked(interaction) {
   const userID = interaction.user.id;
+  const query = getSearchQuery(interaction);
   const [removed] = await sql`
     WITH rows AS (
       DELETE FROM blocked
       WHERE (userid, name, element, weapon) in (
         SELECT ${userID}, name, element, weapon FROM adventurers
-        WHERE LOWER(name) = ANY(ARRAY[${getSearchQuery(interaction)}])
+        WHERE LOWER(name) = ANY(ARRAY[${query}])
       )
       RETURNING *
     )
     SELECT COUNT(*) FROM rows
   `;
+  await logCommand(interaction, 'manage blocked add', query);
   const [numBlocked] = await sql`
     SELECT COUNT(*)
     FROM blocked
@@ -367,7 +402,7 @@ async function leaderboard(interaction) {
     GROUP BY userid
     ORDER BY 1 DESC
   `;
-
+  await logCommand(interaction, 'leaderboard');
   const results = await Promise.all(leaderboard.map(async entry => {
     const {count, userid} = entry;
     const username = await fetchUser(interaction, userid);
@@ -395,4 +430,5 @@ module.exports = {
   clearCompleted,
   clearBlocked,
   leaderboard,
+  logCommand,
 }

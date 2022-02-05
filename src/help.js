@@ -2,6 +2,7 @@
 
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
+const {logCommand} = require('./db');
 
 const COMMAND_CATEGORIES = {
   GENERAL: 'General',
@@ -171,6 +172,7 @@ const helpCommand = {
     ),
   execute: async (interaction, _) => {
     const specificCommand = interaction.options.getString('command');
+    await logCommand(interaction, 'help', specificCommand);
     if (specificCommand == null || !allCommandNames.includes(specificCommand)) {
       const fields = Object.keys(COMMAND_CATEGORIES).map(key => {
         const name = COMMAND_CATEGORIES[key];

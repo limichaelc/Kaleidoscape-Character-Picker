@@ -14,6 +14,7 @@ const {
   clearCompleted,
   clearBlocked,
   leaderboard,
+  logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
 
@@ -85,6 +86,7 @@ function simpleCommand(name, description, vars) {
     execute: async (interaction, _) => {
       const query = getQuery(interaction, vars);
       const [concatResult] = await query;
+      await logCommand(interaction, name);
       return sendMessage(interaction, concatResult);
     }
   };
@@ -96,6 +98,7 @@ const dailyCommand = {
     .setDescription('Picks 3 random characters for daily skips',),
   execute: async (interaction, _) => {
     const query = getQuery(interaction, { limit: 3 });
+    await logCommand(interaction, 'daily');
     const results = await query;
     if (results.length == 0) {
       return interaction.reply('Could not pick any adventurers');
@@ -246,6 +249,7 @@ ALL_WEAPONS.map(weapon => {
     execute: async (interaction, _) => {
       const element = interaction.options.getString('element') ?? '';
       const query = getQuery(interaction, { element, weapons: [weapon] });
+      await logCommand(interaction, 'weapon', element);
       const [concatResult] = await query;
       return sendMessage(interaction, concatResult);
     },
@@ -267,6 +271,7 @@ ALL_ELEMENTS.map(element => {
     execute: async (interaction, _) => {
       const weapon = interaction.options.getString('weapon') ?? '';
       const query = getQuery(interaction, { element, weapons: weapon != '' ? [weapon] : ALL_WEAPONS });
+      await logCommand(interaction, 'element', weapon);
       const [concatResult] = await query;
       return sendMessage(interaction, concatResult);
     },
@@ -334,7 +339,9 @@ function statsCommand(name, description) {
       const totalAdventurers = totalCounts.reduce(countReducer, 0);
       const totalNumerator = numeratorCounts.reduce(countReducer, 0);
       const isCompleted = name == 'completed';
-      const ephemeral = interaction.options.getString('visibility') !== 'everyone';
+      const visibility = interaction.options.getString('visibility');
+      const ephemeral = visibility !== 'everyone';
+      await logCommand(interaction, name, visibility);
 
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
