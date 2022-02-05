@@ -7,7 +7,8 @@ const {allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, limited
 const {
   ALL_WEAPONS,
   ALL_RARITIES,
-  ALL_BOOLEAN_OPTIONS
+  ALL_BOOLEAN_OPTIONS,
+  ACTION_TYPE,
 } = require('./consts');
 
 const sql = postgres(); // will default to the same as psql
