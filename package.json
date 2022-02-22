@@ -2,7 +2,7 @@
   "name": "discordjs",
   "version": "1.0.0",
   "main": "src/index.js",
-  "author": "Jake Runzer",
+  "author": "Michael Li",
   "license": "MIT",
   "scripts": {
     "dev": "nodemon .",
@@ -19,7 +19,4 @@
   "devDependencies": {
     "nodemon": "^2.0.12"
   },
-  "engines": {
-    "node": ">=16.6.0"
-  }
 }
