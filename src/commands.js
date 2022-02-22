@@ -23,7 +23,9 @@ const commandArray = []; // Array to store commands for sending to the REST API.
 
 function sendMessage(interaction, concatResult, isFollowUp = false) {
   if (concatResult == undefined) {
-    return interaction.reply(`Could not find an adventurer with those restrictions... Try allowing completed adventurers or removing some from your blocklist`);
+    return interaction.reply(
+      `Could not find an adventurer with those restrictions... Try allowing completed adventurers or removing some from your blocklist`,
+      ).catch(onRejected => console.error(onRejected));
   }
   const item = concatResult.concat;
   const [id, rarity, adventurerName, element, weapon] = item.split(', ');
@@ -66,7 +68,9 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
         .setStyle('SECONDARY'),
     );
   const message = { embeds: [embed], components: [row] };
-  return isFollowUp ? interaction.followUp(message): interaction.reply(message);
+  return isFollowUp
+    ? interaction.followUp(message).catch(onRejected => console.error(onRejected))
+    : interaction.reply(message).catch(onRejected => console.error(onRejected));
 }
 
 function commandBuilderBase() {
@@ -101,7 +105,7 @@ const dailyCommand = {
     await logCommand(interaction, 'daily');
     const results = await query;
     if (results.length == 0) {
-      return interaction.reply('Could not pick any adventurers');
+      return interaction.reply('Could not pick any adventurers').catch(onRejected => console.error(onRejected));
     }
     sendMessage(interaction, results[0]);
     results.slice(1).map(result => sendMessage(interaction, result, true));
@@ -118,7 +122,7 @@ const searchCommand = {
         .setRequired(true)),
   execute: async (interaction, _) => {
     const results = await search(interaction);
-    interaction.reply(`Searching for *"${interaction.options.getString('query')}"*...`);
+    interaction.reply(`Searching for *"${interaction.options.getString('query')}"*...`).catch(onRejected => console.error(onRejected));
     if (results.length == 0) {
       return interaction.followUp('Could not find any adventurers with those names');
     }
@@ -131,10 +135,9 @@ const leaderboardCommand = {
     .setName('leaderboard')
     .setDescription('Shows leaderboard by clears for all users of the bot'),
   execute: async (interaction, _) => {
-    interaction.deferReply();
     const entries = await leaderboard(interaction);
     const fields = entries.map((entry, index) => {
-      var prefix = prefix = `(${index + 1})`;
+      var prefix = `(${index + 1})`;
       switch (index) {
         case 0:
           prefix = '🥇';
@@ -154,7 +157,7 @@ const leaderboardCommand = {
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
       .setDescription(fields.join('\n'));
-    interaction.editReply({ embeds: [embed] });
+    interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };
 
@@ -347,7 +350,7 @@ function statsCommand(name, description) {
       interaction.reply({
         content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
         ephemeral,
-      });
+      }).catch(onRejected => console.error(onRejected));
       if (totalNumerator == 0) {
         return;
       }
@@ -383,7 +386,7 @@ function statsCommand(name, description) {
         interaction.followUp({
           embeds: [embed],
           ephemeral,
-        });
+        }).catch(onRejected => console.error(onRejected));
       });
     }
   };

@@ -103,6 +103,12 @@ async function setupTables() {
         options text
       );
     `,
+    sql`
+      CREATE TABLE IF NOT EXISTS users(
+        userid text PRIMARY KEY,
+        username text
+      );
+    `,
   ]);
   try {
     await Promise.all(
@@ -131,11 +137,18 @@ async function setupTables() {
 
 async function logCommand(interaction, command, options = '') {
   const userID = interaction.user.id;
+  const username = interaction.user.username;
   const guildName = interaction.guild?.name;
   const allowCompleted = interaction.options?.getBoolean('allow_completed');
   await sql`
     INSERT INTO logging(timestamp, guildName, userid, command, options)
     VALUES(NOW(), ${guildName}, ${userID}, ${command}, ${options + (allowCompleted != null ? (' ' + allowCompleted) : '')})
+  `;
+  await sql`
+    INSERT INTO users(userid, username)
+    VALUES(${userID}, ${username})
+    ON CONFLICT(userid)
+    DO NOTHING
   `;
 }
 
@@ -374,8 +387,8 @@ async function batchRemoveBlocked(interaction) {
   });
 }
 
-async function fetchUser(interaction, id) {
-  const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
+// async function fetchUser(interaction, id) {
+//   const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
   // const guildID = interaction.guildId;
   // if (guildID != null) {
   //   try {
@@ -388,14 +401,14 @@ async function fetchUser(interaction, id) {
   //     console.log(`Could not find guild member ${id} in ${guildID}`);
   //   }
   // }
-  try {
-    const user = await rest.get(Routes.user(id));
-    return user.username;
-  } catch (error) {
-    console.log(`Could not find user ${id}`);
-    return null;
-  }
-}
+//   try {
+//     const user = await rest.get(Routes.user(id));
+//     return user.username;
+//   } catch (error) {
+//     console.log(`Could not find user ${id}`);
+//     return null;
+//   }
+// }
 
 async function leaderboard(interaction) {
   const leaderboard = await sql`
@@ -403,15 +416,18 @@ async function leaderboard(interaction) {
     GROUP BY userid
     ORDER BY 1 DESC
   `;
+  const users = await sql`
+    SELECT userid, username FROM users
+  `;
   await logCommand(interaction, 'leaderboard');
-  const results = await Promise.all(leaderboard.map(async entry => {
+  const results = leaderboard.map(entry => {
     const {count, userid} = entry;
-    const username = await fetchUser(interaction, userid);
+    const username = users.find(user => userid == user.userid)?.username;
     if (username == null) {
       return null;
     }
     return {count, username};
-  }));
+  });
   return results.filter(Boolean);
 }
 

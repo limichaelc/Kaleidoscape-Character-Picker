@@ -87,3 +87,15 @@ client.on("interactionCreate", async interaction => {
     });
   }
 });
+
+client.on('shardError', error => {
+	console.error('A websocket connection encountered an error:', error);
+});
+
+process.on('unhandledRejection', error => {
+	console.error('Unhandled promise rejection:', error);
+});
+
+client.on('rateLimit', info => {
+  console.log(`Rate limit hit ${info.timeDifference ? info.timeDifference : info.timeout ? info.timeout: 'Unknown timeout '}`)
+})
