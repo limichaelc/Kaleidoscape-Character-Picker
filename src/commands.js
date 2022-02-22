@@ -135,6 +135,7 @@ const leaderboardCommand = {
     .setName('leaderboard')
     .setDescription('Shows leaderboard by clears for all users of the bot'),
   execute: async (interaction, _) => {
+    interaction.deferReply();
     const entries = await leaderboard(interaction);
     const fields = entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
@@ -157,7 +158,7 @@ const leaderboardCommand = {
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
       .setDescription(fields.join('\n'));
-    interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
+    interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };
 

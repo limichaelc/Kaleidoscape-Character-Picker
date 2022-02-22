@@ -420,7 +420,7 @@ async function leaderboard(interaction) {
   //   SELECT userid, username FROM users
   // `;
   await logCommand(interaction, 'leaderboard');
-  const results = await Promise.all(leaderboard.map(entry => {
+  const results = await Promise.all(leaderboard.map(async entry => {
     const {count, userid} = entry;
     // const username = users.find(user => userid == user.userid)?.username;
     const username = await fetchUser(interaction, userid);
