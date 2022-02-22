@@ -387,28 +387,28 @@ async function batchRemoveBlocked(interaction) {
   });
 }
 
-// async function fetchUser(interaction, id) {
-//   const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
-  // const guildID = interaction.guildId;
-  // if (guildID != null) {
-  //   try {
-  //     const guildMember = await rest.get(Routes.guildMember(guildID, id));
-  //     const nickname = guildMember?.nick;
-  //     if (nickname != null) {
-  //       return nickname;
-  //     }
-  //   } catch (error) {
-  //     console.log(`Could not find guild member ${id} in ${guildID}`);
-  //   }
-  // }
-//   try {
-//     const user = await rest.get(Routes.user(id));
-//     return user.username;
-//   } catch (error) {
-//     console.log(`Could not find user ${id}`);
-//     return null;
-//   }
-// }
+async function fetchUser(interaction, id) {
+  const rest = new REST({ version: "9" }).setToken(process.env.DISCORD_TOKEN);
+  const guildID = interaction.guildId;
+  if (guildID != null) {
+    try {
+      const guildMember = await rest.get(Routes.guildMember(guildID, id));
+      const nickname = guildMember?.nick;
+      if (nickname != null) {
+        return nickname;
+      }
+    } catch (error) {
+      console.log(`Could not find guild member ${id} in ${guildID}`);
+    }
+  }
+  try {
+    const user = await rest.get(Routes.user(id));
+    return user.username;
+  } catch (error) {
+    console.log(`Could not find user ${id}`);
+    return null;
+  }
+}
 
 async function leaderboard(interaction) {
   const leaderboard = await sql`
@@ -416,18 +416,19 @@ async function leaderboard(interaction) {
     GROUP BY userid
     ORDER BY 1 DESC
   `;
-  const users = await sql`
-    SELECT userid, username FROM users
-  `;
+  // const users = await sql`
+  //   SELECT userid, username FROM users
+  // `;
   await logCommand(interaction, 'leaderboard');
-  const results = leaderboard.map(entry => {
+  const results = await Promise.all(leaderboard.map(entry => {
     const {count, userid} = entry;
-    const username = users.find(user => userid == user.userid)?.username;
+    // const username = users.find(user => userid == user.userid)?.username;
+    const username = await fetchUser(interaction, userid);
     if (username == null) {
       return null;
     }
     return {count, username};
-  });
+  }));
   return results.filter(Boolean);
 }
 
