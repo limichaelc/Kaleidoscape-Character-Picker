@@ -11,7 +11,7 @@ const {
   ACTION_TYPE,
 } = require('./consts');
 
-const sql = postgres(process.env.DATABASE_URL); // will default to the same as psql
+const sql = postgres(process.env.DATABASE_URL, {ssl: true}); // will default to the same as psql
 
 function getQuery(
   interaction,
