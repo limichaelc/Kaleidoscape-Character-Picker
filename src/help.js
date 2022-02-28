@@ -182,7 +182,7 @@ const helpCommand = {
       });
       const embed = new MessageEmbed()
         .setTitle('Oh y\'all wanted an assist, eh?')
-        .setDescription('I support the following commands. Type `/<command>`.\nYou can also do `/help <command>` to learn more about a specific command.\nI usually use `/daily` to get a list of 3 adventurers for my daily skips, marking them completed with the buttons that show up for each result when I finish, and then /leaderboard and /completed to see how I stack up against others.\nYou can also use any of the adventurer generation commands to get a random adventurer from a more specific pool, or use the /manage command to do batch editing of your completed and block lists.')
+        .setDescription('I support the following commands. Type `/<command>`.\nYou can also do `/help <command>` to learn more about a specific command.\n\nI usually use `/daily` to get a list of 3 adventurers for my daily skips, marking them completed with the buttons that show up for each result when I finish, and then `/leaderboard` and `/completed` to see how I stack up against others.\n\nYou can also use any of the adventurer generation commands to get a random adventurer from a more specific pool, or use the `/manage` command to do batch editing of your completed and block lists.')
         .setFields(fields);
       return interaction.reply({ embeds: [embed] });
     }
