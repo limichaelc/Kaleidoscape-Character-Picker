@@ -187,11 +187,11 @@ const manageCommand = {
             .setDescription('Remove adventurers from your completed list')
             .addStringOption(addQueryOption)
         )
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName(MANAGE_SUBCOMMANDS.CLEAR)
-            .setDescription('Clear your completed list')
-        )
+        // .addSubcommand(subcommand =>
+        //   subcommand
+        //     .setName(MANAGE_SUBCOMMANDS.CLEAR)
+        //     .setDescription('Clear your completed list')
+        // )
     )
     .addSubcommandGroup(subcommandGroup =>
       subcommandGroup
@@ -225,8 +225,8 @@ const manageCommand = {
             return await batchAddCompleted(interaction);
           case MANAGE_SUBCOMMANDS.REMOVE:
             return await batchRemoveCompleted(interaction);
-          case MANAGE_SUBCOMMANDS.CLEAR:
-            return await clearCompleted(interaction);
+          // case MANAGE_SUBCOMMANDS.CLEAR:
+          //   return await clearCompleted(interaction);
         }
       case MANAGE_COMMAND_GROUPS.BLOCKED:
         switch (subcommand) {
