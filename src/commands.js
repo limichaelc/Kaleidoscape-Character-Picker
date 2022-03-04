@@ -2,7 +2,7 @@
 
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS, STATS_COMMANDS} = require('./consts');
+const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS, STATS_COMMANDS, ORDERINGS, PAGE_SIZE} = require('./consts');
 const {
   sql,
   getQuery,
@@ -11,14 +11,12 @@ const {
   batchAddBlocked,
   batchRemoveCompleted,
   batchRemoveBlocked,
-  clearCompleted,
   clearBlocked,
   leaderboard,
+  popularity,
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
-
-const PAGE_SIZE = 10;
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -144,6 +142,53 @@ const searchCommand = {
     await Promise.all(results.map(result => sendMessage(interaction, result, true)));
   },
 };
+
+const popularityCommand = {
+  data: new SlashCommandBuilder()
+    .setName('popularity')
+    .setDescription('Shows the characters who have been marked completed by the most people')
+    .addStringOption(option =>
+      option.setName('ordering')
+        .setDescription('Whether to see the results in ascending or descending order')
+        .addChoices([
+          [ORDERINGS.ASCENDING, ORDERINGS.ASCENDING],
+          [ORDERINGS.DESCENDING, ORDERINGS.DESCENDING],
+        ])
+    )
+    .addIntegerOption(option =>
+      option.setName('number')
+        .setDescription('The page of the popularity board to view. Each page is 10 entries long')
+    ),
+  execute: async (interaction, _) => {
+    const pageSize = 25;
+    const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
+    const page = interaction.options.getInteger('page') ?? 1;
+    const entries = await popularity(interaction, ordering);
+    console.log(entries);
+    var previousPrefix = null;
+    var previousCount = null;
+    var fields = entries.sort().map((entry, index) => {
+      var prefix = `(${index + 1})`;
+      if (entry.count === previousCount) {
+        prefix = previousPrefix;
+      } else {
+        previousPrefix = prefix;
+      }
+
+      previousCount = entry.count
+
+      return `${prefix}: ${entry.name} (${entry.count.toString()})`;
+    });
+    if (ordering ===  ORDERINGS.ASCENDING) {
+      fields.reverse();
+    }
+    fields = fields.slice((page - 1) * pageSize, page * pageSize);
+    const embed = new MessageEmbed()
+      .setTitle('Popularity Rankings')
+      .setDescription(fields.join('\n'));
+    interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
+  }
+}
 
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
@@ -362,22 +407,41 @@ const blockedCommand = statsCommand(
 );
 
 function statsCommand(name, description) {
+  const data = new SlashCommandBuilder()
+    .setName(name)
+    .setDescription(description)
+    .addStringOption(option =>
+      option.setName('visibility')
+        .setDescription('Whether to display the results to everyone or just yourself')
+        .addChoices([
+          ['everyone', 'everyone'],
+          ['me', 'me'],
+        ])
+    );
+  if (name !== STATS_COMMANDS.BLOCKED) {
+    data.addBooleanOption(option =>
+      option.setName('allow_blocked')
+        .setDescription('Whether to ignore your block list in the counts')
+    );
+  }
   return {
-    data: new SlashCommandBuilder()
-      .setName(name)
-      .setDescription(description)
-      .addStringOption(option =>
-        option.setName('visibility')
-          .setDescription('Whether to display the results to everyone or just yourself')
-          .addChoices([
-            ['everyone', 'everyone'],
-            ['me', 'me'],
-          ])
-      ),
+    data,
     execute: async (interaction, _) => {
+      const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
       const totalCounts = await sql`
+        WITH exclude AS (
+          SELECT CONCAT(name, ', ', element, ', ', weapon)
+          FROM blocked
+          WHERE userid = (
+            CASE
+              WHEN ${allowBlocked} THEN NULL
+              ELSE ${interaction.user.id}
+            END
+          )
+        )
         SELECT COUNT(*), element, weapon
         FROM adventurers
+        WHERE CONCAT(name, ', ', element, ', ', weapon) NOT IN (SELECT * FROM exclude)
         GROUP BY element, weapon
       `;
       var numeratorCounts, numeratorNames;
@@ -405,6 +469,15 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${interaction.user.id}
+                UNION ALL
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM blocked
+                WHERE userid = (
+                  CASE
+                    WHEN ${allowBlocked} THEN NULL
+                    ELSE ${interaction.user.id}
+                  END
+                )
               )
               SELECT COUNT(*), element, weapon
               FROM adventurers
@@ -418,6 +491,15 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${interaction.user.id}
+                UNION ALL
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM blocked
+                WHERE userid = (
+                  CASE
+                    WHEN ${allowBlocked} THEN NULL
+                    ELSE ${interaction.user.id}
+                  END
+                )
               )
               SELECT element, weapon, string_agg(name, ', ')
               FROM adventurers
@@ -581,6 +663,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   manageCommand,
   dailyCommand,
   leaderboardCommand,
+  popularityCommand,
   helpCommand,
 ].map(command => {
   commands.set(command.data.name, command);

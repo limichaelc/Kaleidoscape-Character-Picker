@@ -9,6 +9,8 @@ const {
   ALL_RARITIES,
   ALL_BOOLEAN_OPTIONS,
   ACTION_TYPE,
+  PAGE_SIZE,
+  ORDERINGS,
 } = require('./consts');
 
 const sql = postgres(process.env.DATABASE_URL, {ssl: true}); // will default to the same as psql
@@ -432,6 +434,15 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
+async function popularity(interaction) {
+  await logCommand(interaction, 'popularity');
+  return await sql`
+    SELECT COUNT(*), name FROM completed
+    GROUP BY name
+    ORDER BY 1 DESC
+  `;
+}
+
 module.exports = {
   sql,
   getQuery,
@@ -448,5 +459,6 @@ module.exports = {
   clearCompleted,
   clearBlocked,
   leaderboard,
+  popularity,
   logCommand,
 }
