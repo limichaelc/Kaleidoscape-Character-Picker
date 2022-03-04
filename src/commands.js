@@ -160,7 +160,7 @@ const popularityCommand = {
         .setDescription('The page of the popularity board to view. Each page is 10 entries long')
     ),
   execute: async (interaction, _) => {
-    interaction.deferReply();
+    // interaction.deferReply();
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
     const page = interaction.options.getInteger('page') ?? 1;
     const entries = await popularity(interaction, ordering, page);
@@ -169,7 +169,7 @@ const popularityCommand = {
     const embed = new MessageEmbed()
       .setTitle('Popularity Ranking')
       .setDescription(fields.join('\n'));
-    interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
+    interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   }
 }
 
