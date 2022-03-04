@@ -35,6 +35,7 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
     SELECT COUNT(*) from completed
     WHERE name = ${adventurerName}
   `;
+  console.log(count);
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
   const embed = {
     "type": "rich",
@@ -48,7 +49,7 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
     },
     "fields": [{
       "name": "\u200B",
-      "value": `Completed by ${count} people`,
+      "value": `Completed by ${count.count} people`,
     }],
     "url": wikiURL,
   }
