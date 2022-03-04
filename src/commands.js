@@ -134,11 +134,11 @@ const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
     .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.')
-    // .addSubcommandGroup(subcommandGroup =>
-    //   subcommandGroup
-    //     .setName('full')
-    //     .setDescription('Managed your completed list'),
-    // )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('full')
+        .setDescription('Managed your completed list'),
+    )
     .addIntegerOption(option =>
       option.setName('page')
         .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
@@ -151,9 +151,9 @@ const leaderboardCommand = {
     const entries = await leaderboard(interaction);
     const fields = entries.sort((a, b) => {
       if (a.count < b.count) {
-        return -1;
-      } else if (a.count > b.count) {
         return 1;
+      } else if (a.count > b.count) {
+        return -1;
       } else {
         return a.username.localeCompare(b.username);
       }
