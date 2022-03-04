@@ -18,6 +18,8 @@ const {
 } = require('./db');
 const {helpCommand} = require('./help');
 
+const PAGE_SIZE = 10;
+
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
 
@@ -133,15 +135,20 @@ const searchCommand = {
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.')
+    .setDescription('Shows leaderboard by clears for all users of the bot.')
     .addSubcommand(subcommand =>
       subcommand
         .setName('full')
-        .setDescription('Managed your completed list'),
+        .setDescription('Shows leaderboard by clears for all users of the bot'),
     )
-    .addIntegerOption(option =>
-      option.setName('page')
-        .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('page')
+        .setDescription('Shows leaderboard by clears for all users of the bot, 10 entries at a time.')
+      .addIntegerOption(option =>
+        option.setName('number')
+          .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
+        ),
     ),
   execute: async (interaction, _) => {
     interaction.deferReply();
@@ -149,7 +156,7 @@ const leaderboardCommand = {
     var previousCount = null;
     var selfEntry = null
     const entries = await leaderboard(interaction);
-    const fields = entries.sort((a, b) => {
+    var fields = entries.sort((a, b) => {
       if (a.count < b.count) {
         return 1;
       } else if (a.count > b.count) {
@@ -188,6 +195,10 @@ const leaderboardCommand = {
       }
       return base;
     });
+    const page = interaction.options.getInteger('number');
+    if (page != null) {
+      fields = fields.slice((page - 1) * PAGE_SIZE, page);
+    }
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
       .setDescription([selfEntry, fields.join('\n')].join('\n\n'));
