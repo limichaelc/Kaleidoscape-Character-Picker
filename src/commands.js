@@ -2,7 +2,7 @@
 
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS} = require('./consts');
+const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS, STATS_COMMANDS} = require('./consts');
 const {
   sql,
   getQuery,
@@ -334,12 +334,17 @@ ALL_ELEMENTS.map(element => {
 });
 
 const completedCommand = statsCommand(
-  'completed',
+  STATS_COMMANDS.COMPLETED,
   'Lists out the adventurers you\'ve marked as completed',
 );
 
+const incompleteCommand = statsCommand(
+  STATS_COMMANDS.INCOMPLETE,
+  'Lists out the adventurers you haven\'t marked as completed',
+);
+
 const blockedCommand = statsCommand(
-  'blocked',
+  STATS_COMMANDS.BLOCKED,
   'Lists out the adventurers you\'ve blocked',
 );
 
@@ -362,32 +367,69 @@ function statsCommand(name, description) {
         FROM adventurers
         GROUP BY element, weapon
       `;
-      const numeratorCounts = await (
-        name == 'blocked'
-          ? sql`
-              SELECT COUNT(*), element, weapon
-              FROM blocked
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
-            `
-          : sql`
+      var numeratorCounts, numeratorNames;
+      switch (name) {
+        case STATS_COMMANDS.COMPLETED:
+          numeratorCounts = await (
+            sql`
               SELECT COUNT(*), element, weapon
               FROM completed
               WHERE userid = ${interaction.user.id} GROUP BY element, weapon
             `
           );
-      const numeratorNames = await (
-        name == 'blocked'
-          ? sql`
-            SELECT element, weapon, string_agg(name, ', ')
-            FROM blocked
-            WHERE userid = ${interaction.user.id} GROUP BY element, weapon
-          `
-          : sql`
-            SELECT element, weapon, string_agg(name, ', ')
-            FROM completed
-            WHERE userid = ${interaction.user.id} GROUP BY element, weapon
-          `
-        );
+          numeratorNames = await (
+            sql`
+              SELECT element, weapon, string_agg(name, ', ')
+              FROM completed
+              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+            `
+          );
+          break;
+        case STATS_COMMANDS.INCOMPLETE:
+          numeratorCounts = await (
+            sql`
+              WITH exclude AS (
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM completed
+                WHERE userid = ${interaction.user.id}
+              )
+              SELECT COUNT(*), element, weapon
+              FROM adventurers
+              WHERE CONCAT(name, ', ', element, ', ', weapon) NOT IN (SELECT * FROM exclude)
+              GROUP BY element, weapon
+            `
+          );
+          numeratorNames = await (
+            sql`
+              WITH exclude AS (
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM completed
+                WHERE userid = ${interaction.user.id}
+              )
+              SELECT element, weapon, string_agg(name, ', ')
+              FROM adventurers
+              WHERE CONCAT(name, ', ', element, ', ', weapon) NOT IN (SELECT * FROM exclude)
+              GROUP BY element, weapon
+            `
+          );
+          break;
+        case STATS_COMMANDS.BLOCKED:
+          numeratorCounts = await (
+            sql`
+              SELECT COUNT(*), element, weapon
+              FROM blocked
+              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+            `
+          );
+          numeratorNames = await (
+            sql`
+              SELECT element, weapon, string_agg(name, ', ')
+              FROM blocked
+              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+            `
+          );
+          break;
+      }
       const countReducer = (previousValue, currentValue) => previousValue + currentValue.count;
       const totalAdventurers = totalCounts.reduce(countReducer, 0);
       const totalNumerator = numeratorCounts.reduce(countReducer, 0);
@@ -396,8 +438,18 @@ function statsCommand(name, description) {
       const ephemeral = visibility !== 'everyone';
       await logCommand(interaction, name, visibility);
 
+      var content;
+      switch (name) {
+        case STATS_COMMANDS.COMPLETED:
+        case STATS_COMMANDS.BLOCKED:
+          content = `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`;
+          break;
+        case STATS_COMMANDS.INCOMPLETE:
+          content = `You have ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
+          break;
+      }
       interaction.reply({
-        content: `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`,
+        content,
         ephemeral,
       }).catch(onRejected => console.error(onRejected));
       if (totalNumerator == 0) {
@@ -510,6 +562,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
     { isLimited: [true] },
   ),
   completedCommand,
+  incompleteCommand,
   blockedCommand,
   searchCommand,
   manageCommand,

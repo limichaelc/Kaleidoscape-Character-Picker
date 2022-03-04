@@ -29,4 +29,9 @@ module.exports = {
     REMOVE: 'remove',
     CLEAR: 'clear',
   },
+  STATS_COMMANDS: {
+    COMPLETED: 'completed',
+    INCOMPLETE: 'incomplete',
+    BLOCKED: 'blocked',
+  },
 }
