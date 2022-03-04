@@ -204,7 +204,7 @@ const leaderboardCommand = {
       fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     }
     const embed = new MessageEmbed()
-      .setTitle(`Leaderboard (${entries.count} competitors)`)
+      .setTitle(`Leaderboard (${entries.length} competitors)`)
       .setDescription([selfEntry, fields.join('\n')].join('\n\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
