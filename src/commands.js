@@ -140,7 +140,7 @@ const leaderboardCommand = {
     var previousCount = null;
     const entries = await leaderboard(interaction);
     const fields = [];
-    var users = [];
+    var users = [entries[0]?.username].filter(Boolean);
     entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
       switch (index) {
@@ -168,7 +168,7 @@ const leaderboardCommand = {
           base = '**' + base + '**';
         }
         fields.push(base);
-        users = [];
+        users = [entry.username];
       }
 
       previousCount = entry.count
