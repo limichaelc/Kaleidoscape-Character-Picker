@@ -165,6 +165,8 @@ const popularityCommand = {
     const page = interaction.options.getInteger('page') ?? 1;
     const entries = await popularity(interaction, ordering);
     console.log(entries);
+    var previousPrefix = null;
+    var previousCount = null;
     const fields = entries.sort().map((entry, index) => {
       var prefix = `(${index + 1})`;
       if (entry.count === previousCount) {
