@@ -439,6 +439,7 @@ async function popularity(interaction) {
   return await sql`
     SELECT COUNT(*), name FROM completed
     GROUP BY name
+    ORDER BY 1 DESC
   `;
 }
 
