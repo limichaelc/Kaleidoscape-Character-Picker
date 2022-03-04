@@ -434,15 +434,11 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
-async function popularity(interaction, ordering, page) {
+async function popularity(interaction) {
+  await logCommand(interaction, 'popularity');
   return await sql`
     SELECT COUNT(*), name FROM completed
     GROUP BY name
-    ORDER BY
-      CASE
-        WHEN ${ordering === ORDERINGS.ASCENDING} THEN -COUNT(*)
-        ELSE COUNT(*)
-      END DESC
   `;
 }
 

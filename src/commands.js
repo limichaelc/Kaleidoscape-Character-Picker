@@ -179,9 +179,12 @@ const popularityCommand = {
 
       return `${prefix}: ${entry.name} (${entry.count.toString()})`;
     });
+    if (ordering ===  ORDERINGS.ASCENDING) {
+      fields.reverse();
+    }
     fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     const embed = new MessageEmbed()
-      .setTitle('Popularity Ranking')
+      .setTitle('Popularity Rankings')
       .setDescription(fields.join('\n'));
     interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   }
