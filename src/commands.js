@@ -177,7 +177,6 @@ const popularityCommand = {
 
       return `${prefix}: ${entry.name} (${entry.count.toString()})`;
     });
-    var page = interaction.options.getInteger('number') ?? 1;
     fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     const embed = new MessageEmbed()
       .setTitle('Popularity Ranking')
