@@ -133,11 +133,21 @@ const searchCommand = {
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription('Shows leaderboard by clears for all users of the bot'),
+    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default. Use full or page subcommands for more')
+    .addSubcommandGroup(subcommandGroup =>
+      subcommandGroup
+        .setName('full')
+        .setDescription('Managed your completed list'),
+    )
+    .addIntegerOption(option =>
+      option.setName('page')
+        .setDescription('The page of the leaderboard to view. Each page is 10 entries long.')
+    ),
   execute: async (interaction, _) => {
     interaction.deferReply();
     var previousPrefix = null;
     var previousCount = null;
+    var selfEntry = null
     const entries = await leaderboard(interaction);
     const fields = entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
@@ -154,7 +164,7 @@ const leaderboardCommand = {
         default:
           break;
       }
-      console.log(entry.count, previousCount);
+
       if (entry.count === previousCount) {
         prefix = previousPrefix;
       } else {
@@ -165,13 +175,18 @@ const leaderboardCommand = {
 
       var base = `${prefix}: ${entry.username} (${entry.count.toString()})`;
       if (entry.isSelf) {
+        selfEntry = `You are rank ${prefix} with a total of ${entry.count.toString()} adventurers`;
         base = '**' + base + '**';
       }
       return base;
     });
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
-      .setDescription(fields.join('\n'));
+      .setDescription(selfEntry)
+      .setFields([{
+        name: '\u200B',
+        value: fields.join('\n'),
+      }]);
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };
