@@ -167,7 +167,7 @@ const popularityCommand = {
     console.log(entries);
     var previousPrefix = null;
     var previousCount = null;
-    const fields = entries.sort().map((entry, index) => {
+    var fields = entries.sort().map((entry, index) => {
       var prefix = `(${index + 1})`;
       if (entry.count === previousCount) {
         prefix = previousPrefix;
