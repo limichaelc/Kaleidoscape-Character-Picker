@@ -435,7 +435,6 @@ async function leaderboard(interaction) {
 }
 
 async function popularity(interaction, ordering, page) {
-  const offset = (page - 1) * PAGE_SIZE;
   return await sql`
     SELECT COUNT(*), name FROM completed
     GROUP BY name
@@ -444,8 +443,6 @@ async function popularity(interaction, ordering, page) {
         WHEN ${ordering === ORDERINGS.ASCENDING} THEN -COUNT(*)
         ELSE COUNT(*)
       END DESC
-    OFFSET ${offset}
-    LIMIT ${PAGE_SIZE}
   `;
 }
 

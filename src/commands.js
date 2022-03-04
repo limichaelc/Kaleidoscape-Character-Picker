@@ -163,9 +163,22 @@ const popularityCommand = {
     // interaction.deferReply();
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
     const page = interaction.options.getInteger('page') ?? 1;
-    const entries = await popularity(interaction, ordering, page);
+    const entries = await popularity(interaction, ordering);
     console.log(entries);
-    const fields = entries.sort().map(entry => `${entry.count}: ${entry.name}`);
+    const fields = entries.sort().map((entry, index) => {
+      var prefix = `(${index + 1})`;
+      if (entry.count === previousCount) {
+        prefix = previousPrefix;
+      } else {
+        previousPrefix = prefix;
+      }
+
+      previousCount = entry.count
+
+      return `${prefix}: ${entry.name} (${entry.count.toString()})`;
+    });
+    var page = interaction.options.getInteger('number') ?? 1;
+    fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     const embed = new MessageEmbed()
       .setTitle('Popularity Ranking')
       .setDescription(fields.join('\n'));
