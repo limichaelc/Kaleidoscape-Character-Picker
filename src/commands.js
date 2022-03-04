@@ -134,11 +134,11 @@ const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
     .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.')
-    .addSubcommandGroup(subcommandGroup =>
-      subcommandGroup
-        .setName('full')
-        .setDescription('Managed your completed list'),
-    )
+    // .addSubcommandGroup(subcommandGroup =>
+    //   subcommandGroup
+    //     .setName('full')
+    //     .setDescription('Managed your completed list'),
+    // )
     .addIntegerOption(option =>
       option.setName('page')
         .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
@@ -190,11 +190,7 @@ const leaderboardCommand = {
     });
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
-      .setDescription(selfEntry)
-      .setFields([{
-        name: '\u200B',
-        value: fields.join('\n'),
-      }]);
+      .setDescription([selfEntry, fields.join('\n')].join('\n\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };
