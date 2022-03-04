@@ -143,39 +143,26 @@ const searchCommand = {
   },
 };
 
-const addOrderingOption = option =>
-  option.setName('ordering')
-    .setDescription('Whether to see the results in ascending or descending order')
-    .addChoices([
-      [ORDERINGS.ASCENDING, ORDERINGS.ASCENDING],
-      [ORDERINGS.DESCENDING, ORDERINGS.DESCENDING],
-    ]);
-
 const popularityCommand = {
   data: new SlashCommandBuilder()
     .setName('popularity')
     .setDescription('Shows the characters who have been marked completed by the most people')
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('full')
-        .setDescription('Shows leaderboard by clears for all users of the bot')
-        .addStringOption(addOrderingOption),
+    .addStringOption(option =>
+      option.setName('ordering')
+        .setDescription('Whether to see the results in ascending or descending order')
+        .addChoices([
+          [ORDERINGS.ASCENDING, ORDERINGS.ASCENDING],
+          [ORDERINGS.DESCENDING, ORDERINGS.DESCENDING],
+        ])
     )
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('page')
-        .setDescription('Shows leaderboard by clears for all users of the bot, 10 entries at a time.')
-        .addStringOption(addOrderingOption)
-        .addIntegerOption(option =>
-          option.setName('number')
-            .setDescription('The page of the popularity ranking to view. Each page is 10 entries long')
-          ),
+    .addIntegerOption(option =>
+      option.setName('number')
+        .setDescription('The page of the popularity board to view. Each page is 10 entries long')
     ),
   execute: async (interaction, _) => {
-    // interaction.deferReply();
-    const subcommand = interaction.options.getSubcommand();
+    const pageSize = 25;
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
-    const page = interaction.options.getInteger('page');
+    const page = interaction.options.getInteger('page') ?? 1;
     const entries = await popularity(interaction, ordering);
     console.log(entries);
     var previousPrefix = null;
@@ -195,12 +182,7 @@ const popularityCommand = {
     if (ordering ===  ORDERINGS.ASCENDING) {
       fields.reverse();
     }
-    if (page == null && subcommand == 'page') {
-      page = 1;
-    }
-    if (page != null) {
-      fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-    }
+    fields = fields.slice((page - 1) * pageSize, page * pageSize);
     const embed = new MessageEmbed()
       .setTitle('Popularity Rankings')
       .setDescription(fields.join('\n'));
