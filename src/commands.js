@@ -407,22 +407,41 @@ const blockedCommand = statsCommand(
 );
 
 function statsCommand(name, description) {
+  const data = new SlashCommandBuilder()
+    .setName(name)
+    .setDescription(description)
+    .addStringOption(option =>
+      option.setName('visibility')
+        .setDescription('Whether to display the results to everyone or just yourself')
+        .addChoices([
+          ['everyone', 'everyone'],
+          ['me', 'me'],
+        ])
+    );
+  if (name !== STATS_COMMANDS.BLOCKED) {
+    data.addBooleanOption(option =>
+      option.setName('allow_blocked')
+        .setDescription('Whether to ignore your block list in the counts')
+    );
+  }
   return {
-    data: new SlashCommandBuilder()
-      .setName(name)
-      .setDescription(description)
-      .addStringOption(option =>
-        option.setName('visibility')
-          .setDescription('Whether to display the results to everyone or just yourself')
-          .addChoices([
-            ['everyone', 'everyone'],
-            ['me', 'me'],
-          ])
-      ),
+    data,
     execute: async (interaction, _) => {
+      const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
       const totalCounts = await sql`
+        WITH exclude AS (
+          SELECT CONCAT(name, ', ', element, ', ', weapon)
+          FROM blocked
+          WHERE userid = (
+            CASE
+              WHEN ${allowBlocked} THEN NULL
+              ELSE ${interaction.user.id}
+            END
+          )
+        )
         SELECT COUNT(*), element, weapon
         FROM adventurers
+        WHERE CONCAT(name, ', ', element, ', ', weapon) NOT IN (SELECT * FROM exclude)
         GROUP BY element, weapon
       `;
       var numeratorCounts, numeratorNames;
