@@ -9,6 +9,7 @@ const {
   ALL_RARITIES,
   ALL_BOOLEAN_OPTIONS,
   ACTION_TYPE,
+  PAGE_SIZE,
 } = require('./consts');
 
 const sql = postgres(process.env.DATABASE_URL, {ssl: true}); // will default to the same as psql
@@ -432,6 +433,21 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
+async function popularity(interaction, ordering, page) {
+  const offset = (page - 1) * PAGE_SIZE;
+  return await sql`
+    SELECT COUNT(*), name FROM completed
+    GROUP BY name
+    ORDER BY
+      CASE
+        WHEN ${ordering === ORDERINGS.ASCENDING} THEN -COUNT(*)
+        ELSE COUNT(*)
+      END DESC
+    OFFSET ${offset}
+    LIMIT ${PAGE_SIZE}
+  `;
+}
+
 module.exports = {
   sql,
   getQuery,
@@ -448,5 +464,6 @@ module.exports = {
   clearCompleted,
   clearBlocked,
   leaderboard,
+  popularity,
   logCommand,
 }

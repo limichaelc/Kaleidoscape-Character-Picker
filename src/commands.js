@@ -2,7 +2,7 @@
 
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS, STATS_COMMANDS} = require('./consts');
+const {ACTION_TYPE, ALL_ELEMENTS, ALL_WEAPONS, MELEE_WEAPONS, RANGED_WEAPONS, COLORS, MANAGE_COMMAND_GROUPS, MANAGE_SUBCOMMANDS, STATS_COMMANDS, ORDERINGS, PAGE_SIZE} = require('./consts');
 const {
   sql,
   getQuery,
@@ -11,14 +11,12 @@ const {
   batchAddBlocked,
   batchRemoveCompleted,
   batchRemoveBlocked,
-  clearCompleted,
   clearBlocked,
   leaderboard,
+  popularity,
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
-
-const PAGE_SIZE = 10;
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -144,6 +142,36 @@ const searchCommand = {
     await Promise.all(results.map(result => sendMessage(interaction, result, true)));
   },
 };
+
+const popularityCommand = {
+  data: new SlashCommandBuilder()
+    .setName('popularity')
+    .setDescription('Shows the characters who have been marked completed by the most people')
+    .addStringOption(option =>
+      option.setName('ordering')
+        .setDescription('Whether to see the results in ascending or descending order')
+        .addChoices([
+          [ORDERINGS.ASCENDING, ORDERINGS.ASCENDING],
+          [ORDERINGS.DESCENDING, ORDERINGS.DESCENDING],
+        ])
+    )
+    .addIntegerOption(option =>
+      option.setName('number')
+        .setDescription('The page of the popularity board to view. Each page is 10 entries long')
+    ),
+  execute: async (interaction, _) => {
+    interaction.deferReply();
+    const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
+    const page = interaction.options.getInteger('page') ?? 1;
+    const entries = await popularity(interaction, ordering, page);
+    console.log(entries);
+    const fields = entries.sort().map(entry => `${entry.count}: ${entry.name}`);
+    const embed = new MessageEmbed()
+      .setTitle('Popularity Ranking')
+      .setDescription(fields.join('\n'));
+    interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
+  }
+}
 
 const leaderboardCommand = {
   data: new SlashCommandBuilder()

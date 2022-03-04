@@ -34,4 +34,9 @@ module.exports = {
     INCOMPLETE: 'incomplete',
     BLOCKED: 'blocked',
   },
+  ORDERINGS: {
+    ASCENDING: 'ascending',
+    DESCENDING: 'descending',
+  },
+  PAGE_SIZE: 10,
 }
