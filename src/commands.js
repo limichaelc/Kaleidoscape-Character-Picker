@@ -469,6 +469,15 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${interaction.user.id}
+                UNION ALL
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM blocked
+                WHERE userid = (
+                  CASE
+                    WHEN ${allowBlocked} THEN NULL
+                    ELSE ${interaction.user.id}
+                  END
+                )
               )
               SELECT COUNT(*), element, weapon
               FROM adventurers
@@ -482,6 +491,15 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${interaction.user.id}
+                UNION ALL
+                SELECT CONCAT(name, ', ', element, ', ', weapon)
+                FROM blocked
+                WHERE userid = (
+                  CASE
+                    WHEN ${allowBlocked} THEN NULL
+                    ELSE ${interaction.user.id}
+                  END
+                )
               )
               SELECT element, weapon, string_agg(name, ', ')
               FROM adventurers
