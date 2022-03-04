@@ -132,17 +132,8 @@ const searchCommand = {
 
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
-    .setName('leaderboard')
-    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.')
-    .addSubcommandGroup(subcommandGroup =>
-      subcommandGroup
-        .setName('full')
-        .setDescription('Managed your completed list'),
-    )
-    .addIntegerOption(option =>
-      option.setName('page')
-        .setDescription('The page of the leaderboard to view. Each page is 10 entries long.')
-    ),
+    .setName('bleh')
+    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.'),
   execute: async (interaction, _) => {
     interaction.deferReply();
     var previousPrefix = null;
