@@ -10,6 +10,7 @@ const {
   ALL_BOOLEAN_OPTIONS,
   ACTION_TYPE,
   PAGE_SIZE,
+  ORDERINGS,
 } = require('./consts');
 
 const sql = postgres(process.env.DATABASE_URL, {ssl: true}); // will default to the same as psql
