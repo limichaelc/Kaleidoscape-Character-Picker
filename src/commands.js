@@ -195,7 +195,11 @@ const leaderboardCommand = {
       }
       return base;
     });
-    const page = interaction.options.getInteger('number');
+    const subcommand = interaction.options.getSubcommand();
+    var page = interaction.options.getInteger('number');
+    if (page == null && subcommand == 'page') {
+      page = 1;
+    }
     if (page != null) {
       fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     }
