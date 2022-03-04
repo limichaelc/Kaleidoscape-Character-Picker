@@ -139,9 +139,7 @@ const leaderboardCommand = {
     var previousPrefix = null;
     var previousCount = null;
     const entries = await leaderboard(interaction);
-    const fields = [];
-    var users = [entries[0]?.username].filter(Boolean);
-    entries.map((entry, index) => {
+    const fields = entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
       switch (index) {
         case 0:
@@ -157,21 +155,19 @@ const leaderboardCommand = {
           break;
       }
       console.log(entry.count, previousCount);
-      // Current user shares placement with previous user
       if (entry.count === previousCount) {
         prefix = previousPrefix;
-        users.push(entry.username);
-      } else { // New placement found, push previous batch and start new one
+      } else {
         previousPrefix = prefix;
-        var base = `${prefix}: ${users.join(', ')} (${entry.count.toString()})`;
-        if (entry.isSelf) {
-          base = '**' + base + '**';
-        }
-        fields.push(base);
-        users = [entry.username];
       }
 
       previousCount = entry.count
+
+      var base = `${prefix}: ${entry.username} (${entry.count.toString()})`;
+      if (entry.isSelf) {
+        base = '**' + base + '**';
+      }
+      return base;
     });
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
