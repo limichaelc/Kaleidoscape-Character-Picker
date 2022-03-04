@@ -136,6 +136,8 @@ const leaderboardCommand = {
     .setDescription('Shows leaderboard by clears for all users of the bot'),
   execute: async (interaction, _) => {
     interaction.deferReply();
+    var previousPrefix = null;
+    var previousCount = null;
     const entries = await leaderboard(interaction);
     const fields = entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
@@ -152,6 +154,14 @@ const leaderboardCommand = {
         default:
           break;
       }
+      console.log(entry.count, previousCount);
+      if (entry.count === previousCount) {
+        prefix = previousPrefix;
+      } else {
+        previousPrefix = prefix;
+      }
+
+      previousCount = entry.count
 
       return `${prefix}: ${entry.username} (${entry.count.toString()})`;
     });
