@@ -609,6 +609,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   manageCommand,
   dailyCommand,
   leaderboardCommand,
+  popularityCommand,
   helpCommand,
 ].map(command => {
   commands.set(command.data.name, command);
