@@ -133,7 +133,7 @@ const searchCommand = {
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default. Use full or page subcommands for more')
+    .setDescription('Shows leaderboard by clears for all users of the bot, caps at top 10 by default.')
     .addSubcommandGroup(subcommandGroup =>
       subcommandGroup
         .setName('full')
