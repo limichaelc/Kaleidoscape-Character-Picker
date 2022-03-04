@@ -18,6 +18,8 @@ const {
 } = require('./db');
 const {helpCommand} = require('./help');
 
+const PAGE_SIZE = 10;
+
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
 
@@ -133,11 +135,36 @@ const searchCommand = {
 const leaderboardCommand = {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription('Shows leaderboard by clears for all users of the bot'),
+    .setDescription('Shows leaderboard by clears for all users of the bot.')
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('full')
+        .setDescription('Shows leaderboard by clears for all users of the bot'),
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('page')
+        .setDescription('Shows leaderboard by clears for all users of the bot, 10 entries at a time.')
+      .addIntegerOption(option =>
+        option.setName('number')
+          .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
+        ),
+    ),
   execute: async (interaction, _) => {
     interaction.deferReply();
+    var previousPrefix = null;
+    var previousCount = null;
+    var selfEntry = null
     const entries = await leaderboard(interaction);
-    const fields = entries.map((entry, index) => {
+    var fields = entries.sort((a, b) => {
+      if (a.count < b.count) {
+        return 1;
+      } else if (a.count > b.count) {
+        return -1;
+      } else {
+        return a.username.localeCompare(b.username);
+      }
+    }).map((entry, index) => {
       var prefix = `(${index + 1})`;
       switch (index) {
         case 0:
@@ -153,11 +180,28 @@ const leaderboardCommand = {
           break;
       }
 
-      return `${prefix}: ${entry.username} (${entry.count.toString()})`;
+      if (entry.count === previousCount) {
+        prefix = previousPrefix;
+      } else {
+        previousPrefix = prefix;
+      }
+
+      previousCount = entry.count
+
+      var base = `${prefix}: ${entry.username} (${entry.count.toString()})`;
+      if (entry.isSelf) {
+        selfEntry = `You are rank ${prefix} with a total of ${entry.count.toString()} adventurers`;
+        base = '**' + base + '**';
+      }
+      return base;
     });
+    const page = interaction.options.getInteger('number');
+    if (page != null) {
+      fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    }
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
-      .setDescription(fields.join('\n'));
+      .setDescription([selfEntry, fields.join('\n')].join('\n\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };

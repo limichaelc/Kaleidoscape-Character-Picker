@@ -427,7 +427,7 @@ async function leaderboard(interaction) {
     if (username == null) {
       return null;
     }
-    return {count, username};
+    return {count, username, isSelf: userid === interaction.user.id};
   }));
   return results.filter(Boolean);
 }
