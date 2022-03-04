@@ -138,6 +138,7 @@ const leaderboardCommand = {
     interaction.deferReply();
     var previousPrefix = null;
     var previousCount = null;
+    var combinedEntry = null;
     const entries = await leaderboard(interaction);
     const fields = entries.map((entry, index) => {
       var prefix = `(${index + 1})`;
@@ -157,17 +158,20 @@ const leaderboardCommand = {
       console.log(entry.count, previousCount);
       if (entry.count === previousCount) {
         prefix = previousPrefix;
+        combinedEntry += entry.username;
+        previousCount = entry.count;
+        return null;
       } else {
         previousPrefix = prefix;
+        combinedEntry = entry.username
+        previousCount = entry.count
       }
 
-      previousCount = entry.count
-
-      return `${prefix}: ${entry.username} (${entry.count.toString()})`;
+      return `${prefix}: ${combinedEntry} (${entry.count.toString()})`;
     });
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
-      .setDescription(fields.join('\n'));
+      .setDescription(fields.filter(Boolean).join('\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
 };
