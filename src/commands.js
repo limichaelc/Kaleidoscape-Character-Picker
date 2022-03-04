@@ -197,7 +197,7 @@ const leaderboardCommand = {
     });
     const page = interaction.options.getInteger('number');
     if (page != null) {
-      fields = fields.slice((page - 1) * PAGE_SIZE, page);
+      fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     }
     const embed = new MessageEmbed()
       .setTitle('Leaderboard')
