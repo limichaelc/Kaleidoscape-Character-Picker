@@ -23,7 +23,7 @@ const PAGE_SIZE = 10;
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
 
-function sendMessage(interaction, concatResult, isFollowUp = false) {
+async function sendMessage(interaction, concatResult, isFollowUp = false) {
   if (concatResult == undefined) {
     return interaction.reply(
       `Could not find an adventurer with those restrictions... Try allowing completed adventurers or removing some from your blocklist`,
@@ -31,6 +31,10 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
   }
   const item = concatResult.concat;
   const [id, rarity, adventurerName, element, weapon] = item.split(', ');
+  const [count] = await sql`
+    SELECT COUNT(*) from completed
+    WHERE name = ${adventurerName}
+  `;
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
   const embed = {
     "type": "rich",
@@ -42,6 +46,10 @@ function sendMessage(interaction, concatResult, isFollowUp = false) {
       "height": 0,
       "width": 0,
     },
+    "fields": [{
+      "name": "\u200B",
+      "value": `Completed by ${count} people`,
+    }],
     "url": wikiURL,
   }
   const row = new MessageActionRow()
@@ -93,7 +101,7 @@ function simpleCommand(name, description, vars) {
       const query = getQuery(interaction, vars);
       const [concatResult] = await query;
       await logCommand(interaction, name);
-      return sendMessage(interaction, concatResult);
+      return await sendMessage(interaction, concatResult);
     }
   };
 }
@@ -109,8 +117,8 @@ const dailyCommand = {
     if (results.length == 0) {
       return interaction.reply('Could not pick any adventurers').catch(onRejected => console.error(onRejected));
     }
-    sendMessage(interaction, results[0]);
-    results.slice(1).map(result => sendMessage(interaction, result, true));
+    await sendMessage(interaction, results[0]);
+    await Promise.all(results.slice(1).map(result => sendMessage(interaction, result, true)));
   }
 };
 
@@ -128,7 +136,7 @@ const searchCommand = {
     if (results.length == 0) {
       return interaction.followUp('Could not find any adventurers with those names');
     }
-    results.map(result => sendMessage(interaction, result, true));
+    await Promise.all(results.map(result => sendMessage(interaction, result, true)));
   },
 };
 
@@ -304,7 +312,7 @@ ALL_WEAPONS.map(weapon => {
       const query = getQuery(interaction, { element, weapons: [weapon] });
       await logCommand(interaction, 'weapon', element);
       const [concatResult] = await query;
-      return sendMessage(interaction, concatResult);
+      return await sendMessage(interaction, concatResult);
     },
   };
   commands.set(command.data.name, command); // Set the command name and file for handler to use.
@@ -326,7 +334,7 @@ ALL_ELEMENTS.map(element => {
       const query = getQuery(interaction, { element, weapons: weapon != '' ? [weapon] : ALL_WEAPONS });
       await logCommand(interaction, 'element', weapon);
       const [concatResult] = await query;
-      return sendMessage(interaction, concatResult);
+      return await sendMessage(interaction, concatResult);
     },
   };
   commands.set(command.data.name, command); // Set the command name and file for handler to use.
