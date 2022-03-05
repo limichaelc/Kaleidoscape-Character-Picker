@@ -156,7 +156,7 @@ const popularityCommand = {
         ])
     )
     .addIntegerOption(option =>
-      option.setName('number')
+      option.setName('page')
         .setDescription('The page of the popularity board to view. Each page is 10 entries long')
     ),
   execute: async (interaction, _) => {
