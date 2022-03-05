@@ -167,7 +167,15 @@ const popularityCommand = {
     console.log(entries);
     var previousPrefix = null;
     var previousCount = null;
-    var fields = entries.sort().map((entry, index) => {
+    var fields = entries.sort((a, b) => {
+      if (a.count < b.count) {
+        return 1;
+      } else if (a.count > b.count) {
+        return -1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    }).map((entry, index) => {
       var prefix = `(${index + 1})`;
       if (entry.count === previousCount) {
         prefix = previousPrefix;
