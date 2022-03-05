@@ -164,7 +164,6 @@ const popularityCommand = {
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
     const page = interaction.options.getInteger('page') ?? 1;
     const entries = await popularity(interaction, ordering);
-    console.log(entries);
     var previousPrefix = null;
     var previousCount = null;
     var fields = entries.sort((a, b) => {
