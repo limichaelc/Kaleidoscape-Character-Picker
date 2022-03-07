@@ -252,14 +252,15 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
   const names = await Promise.all(completers.map(async completer => await fetchUser(interaction, completer.userid)));
   const embed = {
-    "type": "rich",
-    "title": adventurer,
-    "description": names.join('\n'),
-    "thumbnail": {
-      "url": thumbnailUrl,
-      "height": 0,
-      "width": 0
-    }
+    'type': 'rich',
+    'title': adventurer,
+    'description': names.join('\n'),
+    'thumbnail': {
+      'url': thumbnailUrl,
+      'height': 0,
+      'width': 0
+    },
+    'url': `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`,
   };
   return interaction.reply({embeds: [embed]});
 }
