@@ -467,6 +467,7 @@ async function recent(interaction) {
       const query = getSearchQueryRaw(options);
       const adventurers = await searchRaw(query);
       const names = adventurers.map(adventurer => {
+        console.log(adventurer, adventurer.split(', '));
         const [_id, _rarity, name, _element, _weapon] = adventurer.split(', ');
         return name;
       });
