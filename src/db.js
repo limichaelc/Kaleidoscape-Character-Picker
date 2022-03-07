@@ -486,11 +486,16 @@ async function history(interaction) {
   `;
 
   await logCommand(interaction, 'history');
+  const usernameMap = {};
   const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
-    const username = await fetchUser(interaction, userid);
+    var username = usernameMap[userid];
     if (username == null) {
-      return null;
+      username = await fetchUser(interaction, userid);
+      if (username == null) {
+        return null;
+      }
+      usernameMap[userid] = username;
     }
     var namesStr;
     if (command === 'manage completed add') {
