@@ -142,9 +142,14 @@ async function logCommand(interaction, command, options = '') {
   const username = interaction.user.username;
   const guildName = interaction.guild?.name;
   const allowCompleted = interaction.options?.getBoolean('allow_completed');
+  const allowBlocked = interaction.options?.getBoolean('allow_blocked');
+  const page = interaction.options?.getInteger('page');
+  const additionalOptions = [allowCompleted, allowBlocked, page].filter(Boolean);
+  const additionalOptionsString = additionalOptions.length > 0 ? (' ' + additionalOptions.join(' ')) : '';
+
   await sql`
     INSERT INTO logging(timestamp, guildName, userid, command, options)
-    VALUES(NOW(), ${guildName}, ${userID}, ${command}, ${options + (allowCompleted != null ? (' ' + allowCompleted) : '')})
+    VALUES(NOW(), ${guildName}, ${userID}, ${command}, ${options + (additionalOptionsString)})
   `;
   await sql`
     INSERT INTO users(userid, username)
@@ -234,21 +239,29 @@ async function markIncomplete(interaction, adventurer) {
   });
 }
 
-function getSearchQuery(interaction, addWildcards = false) {
-  return interaction.options.getString('query').split(',').map(entry => {
+function getSearchQueryRaw(query, addWildcards = false) {
+  return query.split(',').map(entry => {
     const trimmed = entry.toLowerCase().trim();
     return addWildcards ? `%${trimmed}%` : trimmed;
   });
 }
 
-async function search(interaction) {
-  const query = getSearchQuery(interaction, true)
-  await logCommand(interaction, 'search', query);
+function getSearchQuery(interaction, addWildcards = false) {
+  return getSearchQueryRaw(interaction.options.getString('query'), addWildcards);
+}
+
+async function searchRaw(query) {
   return await sql`
     SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
     FROM adventurers
     WHERE name ILIKE ANY(ARRAY[${query}]) OR aliases ILIKE ANY(ARRAY[${query}])
   `;
+}
+
+async function search(interaction) {
+  const query = getSearchQuery(interaction, true)
+  await logCommand(interaction, 'search', query);
+  return await searchRaw(query);
 }
 
 async function clearCompleted(interaction) {
@@ -434,6 +447,39 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
+async function recent(interaction) {
+  const recent = await sql`
+    SELECT timestamp, userid, command, options FROM logging
+    WHERE command IN ('complete', 'manage completed add')
+    AND timestamp > (current_date - INTERVAL '1 day')
+    ORDER BY timestamp DESC
+  `;
+
+  await logCommand(interaction, 'recent');
+  const results = await Promise.all(leaderboard.map(async entry => {
+    const {timestamp, userid, command, options} = entry;
+    const username = await fetchUser(interaction, userid);
+    if (username == null) {
+      return null;
+    }
+    var namesStr = options;
+    if (command === 'manage completed add') {
+      const query = getSearchQueryRaw(options);
+      const adventurers = await searchRaw(query);
+      SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
+      const names = adventurers.map(adventurer => {
+        const [_, _, name, _, _] = adventurer.split(', ');
+        return name;
+      });
+      namesStr = names.length > 1 ? names.slice(0, -1).join(',') + ' and ' + names.slice(-1) : names[0];
+    } else {
+
+    }
+    return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
+  }));
+  return results.filter(Boolean);
+}
+
 async function popularity(interaction) {
   await logCommand(interaction, 'popularity');
   return await sql`
@@ -460,5 +506,6 @@ module.exports = {
   clearBlocked,
   leaderboard,
   popularity,
+  recent,
   logCommand,
 }

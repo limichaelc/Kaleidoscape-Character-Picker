@@ -14,6 +14,7 @@ const {
   clearBlocked,
   leaderboard,
   popularity,
+  recent,
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
@@ -588,6 +589,39 @@ function statsCommand(name, description) {
   };
 }
 
+function getRelativeTime(d1, d2 = new Date()) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const elapsed = d1 - d2
+
+  // "Math.abs" accounts for both "past" & "future" scenarios
+  for (const u in units)
+    if (Math.abs(elapsed) > units[u] || u == 'second')
+      return rtf.format(Math.round(elapsed/units[u]), u)
+}
+
+const recentCommand = {
+  data: new SlashCommandBuilder()
+    .setName('recent')
+    .setDescription('Shows completions from the last day by all users of the bot.'),
+  execute: async (interaction, _) => {
+    interaction.deferReply();
+    const entries = await recent(interaction);
+    var fields = entries.map(entry => {
+      const prefix = getRelativeTime(entry.timestamp);
+      const name = entry.isSelf ? 'You' : entry.username;
+      var base = `${prefix}: ${name} completed (${entry.namesStr})`;
+      if (entry.isSelf) {
+        base = '**' + base + '**';
+      }
+      return base;
+    });
+    const embed = new MessageEmbed()
+      .setTitle(`Recent Completions)`)
+      .setDescription(fields.join('\n'));
+    interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
+  },
+};
+
 function capitalize(input) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
@@ -664,6 +698,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   dailyCommand,
   leaderboardCommand,
   popularityCommand,
+  recentCommand,
   helpCommand,
 ].map(command => {
   commands.set(command.data.name, command);
