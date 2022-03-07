@@ -40,7 +40,7 @@ async function handleButtonInteraction(interaction) {
     case ACTION_TYPE.INCOMPLETE:
       return markIncomplete(interaction, adventurer);
     case ACTION_TYPE.COMPLETERS:
-      return findCompleters(interaction, adventurer);
+      return findCompleters(interaction, embed.title, embed.thumbnail.url);
     default:
       return;
   }
