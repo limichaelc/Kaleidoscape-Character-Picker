@@ -456,7 +456,7 @@ async function recent(interaction) {
   `;
 
   await logCommand(interaction, 'recent');
-  const results = await Promise.all(leaderboard.map(async entry => {
+  const results = await Promise.all(recent.map(async entry => {
     const {timestamp, userid, command, options} = entry;
     const username = await fetchUser(interaction, userid);
     if (username == null) {
