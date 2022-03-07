@@ -254,7 +254,12 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
   const embed = {
     'type': 'rich',
     'title': adventurer,
-    'description': names.join('\n'),
+    'fields': [
+        {
+          'name': `Completed by:`,
+          'value': names.join('\n'),
+        }
+      ],
     'thumbnail': {
       'url': thumbnailUrl,
       'height': 0,
