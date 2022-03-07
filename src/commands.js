@@ -631,7 +631,6 @@ const historyCommand = {
       return base;
     });
     const embed = new MessageEmbed()
-      .setTitle(`History`)
       .setDescription(fields.join('\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },

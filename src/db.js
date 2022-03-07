@@ -473,7 +473,8 @@ async function history(interaction) {
         const [_id, _rarity, name, _element, _weapon] = adventurer.concat.split(', ');
         return name;
       });
-      namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names.slice(-1) : names[0];
+      const andStr = names.length > 2 ? ', and ' : ' and ';
+      namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
     } else {
       namesStr = options.split(', ')[0];
     }
