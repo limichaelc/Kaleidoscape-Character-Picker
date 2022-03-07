@@ -49,9 +49,20 @@ const supportedCommands = [
     description: `
       This command shows the leaderboard in terms of unique characters completed by all users of the bot.\n
       For people in the server the command is used, it will show their nickname, otherwise, their Discord username.
+      The leaderboard is split into pages of 10 by default, and you can use the \`page\` subcommand to navigate. Alternatively, you can use the \`full\` subcommand to see the entire list.
     `,
-    usage: 'leaderboard',
+    usage: 'leaderboard <page|full> <page>',
     example: 'leaderboard',
+  },
+  {
+    names: ['history'],
+    category: COMMAND_CATEGORIES.GENERAL,
+    description: `
+      This command shows the last day of completes by all users of the bot.\n
+      For people in the server the command is used, it will show their nickname, otherwise, their Discord username.
+    `,
+    usage: 'history',
+    example: 'history',
   },
   {
     names: ['manage'],
@@ -66,14 +77,15 @@ const supportedCommands = [
     example: 'manage completed add xainfried, aurien, the prince`, `/manage blocked clear',
   },
   {
-    names: ['completed', 'blocked'],
+    names: ['completed', 'blocked', 'incomplete'],
     category: COMMAND_CATEGORIES.GENERAL,
     description: `
-      This command displays all the adventurers on your completed/blocked lists.\n
+      This command displays all the adventurers on your completed/blocked/incomplete lists.\n
       By default, the bot's response will be in messages only visible to you, but you can pass in a \`visibility\` option to make it show up for everyone as well.
+      For \`/completed\` and \`/incomplete\`, the stats will be calculated taking your block list into consideration, but you can also provide a \`allow_blocked\` option to bypass that.
     `,
-    usage: '<completed|blocked> <visibility>',
-    example: 'completed everyone`, `/blocked me',
+    usage: '<completed|blocked|incomplete> <visibility> <allow_blocked>',
+    example: 'completed everyone`, , `incomplete true`, `/blocked me',
   },
   {
     names: ['perma', 'limited'],
