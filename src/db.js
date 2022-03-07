@@ -489,13 +489,13 @@ async function history(interaction) {
   const usernameMap = {};
   const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
-    var username = usernameMap.userid;
+    var username = usernameMap[userid];
     if (username == null) {
       username = await fetchUser(interaction, userid);
       if (username == null) {
         return null;
       }
-      usernameMap.userid = username;
+      usernameMap[userid] = username;
     }
     console.log(usernameMap);
     var namesStr;
