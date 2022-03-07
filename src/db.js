@@ -451,7 +451,7 @@ async function recent(interaction) {
   const recent = await sql`
     SELECT timestamp, userid, command, options FROM logging
     WHERE command IN ('complete', 'manage completed add')
-    AND timestamp > (now() - INTERVAL '1 day')
+    AND timestamp > (now() - INTERVAL '3 day')
     ORDER BY timestamp DESC
   `;
 
@@ -462,7 +462,7 @@ async function recent(interaction) {
     if (username == null) {
       return null;
     }
-    var namesStr = options;
+    var namesStr;
     if (command === 'manage completed add') {
       const query = getSearchQueryRaw(options);
       const adventurers = await searchRaw(query);
@@ -470,9 +470,9 @@ async function recent(interaction) {
         const [_id, _rarity, name, _element, _weapon] = adventurer.concat.split(', ');
         return name;
       });
-      namesStr = names.length > 1 ? names.slice(0, -1).join(',') + ' and ' + names.slice(-1) : names[0];
+      namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names.slice(-1) : names[0];
     } else {
-
+      namesStr = options.split(', ')[0];
     }
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
   }));
