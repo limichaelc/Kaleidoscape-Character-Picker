@@ -247,7 +247,7 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
   const completers = await sql`
     SELECT userid
     FROM completed
-    WHERE CONCAT(name, ', ', element, ', ', weapon) = ${adventurer}
+    WHERE name = ${adventurer}
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
   const names = await Promise.all(completers.map(async completer => await fetchUser(interaction, completer.userid)));
