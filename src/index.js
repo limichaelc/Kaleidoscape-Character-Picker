@@ -39,7 +39,7 @@ async function handleButtonInteraction(interaction) {
       return markCompleted(interaction, adventurer);
     case ACTION_TYPE.INCOMPLETE:
       return markIncomplete(interaction, adventurer);
-    case ACTION_TYPE.COMPLETERS
+    case ACTION_TYPE.COMPLETERS:
       return findCompleters(interaction, adventurer);
     default:
       return;
