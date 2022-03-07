@@ -447,16 +447,16 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
-async function recent(interaction) {
-  const recent = await sql`
+async function history(interaction) {
+  const history = await sql`
     SELECT timestamp, userid, command, options FROM logging
     WHERE command IN ('complete', 'manage completed add')
-    AND timestamp > (now() - INTERVAL '3 day')
+    AND timestamp > (now() - INTERVAL '1 day')
     ORDER BY timestamp DESC
   `;
 
-  await logCommand(interaction, 'recent');
-  const results = await Promise.all(recent.map(async entry => {
+  await logCommand(interaction, 'history');
+  const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
     const username = await fetchUser(interaction, userid);
     if (username == null) {

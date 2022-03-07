@@ -165,7 +165,6 @@ const popularityCommand = {
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
     const page = interaction.options.getInteger('page') ?? 1;
     const entries = await popularity(interaction, ordering);
-    console.log(entries);
     var previousPrefix = null;
     var previousCount = null;
     var fields = entries.sort().map((entry, index) => {
@@ -607,13 +606,13 @@ function getRelativeTime(d1, d2 = new Date()) {
       return rtf.format(Math.round(elapsed/units[u]), u)
 }
 
-const recentCommand = {
+const historyCommand = {
   data: new SlashCommandBuilder()
-    .setName('recent')
+    .setName('history')
     .setDescription('Shows completions from the last day by all users of the bot.'),
   execute: async (interaction, _) => {
     interaction.deferReply();
-    const entries = await recent(interaction);
+    const entries = await history(interaction);
     var fields = entries.map(entry => {
       const prefix = getRelativeTime(entry.timestamp);
       const name = entry.isSelf ? 'You' : entry.username;
@@ -624,7 +623,7 @@ const recentCommand = {
       return base;
     });
     const embed = new MessageEmbed()
-      .setTitle(`Recent Completions`)
+      .setTitle(`History`)
       .setDescription(fields.join('\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
@@ -706,7 +705,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   dailyCommand,
   leaderboardCommand,
   popularityCommand,
-  recentCommand,
+  historyCommand,
   helpCommand,
 ].map(command => {
   commands.set(command.data.name, command);
