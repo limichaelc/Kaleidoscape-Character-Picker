@@ -451,7 +451,7 @@ async function recent(interaction) {
   const recent = await sql`
     SELECT timestamp, userid, command, options FROM logging
     WHERE command IN ('complete', 'manage completed add')
-    AND timestamp > (current_date - INTERVAL '1 day')
+    AND timestamp > (now() - INTERVAL '1 day')
     ORDER BY timestamp DESC
   `;
 

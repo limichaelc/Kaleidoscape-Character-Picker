@@ -617,14 +617,14 @@ const recentCommand = {
     var fields = entries.map(entry => {
       const prefix = getRelativeTime(entry.timestamp);
       const name = entry.isSelf ? 'You' : entry.username;
-      var base = `${prefix}: ${name} completed (${entry.namesStr})`;
+      var base = `${prefix}: ${name} completed (${entry.names})`;
       if (entry.isSelf) {
         base = '**' + base + '**';
       }
       return base;
     });
     const embed = new MessageEmbed()
-      .setTitle(`Recent Completions)`)
+      .setTitle(`Recent Completions`)
       .setDescription(fields.join('\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
