@@ -65,6 +65,17 @@ const supportedCommands = [
     example: 'history',
   },
   {
+    names: ['popularity'],
+    category: COMMAND_CATEGORIES.GENERAL,
+    description: `
+      This command shows how popular adventurers are in term of completes.\n
+      The popularity ranking is split into pages of 25 by default, and you can use the \`page\` subcommand to navigate.\n
+      You can also use the \`ordering\` subcommand to reverse the order.
+    `,
+    usage: 'popularity <page> <ordering>',
+    example: 'popularity`, `/popularity 2`, `/popularity ascending',
+  },
+  {
     names: ['manage'],
     category: COMMAND_CATEGORIES.LIST_MANAGEMENT,
     description: `
