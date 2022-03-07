@@ -243,7 +243,7 @@ async function markIncomplete(interaction, adventurer) {
   });
 }
 
-async function findCompleters(interaction, adventurer) {
+async function findCompleters(interaction, adventurer, thumbnailUrl) {
   const completers = await sql`
     SELECT userid
     FROM completed
@@ -251,9 +251,16 @@ async function findCompleters(interaction, adventurer) {
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
   const names = await Promise.all(completers.map(async completer => await fetchUser(interaction, completer.userid)));
-  const embed = new MessageEmbed()
-      .setTitle(adventurer)
-      .setDescription(names.join('\n'));
+  const embed = {
+    "type": "rich",
+    "title": adventurer,
+    "description": names.join('\n'),
+    "thumbnail": {
+      "url": thumbnailUrl,
+      "height": 0,
+      "width": 0
+    }
+  };
   return interaction.reply({embeds: [embed]});
 }
 
