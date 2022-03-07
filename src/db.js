@@ -497,7 +497,7 @@ async function history(interaction) {
       }
       usernameMap.userid = username;
     }
-    consoe.log(usernameMap);
+    console.log(usernameMap);
     var namesStr;
     if (command === 'manage completed add') {
       const query = getSearchQueryRaw(options);
