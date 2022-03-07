@@ -597,7 +597,7 @@ function getRelativeTime(d1, d2 = new Date()) {
     hour  : 60 * 60 * 1000,
     minute: 60 * 1000,
     second: 1000
-  }
+  };
   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
   const elapsed = d1 - d2
 
