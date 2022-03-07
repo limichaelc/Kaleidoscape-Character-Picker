@@ -250,7 +250,7 @@ async function findCompleters(interaction, adventurer) {
     WHERE CONCAT(name, ', ', element, ', ', weapon) = ${adventurer}
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
-  const names = completers.map(async completer => await fetchUser(interaction, completer.userid));
+  const names = Promise.all(completers.map(async completer => await fetchUser(interaction, completer.userid)));
   const embed = new MessageEmbed()
       .setTitle(adventurer)
       .setDescription(names.join('\n'));
