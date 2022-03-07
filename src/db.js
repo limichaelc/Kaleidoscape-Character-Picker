@@ -144,6 +144,9 @@ async function logCommand(interaction, command, options = '') {
   const allowCompleted = interaction.options?.getBoolean('allow_completed');
   const allowBlocked = interaction.options?.getBoolean('allow_blocked');
   const page = interaction.options?.getInteger('page');
+  if (options === null) {
+    options = '';
+  }
   const additionalOptions = [allowCompleted, allowBlocked, page].filter(Boolean);
   const additionalOptionsString = additionalOptions.length > 0 ? (' ' + additionalOptions.join(' ')) : '';
 
