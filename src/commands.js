@@ -590,6 +590,14 @@ function statsCommand(name, description) {
 }
 
 function getRelativeTime(d1, d2 = new Date()) {
+  const units = {
+    year  : 24 * 60 * 60 * 1000 * 365,
+    month : 24 * 60 * 60 * 1000 * 365/12,
+    day   : 24 * 60 * 60 * 1000,
+    hour  : 60 * 60 * 1000,
+    minute: 60 * 1000,
+    second: 1000
+  }
   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
   const elapsed = d1 - d2
 
