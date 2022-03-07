@@ -80,6 +80,12 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
         .setCustomId(ACTION_TYPE.UNBLOCK)
         .setLabel('Unblock')
         .setStyle('SECONDARY'),
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId(ACTION_TYPE.COMPLETERS)
+        .setLabel('See who has completed')
+        .setStyle('SECONDARY'),
     );
   const message = { embeds: [embed], components: [row] };
   return isFollowUp
