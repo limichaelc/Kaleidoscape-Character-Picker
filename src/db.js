@@ -466,7 +466,6 @@ async function recent(interaction) {
     if (command === 'manage completed add') {
       const query = getSearchQueryRaw(options);
       const adventurers = await searchRaw(query);
-      SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
       const names = adventurers.map(adventurer => {
         const [_, _, name, _, _] = adventurer.split(', ');
         return name;
