@@ -242,6 +242,20 @@ async function markIncomplete(interaction, adventurer) {
   });
 }
 
+async function findCompleters(interaction, adventurer) {
+  const completers = await sql`
+    SELECT userid
+    FROM completed
+    WHERE CONCAT(name, ', ', element, ', ', weapon) = ${adventurer}
+  `;
+  await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
+  const names = completers.map(async completer => await fetchUser(interaction, completer.userid));
+  const embed = new MessageEmbed()
+      .setTitle(adventurer)
+      .setDescription(names.join('\n'));
+  return interaction.reply({embeds: [embed]});
+}
+
 function getSearchQueryRaw(query, addWildcards = false) {
   return query.split(',').map(entry => {
     const trimmed = entry.toLowerCase().trim();
@@ -499,6 +513,7 @@ module.exports = {
   markIncomplete,
   addToBlocklist,
   removeFromBlocklist,
+  findCompleters,
   search,
   batchAddCompleted,
   batchAddBlocked,

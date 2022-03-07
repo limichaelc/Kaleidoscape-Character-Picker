@@ -6,6 +6,7 @@ module.exports = {
     INCOMPLETE: 'incomplete',
     BLOCK: 'block',
     UNBLOCK: 'unblock',
+    COMPLETERS: 'completers',
   },
   ALL_WEAPONS: ['sword', 'blade', 'dagger', 'axe', 'lance', 'wand', 'bow', 'staff', 'manacaster'],
   ALL_ELEMENTS: ['flame', 'water', 'wind', 'light', 'shadow'],
