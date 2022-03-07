@@ -260,7 +260,7 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
       'height': 0,
       'width': 0
     },
-    'url': `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`,
+    'url': `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurer)}`,
   };
   return interaction.reply({embeds: [embed]});
 }
