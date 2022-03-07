@@ -505,6 +505,6 @@ module.exports = {
   clearBlocked,
   leaderboard,
   popularity,
-  recent,
+  history,
   logCommand,
 }

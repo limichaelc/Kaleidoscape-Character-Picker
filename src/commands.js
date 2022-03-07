@@ -14,7 +14,7 @@ const {
   clearBlocked,
   leaderboard,
   popularity,
-  recent,
+  history,
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
