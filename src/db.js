@@ -3,6 +3,7 @@
 const {REST} = require('@discordjs/rest')
 const {Routes} = require('discord-api-types/v9')
 const postgres = require('postgres');
+const {MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {allAdventurers, dragonDrive, uniqueDragon, threeStars, fourStars, limited} = require('./adventurers');
 const {
   ALL_WEAPONS,
