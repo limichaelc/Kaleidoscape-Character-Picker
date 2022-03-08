@@ -509,13 +509,17 @@ async function history(interaction) {
     } else {
       names = [options.split(', ')[0]];
     }
-    names.filter(name => !adventurersMap[userid].contains(name));
+    names.filter(name => !adventurersMap[userid]?.contains(name));
     if (names.length === 0) {
       return null;
     }
     const andStr = names.length > 2 ? ', and ' : ' and ';
     const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
-    adventurersMap[userid].concat(names);
+    if (adventurersMap[userid] != null) {
+      adventurersMap[userid].concat(names);
+    } else {
+      adventurersMap[userid] = names;
+    }
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
   }));
   return results.filter(Boolean);
