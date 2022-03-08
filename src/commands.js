@@ -565,6 +565,12 @@ function statsCommand(name, description) {
         return;
       }
 
+      if (totalNumerator == totalAdventurers) {
+        interaction.followUp({
+          content: 'Wait, 100%?! You madman, you\'ve done it! 🥳 Now, go outside and get a life or something, jeez...'
+        });
+      }
+
       ALL_ELEMENTS.map(element => {
         const elementFilter = entry => entry.element.toLowerCase() == element.toLowerCase();
         const fields = ALL_WEAPONS.map(weapon => {
@@ -602,24 +608,6 @@ function statsCommand(name, description) {
   };
 }
 
-function getRelativeTime(d1, d2 = new Date()) {
-  const units = {
-    year  : 24 * 60 * 60 * 1000 * 365,
-    month : 24 * 60 * 60 * 1000 * 365/12,
-    day   : 24 * 60 * 60 * 1000,
-    hour  : 60 * 60 * 1000,
-    minute: 60 * 1000,
-    second: 1000
-  };
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-  const elapsed = d1 - d2
-
-  // "Math.abs" accounts for both "past" & "future" scenarios
-  for (const u in units)
-    if (Math.abs(elapsed) > units[u] || u == 'second')
-      return rtf.format(Math.round(elapsed/units[u]), u)
-}
-
 const historyCommand = {
   data: new SlashCommandBuilder()
     .setName('history')
@@ -628,9 +616,8 @@ const historyCommand = {
     interaction.deferReply();
     const entries = await history(interaction);
     var fields = entries.map(entry => {
-      const prefix = getRelativeTime(entry.timestamp);
       const name = entry.isSelf ? 'You' : entry.username;
-      var base = `${prefix}: ${name} completed ${entry.names}`;
+      var base = `${entry.prefix}: ${name} completed ${entry.names}`;
       if (entry.isSelf) {
         base = '**' + base + '**';
       }

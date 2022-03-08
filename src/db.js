@@ -477,6 +477,24 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
+function getRelativeTime(d1, d2 = new Date()) {
+  const units = {
+    year  : 24 * 60 * 60 * 1000 * 365,
+    month : 24 * 60 * 60 * 1000 * 365/12,
+    day   : 24 * 60 * 60 * 1000,
+    hour  : 60 * 60 * 1000,
+    minute: 60 * 1000,
+    second: 1000
+  };
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const elapsed = d1 - d2
+
+  // "Math.abs" accounts for both "past" & "future" scenarios
+  for (const u in units)
+    if (Math.abs(elapsed) > units[u] || u == 'second')
+      return rtf.format(Math.round(elapsed/units[u]), u)
+}
+
 async function history(interaction) {
   const history = await sql`
     SELECT timestamp, userid, command, options FROM logging
@@ -487,9 +505,14 @@ async function history(interaction) {
 
   await logCommand(interaction, 'history');
   const usernameMap = {};
-  const results = await Promise.all(history.map(async entry => {
+  const adventurersMap = {};
+  var results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
+    const prefix = getRelativeTime(timestamp);
     var username = usernameMap[userid];
+    if (adventurersMap[userid] == null) {
+      adventurersMap[userid] = [];
+    }
     if (username == null) {
       username = await fetchUser(interaction, userid);
       if (username == null) {
@@ -497,22 +520,41 @@ async function history(interaction) {
       }
       usernameMap[userid] = username;
     }
-    var namesStr;
+    var names;
     if (command === 'manage completed add') {
       const query = getSearchQueryRaw(options);
       const adventurers = await searchRaw(query);
-      const names = adventurers.map(adventurer => {
+      names = adventurers.map(adventurer => {
         const [_id, _rarity, name, _element, _weapon] = adventurer.concat.split(', ');
         return name;
       });
-      const andStr = names.length > 2 ? ', and ' : ' and ';
-      namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
     } else {
-      namesStr = options.split(', ')[0];
+      names = [options.split(', ')[0]];
     }
-    return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
+    names = names.filter(name => !adventurersMap[userid].includes(name));
+    if (names.length === 0) {
+      return null;
+    }
+    adventurersMap[userid] = adventurersMap[userid].concat(names);
+    return {prefix, username, names, userid};
   }));
-  return results.filter(Boolean);
+  results = results.filter(Boolean);
+  for (var i = 0; i < results.length - 1; i++) {
+    const curr = results[i];
+    const next = results[i + 1];
+    if (curr.timestamp === next.timestamp && curr.username === next.username) {
+      curr.names = curr.names.concat(next.names);
+      results[i + 1] = null;
+      i++;
+    }
+  }
+
+  return results.filter(Boolean).map(result => {
+    const {prefix, username, names, userid} = result;
+    const andStr = names.length > 2 ? ', and ' : ' and ';
+    const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
+    return {prefix, username, names: namesStr, isSelf: userid === interaction.user.id};
+  });
 }
 
 async function popularity(interaction) {
