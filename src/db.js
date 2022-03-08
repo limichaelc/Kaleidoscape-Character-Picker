@@ -541,7 +541,7 @@ async function history(interaction) {
   results = results.filter(Boolean);
   for (var i = 0; i < results.length - 1; i++) {
     const curr = results[i];
-    const next = result[i + 1];
+    const next = results[i + 1];
     if (curr.timestamp === next.timestamp && curr.username === next.username) {
       curr.names = curr.names.concat(next.names);
       results[i + 1] = null;
