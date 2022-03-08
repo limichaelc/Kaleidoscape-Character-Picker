@@ -512,7 +512,7 @@ async function history(interaction) {
     } else {
       names = [options.split(', ')[0]];
     }
-    names.filter(name => !adventurersMap[userid]?.contains(name));
+    names.filter(name => !adventurersMap[userid].includes(name));
     if (names.length === 0) {
       return null;
     }
