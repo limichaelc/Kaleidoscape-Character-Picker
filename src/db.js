@@ -506,7 +506,7 @@ async function history(interaction) {
   await logCommand(interaction, 'history');
   const usernameMap = {};
   const adventurersMap = {};
-  const results = await Promise.all(history.map(async entry => {
+  var results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
     const prefix = getRelativeTime(timestamp);
     var username = usernameMap[userid];
@@ -537,7 +537,8 @@ async function history(interaction) {
     }
     adventurersMap[userid] = adventurersMap[userid].concat(names);
     return {timestamp, username, names, userid};
-  })).filter(Boolean);
+  }));
+  results = results.filter(Boolean);
   for (var i = 0; i < results.length - 1; i++) {
     const curr = results[i];
     const next = result[i + 1];
