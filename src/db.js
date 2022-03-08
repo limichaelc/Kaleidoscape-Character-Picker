@@ -536,7 +536,7 @@ async function history(interaction) {
       return null;
     }
     adventurersMap[userid] = adventurersMap[userid].concat(names);
-    return {timestamp, username, names, userid};
+    return {prefix, username, names, userid};
   }));
   results = results.filter(Boolean);
   for (var i = 0; i < results.length - 1; i++) {
@@ -550,10 +550,10 @@ async function history(interaction) {
   }
 
   return results.filter(Boolean).map(result => {
-    const {timestamp, username, names, userid} = result;
+    const {prefix, username, names, userid} = result;
     const andStr = names.length > 2 ? ', and ' : ' and ';
     const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
-    return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
+    return {prefix, username, names: namesStr, isSelf: userid === interaction.user.id};
   });
 }
 

@@ -609,7 +609,7 @@ const historyCommand = {
     const entries = await history(interaction);
     var fields = entries.map(entry => {
       const name = entry.isSelf ? 'You' : entry.username;
-      var base = `${entry.timestamp}: ${name} completed ${entry.names}`;
+      var base = `${entry.prefix}: ${name} completed ${entry.names}`;
       if (entry.isSelf) {
         base = '**' + base + '**';
       }
