@@ -512,13 +512,13 @@ async function history(interaction) {
     } else {
       names = [options.split(', ')[0]];
     }
-    names.filter(name => !adventurersMap[userid].includes(name));
+    names = names.filter(name => !adventurersMap[userid].includes(name));
     if (names.length === 0) {
       return null;
     }
     const andStr = names.length > 2 ? ', and ' : ' and ';
     const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
-    adventurersMap[userid].concat(names);
+    adventurersMap[userid] = adventurersMap[userid].concat(names);
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
   }));
   return results.filter(Boolean);
