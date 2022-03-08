@@ -557,6 +557,12 @@ function statsCommand(name, description) {
         return;
       }
 
+      if (totalNumerator == totalAdventurers) {
+        interaction.followUp({
+          content: 'Wait, 100%?! You madman, you\'ve done it! 🥳 Now, go outside and get a life or something, jeez...'
+        });
+      }
+
       ALL_ELEMENTS.map(element => {
         const elementFilter = entry => entry.element.toLowerCase() == element.toLowerCase();
         const fields = ALL_WEAPONS.map(weapon => {

@@ -487,6 +487,7 @@ async function history(interaction) {
 
   await logCommand(interaction, 'history');
   const usernameMap = {};
+  const adventurersMap = {};
   const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
     var username = usernameMap[userid];
@@ -497,18 +498,24 @@ async function history(interaction) {
       }
       usernameMap[userid] = username;
     }
-    var namesStr;
+    var names;
     if (command === 'manage completed add') {
       const query = getSearchQueryRaw(options);
       const adventurers = await searchRaw(query);
-      const names = adventurers.map(adventurer => {
+      names = adventurers.map(adventurer => {
         const [_id, _rarity, name, _element, _weapon] = adventurer.concat.split(', ');
         return name;
       });
-      namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names.slice(-1) : names[0];
     } else {
-      namesStr = options.split(', ')[0];
+      names = [options.split(', ')[0]];
     }
+    names.filter(name => !adventurersMap[userid].contains(name));
+    if (names.length === 0) {
+      return null;
+    }
+    const andStr = names.length > 2 ? ', and ' : ' and ';
+    const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
+    adventurersMap[userid].concat(names);
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
   }));
   return results.filter(Boolean);
