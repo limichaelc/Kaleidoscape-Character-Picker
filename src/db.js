@@ -477,6 +477,24 @@ async function leaderboard(interaction) {
   return results.filter(Boolean);
 }
 
+function getRelativeTime(d1, d2 = new Date()) {
+  const units = {
+    year  : 24 * 60 * 60 * 1000 * 365,
+    month : 24 * 60 * 60 * 1000 * 365/12,
+    day   : 24 * 60 * 60 * 1000,
+    hour  : 60 * 60 * 1000,
+    minute: 60 * 1000,
+    second: 1000
+  };
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const elapsed = d1 - d2
+
+  // "Math.abs" accounts for both "past" & "future" scenarios
+  for (const u in units)
+    if (Math.abs(elapsed) > units[u] || u == 'second')
+      return rtf.format(Math.round(elapsed/units[u]), u)
+}
+
 async function history(interaction) {
   const history = await sql`
     SELECT timestamp, userid, command, options FROM logging
@@ -490,6 +508,7 @@ async function history(interaction) {
   const adventurersMap = {};
   const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
+    const prefix = getRelativeTime(timestamp);
     var username = usernameMap[userid];
     if (adventurersMap[userid] == null) {
       adventurersMap[userid] = [];
@@ -516,12 +535,25 @@ async function history(interaction) {
     if (names.length === 0) {
       return null;
     }
+    adventurersMap[userid] = adventurersMap[userid].concat(names);
+    return {timestamp, username, names, userid};
+  })).filter(Boolean);
+  for (var i = 0; i < results.length - 1; i++) {
+    const curr = results[i];
+    const next = result[i + 1];
+    if (curr.timestamp === next.timestamp && curr.username === next.username) {
+      curr.names = curr.names.concat(next.names);
+      results[i + 1] = null;
+      i++;
+    }
+  }
+
+  return results.filter(Boolean).map(result => {
+    const {timestamp, username, names, userid} = result;
     const andStr = names.length > 2 ? ', and ' : ' and ';
     const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
-    adventurersMap[userid] = adventurersMap[userid].concat(names);
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
-  }));
-  return results.filter(Boolean);
+  });
 }
 
 async function popularity(interaction) {
