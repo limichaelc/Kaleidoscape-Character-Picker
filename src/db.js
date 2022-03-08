@@ -491,6 +491,9 @@ async function history(interaction) {
   const results = await Promise.all(history.map(async entry => {
     const {timestamp, userid, command, options} = entry;
     var username = usernameMap[userid];
+    if (adventurersMap[userid] == null) {
+      adventurersMap[userid] = [];
+    }
     if (username == null) {
       username = await fetchUser(interaction, userid);
       if (username == null) {
@@ -515,11 +518,7 @@ async function history(interaction) {
     }
     const andStr = names.length > 2 ? ', and ' : ' and ';
     const namesStr = names.length > 1 ? names.slice(0, -1).join(', ') + andStr + names.slice(-1) : names[0];
-    if (adventurersMap[userid] != null) {
-      adventurersMap[userid].concat(names);
-    } else {
-      adventurersMap[userid] = names;
-    }
+    adventurersMap[userid].concat(names);
     return {timestamp, username, names: namesStr, isSelf: userid === interaction.user.id};
   }));
   return results.filter(Boolean);
