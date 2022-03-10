@@ -435,6 +435,14 @@ function statsCommand(name, description) {
           ['everyone', 'everyone'],
           ['me', 'me'],
         ])
+    )
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('Person (from the current server) whose lists to view')
+    )
+    .addStringOption(option =>
+      option.setName('external_user')
+        .setDescription('Person (from all users of the bot) whose lists to view')
     );
   if (name !== STATS_COMMANDS.BLOCKED) {
     data.addBooleanOption(option =>
@@ -445,6 +453,26 @@ function statsCommand(name, description) {
   return {
     data,
     execute: async (interaction, _) => {
+      const user = interaction.options.getUser('user');
+      const externalUser = interaction.options.getString('external_user');
+      var userID = interaction.user.id;
+      if (user != null) {
+        userID = user.id;
+      } else if (externalUser != null) {
+        const query = `%${externalUser}%`
+        const candidates = await sql`
+          SELECT userid, username from users
+          WHERE username ILIKE ${externalUser}
+        `;
+        if (candidates.length > 1) {
+          return interaction.reply({
+            content: `Found more than one possible user: ${candidates.map(candidate => candidate.username).join(', ')}\nPlease try again with a more specific query`,
+            ephemeral: true,
+          });
+        } else {
+          userID = candidates[0].userid;
+        }
+      }
       const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
       const totalCounts = await sql`
         WITH exclude AS (
@@ -453,7 +481,7 @@ function statsCommand(name, description) {
           WHERE userid = (
             CASE
               WHEN ${allowBlocked} THEN NULL
-              ELSE ${interaction.user.id}
+              ELSE ${userID}
             END
           )
         )
@@ -469,14 +497,14 @@ function statsCommand(name, description) {
             sql`
               SELECT COUNT(*), element, weapon
               FROM completed
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           numeratorNames = await (
             sql`
               SELECT element, weapon, string_agg(name, ', ')
               FROM completed
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           break;
