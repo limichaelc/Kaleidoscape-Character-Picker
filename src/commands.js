@@ -187,7 +187,7 @@ const popularityCommand = {
     const weapon = interaction.options.getString('weapon');
     const element = interaction.options.getString('element');
     const page = interaction.options.getInteger('page') ?? 1;
-    const entries = await popularity(interaction, weapon, element);
+    const entries = await popularity(interaction, capitalize(weapon), capitalize(element));
     var previousPrefix = null;
     var previousCount = null;
     var fields = entries.sort().map((entry, index) => {
