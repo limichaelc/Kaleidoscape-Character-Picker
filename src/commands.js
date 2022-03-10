@@ -645,7 +645,7 @@ function pluralize(input) {
   if (input == null) {
     return null;
   }
-  if (input === 'staff') {
+  if (input.toLowerCase() === 'staff') {
     return 'Staves'
   }
   return input + 's';
