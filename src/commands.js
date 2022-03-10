@@ -456,13 +456,15 @@ function statsCommand(name, description) {
       const user = interaction.options.getUser('user');
       const externalUser = interaction.options.getString('external_user');
       var userID = interaction.user.id;
+      var usernamePrefix = 'You have';
       if (user != null) {
         userID = user.id;
+        usernamePrefix = user.username + ' has';
       } else if (externalUser != null) {
         const query = `%${externalUser}%`
         const candidates = await sql`
           SELECT userid, username from users
-          WHERE username ILIKE ${externalUser}
+          WHERE username ILIKE ${query}
         `;
         if (candidates.length > 1) {
           return interaction.reply({
@@ -471,6 +473,7 @@ function statsCommand(name, description) {
           });
         } else {
           userID = candidates[0].userid;
+          usernamePrefix = candidates[0].username + ' has';
         }
       }
       const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
@@ -583,10 +586,10 @@ function statsCommand(name, description) {
       switch (name) {
         case STATS_COMMANDS.COMPLETED:
         case STATS_COMMANDS.BLOCKED:
-          content = `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`;
+          content = `${usernamePrefix} ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`;
           break;
         case STATS_COMMANDS.INCOMPLETE:
-          content = `You have ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
+          content = `${usernamePrefix} ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
           break;
       }
       interaction.reply({
