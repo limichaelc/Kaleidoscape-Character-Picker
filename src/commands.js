@@ -176,7 +176,7 @@ const popularityCommand = {
         ])
     )
     .addIntegerOption(option =>
-      option.setName('number')
+      option.setName('page')
         .setDescription('The page of the popularity board to view. Each page is 10 entries long')
     )
     .addStringOption(allElementOptions)
@@ -207,7 +207,7 @@ const popularityCommand = {
     }
     fields = fields.slice((page - 1) * pageSize, page * pageSize);
     const suffix = (element != null || weapon != null)
-      ? ' for ' + [element, weapon ?? 'Adventurers'].join(' ')
+      ? ' for ' + [element, pluralize(weapon) ?? 'Adventurers'].join(' ')
       : ''
     const embed = new MessageEmbed()
       .setTitle('Popularity Rankings' + suffix)
