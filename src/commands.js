@@ -520,14 +520,14 @@ function statsCommand(name, description) {
               WITH exclude AS (
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
-                WHERE userid = ${interaction.user.id}
+                WHERE userid = ${userID}
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
                 WHERE userid = (
                   CASE
                     WHEN ${allowBlocked} THEN NULL
-                    ELSE ${interaction.user.id}
+                    ELSE ${userID}
                   END
                 )
               )
@@ -542,14 +542,14 @@ function statsCommand(name, description) {
               WITH exclude AS (
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
-                WHERE userid = ${interaction.user.id}
+                WHERE userid = ${userID}
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
                 WHERE userid = (
                   CASE
                     WHEN ${allowBlocked} THEN NULL
-                    ELSE ${interaction.user.id}
+                    ELSE ${userID}
                   END
                 )
               )
@@ -565,14 +565,14 @@ function statsCommand(name, description) {
             sql`
               SELECT COUNT(*), element, weapon
               FROM blocked
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           numeratorNames = await (
             sql`
               SELECT element, weapon, string_agg(name, ', ')
               FROM blocked
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           break;
