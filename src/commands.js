@@ -470,13 +470,13 @@ function statsCommand(name, description) {
         `;
         if (candidates.length > 1) {
           return interaction.reply({
-            content: `Found more than one possible user:\n\t${candidates.map(candidate => candidate.username).join('\n\t')}\nPlease try again with a more specific query`,
+            content: `Found more than one possible user:\n · ${candidates.map(candidate => candidate.username).join('\n · ')}\nPlease try again with a more specific query`,
             ephemeral: true,
           });
         } else {
           userID = candidates[0].userid;
           usernamePrefix = candidates[0].username + ' has';
-          author = candidate[0].username;
+          author = candidates[0].username;
         }
       }
       const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
