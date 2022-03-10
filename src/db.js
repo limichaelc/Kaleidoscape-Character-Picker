@@ -557,10 +557,22 @@ async function history(interaction) {
   });
 }
 
-async function popularity(interaction) {
+async function popularity(interaction, weapon, element) {
   await logCommand(interaction, 'popularity');
   return await sql`
     SELECT COUNT(*), name FROM completed
+    WHERE weapon = (
+      CASE
+        WHEN ${weapon == null} THEN weapon
+        ELSE ${weapon}
+      END
+    )
+    AND WHERE element = (
+      CASE
+        WHEN ${element == null} THEN element
+        ELSE ${element}
+      END
+    )
     GROUP BY name
     ORDER BY 1 DESC
   `;
