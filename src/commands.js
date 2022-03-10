@@ -184,10 +184,10 @@ const popularityCommand = {
   execute: async (interaction, _) => {
     const pageSize = 25;
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
-    const weapon = interaction.options.getString('weapon');
-    const element = interaction.options.getString('element');
+    const weapon = capitalize(interaction.options.getString('weapon'));
+    const element = capitalize(interaction.options.getString('element'));
     const page = interaction.options.getInteger('page') ?? 1;
-    const entries = await popularity(interaction, capitalize(weapon), capitalize(element));
+    const entries = await popularity(interaction, weapon, element);
     var previousPrefix = null;
     var previousCount = null;
     var fields = entries.sort().map((entry, index) => {
@@ -207,7 +207,7 @@ const popularityCommand = {
     }
     fields = fields.slice((page - 1) * pageSize, page * pageSize);
     const suffix = (element != null || weapon != null)
-      ? ' for ' + [capitalize(element), pluralize(weapon) ?? 'Adventurers'].join(' ')
+      ? ' for ' + [element, weapon ?? 'Adventurers'].join(' ')
       : ''
     const embed = new MessageEmbed()
       .setTitle('Popularity Rankings' + suffix)
@@ -635,6 +635,9 @@ const historyCommand = {
 };
 
 function capitalize(input) {
+  if (input == null) {
+    return null;
+  }
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
@@ -645,7 +648,7 @@ function pluralize(input) {
   if (input === 'staff') {
     return 'Staves'
   }
-  return capitalize(input) + 's';
+  return input + 's';
 }
 
 function formatPercentage(numerator, denominator) {
