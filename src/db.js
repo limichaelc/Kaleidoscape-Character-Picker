@@ -567,7 +567,7 @@ async function popularity(interaction, weapon, element) {
         ELSE ${weapon}
       END
     )
-    AND WHERE element = (
+    AND element = (
       CASE
         WHEN ${element == null} THEN element
         ELSE ${element}
