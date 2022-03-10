@@ -150,6 +150,19 @@ const searchCommand = {
   },
 };
 
+
+const allElementOptions = option =>
+  option.setName('element')
+    .setDescription('Specify the character element')
+    .setRequired(false)
+    .addChoices(ALL_ELEMENTS.map(element => [element, element]));
+
+const allWeaponOptions = option =>
+  option.setName('weapon')
+    .setDescription('Specify the character weapon type')
+    .setRequired(false)
+    .addChoices(ALL_WEAPONS.map(weapon => [weapon, weapon]));
+
 const popularityCommand = {
   data: new SlashCommandBuilder()
     .setName('popularity')
@@ -165,12 +178,16 @@ const popularityCommand = {
     .addIntegerOption(option =>
       option.setName('page')
         .setDescription('The page of the popularity board to view. Each page is 10 entries long')
-    ),
+    )
+    .addStringOption(allElementOptions)
+    .addStringOption(allWeaponOptions),
   execute: async (interaction, _) => {
     const pageSize = 25;
     const ordering = interaction.options.getString('ordering') ?? ORDERINGS.DESCENDING;
+    const weapon = capitalize(interaction.options.getString('weapon'));
+    const element = capitalize(interaction.options.getString('element'));
     const page = interaction.options.getInteger('page') ?? 1;
-    const entries = await popularity(interaction, ordering);
+    const entries = await popularity(interaction, weapon, element);
     var previousPrefix = null;
     var previousCount = null;
     var fields = entries.sort((a, b) => {
@@ -197,8 +214,11 @@ const popularityCommand = {
       fields.reverse();
     }
     fields = fields.slice((page - 1) * pageSize, page * pageSize);
+    const suffix = (element != null || weapon != null)
+      ? ' for ' + [element, pluralize(weapon) ?? 'Adventurers'].join(' ')
+      : ''
     const embed = new MessageEmbed()
-      .setTitle('Popularity Rankings')
+      .setTitle('Popularity Rankings' + suffix)
       .setDescription(fields.join('\n'));
     interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   }
@@ -366,11 +386,7 @@ ALL_WEAPONS.map(weapon => {
     data: commandBuilderBase()
       .setName(weapon)
       .setDescription("Picks a random character with the given weapon type")
-      .addStringOption(option =>
-        option.setName('element')
-          .setDescription('Specify the character element')
-          .setRequired(false)
-          .addChoices(ALL_ELEMENTS.map(element => [element, element]))),
+      .addStringOption(allElementOptions),
     execute: async (interaction, _) => {
       const element = interaction.options.getString('element') ?? '';
       const query = getQuery(interaction, { element, weapons: [weapon] });
@@ -388,11 +404,7 @@ ALL_ELEMENTS.map(element => {
     data: commandBuilderBase()
       .setName(element)
       .setDescription("Picks a random character with the given element")
-      .addStringOption(option =>
-        option.setName('weapon')
-          .setDescription('Specify the character weapon type')
-          .setRequired(false)
-          .addChoices(ALL_WEAPONS.map(weapon => [weapon, weapon]))),
+      .addStringOption(allWeaponOptions),
     execute: async (interaction, _) => {
       const weapon = interaction.options.getString('weapon') ?? '';
       const query = getQuery(interaction, { element, weapons: weapon != '' ? [weapon] : ALL_WEAPONS });
@@ -630,7 +642,20 @@ const historyCommand = {
 };
 
 function capitalize(input) {
+  if (input == null) {
+    return null;
+  }
   return input.charAt(0).toUpperCase() + input.slice(1);
+}
+
+function pluralize(input) {
+  if (input == null) {
+    return null;
+  }
+  if (input.toLowerCase() === 'staff') {
+    return 'Staves'
+  }
+  return input + 's';
 }
 
 function formatPercentage(numerator, denominator) {
