@@ -461,7 +461,6 @@ function statsCommand(name, description) {
   return {
     data,
     execute: async (interaction, _) => {
-      interaction.deferReply();
       const user = interaction.options.getUser('user');
       const externalUser = interaction.options.getString('external_user');
       var userID = interaction.user.id;
@@ -469,9 +468,8 @@ function statsCommand(name, description) {
       var author = interaction.member?.nickname ?? interaction.user.username;
       if (user != null) {
         userID = user.id;
-        author = (await interaction.guild.members.fetch())
-          .find((m) => m.user == user)?.displayName;
-        usernamePrefix = author + ' has';
+        usernamePrefix = user.username + ' has';
+        author = user.username;
       } else if (externalUser != null) {
         const query = `%${externalUser}%`
         const candidates = await sql`
@@ -479,7 +477,7 @@ function statsCommand(name, description) {
           WHERE username ILIKE ${query}
         `;
         if (candidates.length > 1) {
-          return interaction.editReply({
+          return interaction.reply({
             content: `Found more than one possible user:\n · ${candidates.map(candidate => candidate.username).join('\n · ')}\nPlease try again with a more specific query`,
             ephemeral: true,
           });
@@ -605,7 +603,7 @@ function statsCommand(name, description) {
           content = `${usernamePrefix} ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
           break;
       }
-      interaction.editReply({
+      interaction.reply({
         content,
         ephemeral,
       }).catch(onRejected => console.error(onRejected));
