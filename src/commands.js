@@ -443,6 +443,14 @@ function statsCommand(name, description) {
           ['everyone', 'everyone'],
           ['me', 'me'],
         ])
+    )
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('Person (from the current server) whose lists to view')
+    )
+    .addStringOption(option =>
+      option.setName('external_user')
+        .setDescription('Person (from all users of the bot) whose lists to view')
     );
   if (name !== STATS_COMMANDS.BLOCKED) {
     data.addBooleanOption(option =>
@@ -453,6 +461,32 @@ function statsCommand(name, description) {
   return {
     data,
     execute: async (interaction, _) => {
+      const user = interaction.options.getUser('user');
+      const externalUser = interaction.options.getString('external_user');
+      var userID = interaction.user.id;
+      var usernamePrefix = 'You have';
+      var author = interaction.member?.nickname ?? interaction.user.username;
+      if (user != null) {
+        userID = user.id;
+        usernamePrefix = user.username + ' has';
+        author = user.username;
+      } else if (externalUser != null) {
+        const query = `%${externalUser}%`
+        const candidates = await sql`
+          SELECT userid, username from users
+          WHERE username ILIKE ${query}
+        `;
+        if (candidates.length > 1) {
+          return interaction.reply({
+            content: `Found more than one possible user:\n · ${candidates.map(candidate => candidate.username).join('\n · ')}\nPlease try again with a more specific query`,
+            ephemeral: true,
+          });
+        } else {
+          userID = candidates[0].userid;
+          usernamePrefix = candidates[0].username + ' has';
+          author = candidates[0].username;
+        }
+      }
       const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
       const totalCounts = await sql`
         WITH exclude AS (
@@ -461,7 +495,7 @@ function statsCommand(name, description) {
           WHERE userid = (
             CASE
               WHEN ${allowBlocked} THEN NULL
-              ELSE ${interaction.user.id}
+              ELSE ${userID}
             END
           )
         )
@@ -477,14 +511,14 @@ function statsCommand(name, description) {
             sql`
               SELECT COUNT(*), element, weapon
               FROM completed
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           numeratorNames = await (
             sql`
               SELECT element, weapon, string_agg(name, ', ')
               FROM completed
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           break;
@@ -494,14 +528,14 @@ function statsCommand(name, description) {
               WITH exclude AS (
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
-                WHERE userid = ${interaction.user.id}
+                WHERE userid = ${userID}
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
                 WHERE userid = (
                   CASE
                     WHEN ${allowBlocked} THEN NULL
-                    ELSE ${interaction.user.id}
+                    ELSE ${userID}
                   END
                 )
               )
@@ -516,14 +550,14 @@ function statsCommand(name, description) {
               WITH exclude AS (
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
-                WHERE userid = ${interaction.user.id}
+                WHERE userid = ${userID}
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
                 WHERE userid = (
                   CASE
                     WHEN ${allowBlocked} THEN NULL
-                    ELSE ${interaction.user.id}
+                    ELSE ${userID}
                   END
                 )
               )
@@ -539,14 +573,14 @@ function statsCommand(name, description) {
             sql`
               SELECT COUNT(*), element, weapon
               FROM blocked
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           numeratorNames = await (
             sql`
               SELECT element, weapon, string_agg(name, ', ')
               FROM blocked
-              WHERE userid = ${interaction.user.id} GROUP BY element, weapon
+              WHERE userid = ${userID} GROUP BY element, weapon
             `
           );
           break;
@@ -563,10 +597,10 @@ function statsCommand(name, description) {
       switch (name) {
         case STATS_COMMANDS.COMPLETED:
         case STATS_COMMANDS.BLOCKED:
-          content = `You've ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`;
+          content = `${usernamePrefix} ${name} ${formatCounts(totalNumerator, totalAdventurers)} adventurers`;
           break;
         case STATS_COMMANDS.INCOMPLETE:
-          content = `You have ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
+          content = `${usernamePrefix} ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
           break;
       }
       interaction.reply({
@@ -609,7 +643,7 @@ function statsCommand(name, description) {
         const embed = new MessageEmbed()
           .setColor(COLORS[element.toUpperCase()])
           .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`)
-          .setAuthor(interaction.member?.nickname ?? interaction.user.username)
+          .setAuthor(author)
           .addFields(fields.filter(Boolean))
         interaction.followUp({
           embeds: [embed],
