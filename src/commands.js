@@ -461,6 +461,7 @@ function statsCommand(name, description) {
   return {
     data,
     execute: async (interaction, _) => {
+      interaction.deferReply();
       const user = interaction.options.getUser('user');
       const externalUser = interaction.options.getString('external_user');
       var userID = interaction.user.id;
@@ -478,7 +479,7 @@ function statsCommand(name, description) {
           WHERE username ILIKE ${query}
         `;
         if (candidates.length > 1) {
-          return interaction.reply({
+          return interaction.editReply({
             content: `Found more than one possible user:\n · ${candidates.map(candidate => candidate.username).join('\n · ')}\nPlease try again with a more specific query`,
             ephemeral: true,
           });
@@ -604,7 +605,7 @@ function statsCommand(name, description) {
           content = `${usernamePrefix} ${formatCounts(totalNumerator, totalAdventurers)} adventurers remaining`;
           break;
       }
-      interaction.reply({
+      interaction.editReply({
         content,
         ephemeral,
       }).catch(onRejected => console.error(onRejected));
