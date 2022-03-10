@@ -457,9 +457,11 @@ function statsCommand(name, description) {
       const externalUser = interaction.options.getString('external_user');
       var userID = interaction.user.id;
       var usernamePrefix = 'You have';
+      var author = interaction.member?.nickname ?? interaction.user.username;
       if (user != null) {
         userID = user.id;
         usernamePrefix = user.username + ' has';
+        author = user.username;
       } else if (externalUser != null) {
         const query = `%${externalUser}%`
         const candidates = await sql`
@@ -468,12 +470,13 @@ function statsCommand(name, description) {
         `;
         if (candidates.length > 1) {
           return interaction.reply({
-            content: `Found more than one possible user: ${candidates.map(candidate => candidate.username).join(', ')}\nPlease try again with a more specific query`,
+            content: `Found more than one possible user:\n\t${candidates.map(candidate => candidate.username).join('\n\t')}\nPlease try again with a more specific query`,
             ephemeral: true,
           });
         } else {
           userID = candidates[0].userid;
           usernamePrefix = candidates[0].username + ' has';
+          author = candidate[0].username;
         }
       }
       const allowBlocked = interaction.options.getBoolean('allow_blocked') ?? false;
@@ -632,7 +635,7 @@ function statsCommand(name, description) {
         const embed = new MessageEmbed()
           .setColor(COLORS[element.toUpperCase()])
           .setTitle(`${capitalize(element)}: ${formatCounts(numeratorCount, totalCount, isCompleted)}`)
-          .setAuthor(interaction.member?.nickname ?? interaction.user.username)
+          .setAuthor(author)
           .addFields(fields.filter(Boolean))
         interaction.followUp({
           embeds: [embed],
