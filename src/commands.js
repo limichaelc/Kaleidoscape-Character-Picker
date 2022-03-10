@@ -468,8 +468,9 @@ function statsCommand(name, description) {
       var author = interaction.member?.nickname ?? interaction.user.username;
       if (user != null) {
         userID = user.id;
-        usernamePrefix = user.username + ' has';
-        author = user.username;
+        author = (await interaction.guild.members.fetch())
+          .find((m) => m.user == user)?.displayName;
+        usernamePrefix = author + ' has';
       } else if (externalUser != null) {
         const query = `%${externalUser}%`
         const candidates = await sql`
