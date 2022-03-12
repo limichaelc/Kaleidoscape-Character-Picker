@@ -169,10 +169,10 @@ function isHitterAbility(type) {
     ].includes(type);
 }
 
-function parseAbility(interaction, str) {
+function parseAbility(str) {
   const [typeStr, valueStr] = str.trim().split(' ');
   const type = find(ABILITY_NAMES, typeStr.toLowerCase());
-  console.log(typeStr, valueStr, type);
+
   if (type == null) {
     return {error: `Could not find matching ability for ${str}`};
   }
@@ -216,6 +216,13 @@ function formatAbility(element, weapon, type, value) {
     : base + `${value}%`;
 }
 
+function formatPrint(print) {
+  const ability2Str = print.ability2_type != null
+      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value))
+      : ''
+  return `(ID ${print.id}) ${print.adventurer}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`;
+}
+
 async function genPrintsForElementWeapon(interaction, elementWeapon) {
   const userID = interaction.user.id;
   const {element, weapon} = elementWeapon;
@@ -235,12 +242,7 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
       OR ability2_weapon IS NULL
     )
   `;
-  const results = prints.map(print => {
-    const ability2Str = print.ability2_type != null
-      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value))
-      : ''
-    return `(${print.id}) ${print.adventurer}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`
-  });
+  const results = prints.map(print => formatPrint(print));
   return (results.length === 0)
     ? ['No prints found']
     : results;
@@ -281,35 +283,59 @@ async function genNameElementWeapon(adventurer) {
   return results[0];
 }
 
-// async function addPrints(userID, adventurer, printStrs) {
-//   const elementWeapon = await getElementWeapon(adventurer);
-//   if (elementWeapon.error != null) {
-//     return elementWeapon.error;
-//   }
-//   const [element, weapon] = elementWeapon;
-//   const prints = printStrs
-//     .split(';')
-//     .map((print) => {
-//       const [ability1, ability2] = print.split(',').map(
-//       (ability) => parseAbility(ability));
-//       return {ability1, ability2};
-//     });
-//   console.log(prints);
-//   await sql`
-//     WITH rows AS (
-//       INSERT INTO completed(userid, name, element, weapon)
-//       SELECT ${userID}, name, element, weapon FROM adventurers
-//       WHERE LOWER(name) = ANY(ARRAY[${query}])
-//       ON CONFLICT(userid, name, element, weapon)
-//       DO NOTHING
-//       RETURNING *
-//     )
-//     SELECT COUNT(*) FROM rows
-//   `;
-// }
+async function genAddPrints(userID, adventurer, printStrs) {
+  const elementWeapon = await genNameElementWeapon(adventurer);
+  if (elementWeapon.error != null) {
+    return elementWeapon.error;
+  }
+  const {name, element, weapon} = elementWeapon;
+  const prints = printStrs
+    .split(';')
+    .map((print) => {
+      const [ability1, ability2] = print.split(',').map((ability) => parseAbility(ability));
+      if (ability1.error != null || ability2.error != null) {
+        return {error: [ability1.error, ability2.error].join('\n')};
+      }
+      return {
+        userid: userID,
+        adventurer: name,
+        abitily1_type: ability1.type,
+        abitily1_value: ability1.value,
+        abitily1_element: ability1.restriction !== RESTRICTIONS.NONE ? element : null,
+        abitily1_weapon: ability1.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
+        abitily2_type: ability2.type,
+        abitily2_value: ability2.value,
+        abitily2_element: ability2.restriction !== RESTRICTIONS.NONE ? element : null,
+        abitily2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
+      };
+    });
+  const errors = prints.filter(print => print.error != null);
+  const successes = await sql`
+    WITH rows AS (
+      INSERT INTO prints
+      VALUES ${sql(
+        prints.filter(print => print.error == null),
+        'userid',
+        'adventurer',
+        'ability1_type',
+        'ability1_value',
+        'ability1_weapon',
+        'ability1_element',
+        'ability2_type',
+        'ability2_value',
+        'ability2_weapon',
+        'ability2_element',
+      )}
+      RETURNING *
+    )
+    SELECT * FROM rows
+  `;
+  return {errors, successes};
+}
 
 const PRINTS_COMMAND_GROUPS = {
   FOR: 'for',
+  ADD: 'add',
 };
 
 const PRINTS_SUBCOMMANDS = {
@@ -343,6 +369,21 @@ const printsCommand = {
                 .setRequired(true)
                 .addChoices(ALL_ELEMENTS.map(element => [element, element])))
             .addStringOption(allWeaponOptions)
+        )
+    )
+    .addSubcommandGroup(subcommandGroup =>
+      subcommandGroup
+        .setName(PRINTS_COMMAND_GROUPS.ADD)
+        .setDescription('Add prints to your collection')
+        .addStringOption(option =>
+          option.setName('adventurer')
+            .setDescription('Search query for the adventurer whose prints you are adding, single name, fuzzy match')
+            .setRequired(true)
+        )
+        .addStringOption(option =>
+          option.setName('prints')
+            .setDescription('Print descriptions, format is "hp 15, prep 40". Separate multiple prints with ";". See the `/help prints` command for more')
+            .setRequired(true)
         )
     ),
   execute: async (interaction, _) => {
@@ -381,6 +422,28 @@ const printsCommand = {
             }
             return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
         }
+      case PRINTS_COMMAND_GROUPS.ADD:
+        const adventurer = interaction.options.getString('adventurer');
+        const printStrs = interaction.options.getString('prints');
+        const {errors, successes} = await genAddPrints(interaction.user.id, adventurer, printStrs);
+        const errorField = errors.length > 0
+          ? {
+              name: 'Ran into the following errors:',
+              value: errors.join('\n'),
+            }
+          : null;
+        const successField = successes.length > 0
+          ? {
+              name: `Successfully added ${successes.length} prints:`,
+              value: prints.map(print => formatPrint(print)).join('\n'),
+            }
+          : null;
+
+        const embed = {
+          "type": "rich",
+          "fields": [successField, errorField],
+        };
+        return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
     }
   }
 }
