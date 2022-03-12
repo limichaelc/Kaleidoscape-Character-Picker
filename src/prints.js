@@ -468,6 +468,7 @@ const printsCommand = {
         SELECT COUNT(*) from prints
         WHERE userid = ${interaction.user.id}
       `;
+      console.log(count);
       const totalPages = Math.ceil(count / 10)
       const prints = await sql`
         SELECT * from prints
@@ -475,6 +476,7 @@ const printsCommand = {
         OFFSET ${page * 10}
         LIMIT 10
       `;
+      console.log(prints);
       const embed = {
         "type": "rich",
         "title": `${interaction.member?.nickname ?? interaction.user.username}'s Print Collection (Page ${page} of ${totalPages})`,
