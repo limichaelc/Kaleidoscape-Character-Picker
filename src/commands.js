@@ -769,6 +769,5 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
 module.exports = {
   commands,
   commandArray,
-  allWeaponOptions,
   pluralize,
 }
