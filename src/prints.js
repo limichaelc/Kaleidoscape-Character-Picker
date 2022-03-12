@@ -255,7 +255,7 @@ function formatPrint(print) {
   const ability2Str = print.ability2_type != null
       ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value))
       : ''
-  return `(ID ${print.id}) ${print.adventurer}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`;
+  return `ID ${print.id}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`;
 }
 
 async function genPrintsForElementWeapon(interaction, elementWeapon) {
@@ -371,6 +371,23 @@ async function genAddPrints(userID, adventurer, printStrs) {
   return {errors, successes};
 }
 
+function fieldifyPrints(prints) {
+  const map = {};
+  prints.forEach(print => {
+    if (map[print.adventurer] == null) {
+      map[print.adventurer] = [];
+    }
+    map[print.adventurer].append(print);
+  });
+  return Object.keys(map).map(adventurer => {
+    const prints = map[adventurer];
+    return {
+      name: adventurer,
+      value: prints.map(print => formatPrint(print).join('\n')),
+    };;
+  });
+}
+
 const PRINTS_COMMAND_GROUPS = {
   FOR: 'for',
 };
@@ -442,24 +459,26 @@ const printsCommand = {
       const adventurer = interaction.options.getString('adventurer');
       const printStrs = interaction.options.getString('prints');
       const {errors, successes} = await genAddPrints(interaction.user.id, adventurer, printStrs);
-      const errorField = errors.length > 0
+      const errorEmbed = errors.length > 0
         ? {
-            name: 'Ran into the following errors:',
-            value: errors.join('\n'),
+            title: 'Ran into the following errors:',
+            description: errors.join('\n'),
           }
         : null;
-      const successField = successes.length > 0
+      const successEmbed = successes.length > 0
         ? {
-            name: `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
-            value: successes.map(print => formatPrint(print)).join('\n'),
+            title: `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
+            fields: fieldifyPrints(successes),
           }
         : null;
-
-      const embed = {
-        "type": "rich",
-        "fields": [successField, errorField].filter(Boolean),
-      };
-      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+      if (successEmbed != null) {
+        interaction.editReply({embeds: [successEmbed]});
+        if (errorEmbed != null) {
+          interaction.followUp({embeds: [errorEmbed]});
+        }
+      } else if (errorEmbed != null) {
+        interaction.editReply({embeds: [errorEmbed]});
+      }
     } else if (subcommand === PRINTS_SUBCOMMANDS.PAGE) {
       var page = interaction.options.getInteger('number');
       if (page == null && subcommand == 'page') {
@@ -482,7 +501,7 @@ const printsCommand = {
       const embed = {
         "type": "rich",
         "title": `${interaction.member?.nickname ?? interaction.user.username}'s Print Collection (Page ${page} of ${totalPages})`,
-        "description": prints.map(print => formatPrint(print)).join('\n'),
+        "fields": fieldifyPrints(prints),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
