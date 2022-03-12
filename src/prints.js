@@ -346,7 +346,6 @@ const printsCommand = {
         )
     ),
   execute: async (interaction, _) => {
-    interaction.deferReply();
     const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
     switch (group) {
@@ -356,7 +355,7 @@ const printsCommand = {
             const query = interaction.options.getString('query');
             const nameElementWeapon = await genNameElementWeapon(query);
             if (nameElementWeapon.error != null) {
-              return interaction.editReply({
+              return interaction.reply({
                 content: nameElementWeapon.error,
               })
             }
@@ -367,7 +366,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
-            return interaction.editReply({embeds: [embed]});
+            return interaction.reply({embeds: [embed]});
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
@@ -379,7 +378,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[element.toUpperCase()],
             }
-            return interaction.editReply({embeds: [embed]});
+            return interaction.reply({embeds: [embed]});
         }
     }
   }
