@@ -199,8 +199,7 @@ const supportedCommands = [
       This is a group of commands you can use to manage your print collection.\n
       Use \`/prints add <adventurer> <prints>\` to add prints to your collection. You can specify the adventurer by alias (e.g. "gmym") or by their full name (e.g. "Ayaha & Otoha").\n
       Prints are specified as a semi-colon separated list, e.g. "print1; print2", and the individual abilities are specified as a comma separated list, e.g. "hp15, def7".\n
-      Abilities can be specified by full name (e.g. "strength"). If there is a space in the ability, remove it or replace it with an underscore (e.g. "criticaldamage" or "skill_haste").\n
-      Abilities can also be specified by alias, such as "str" or "dhaste". **For a full list of available aliases, refer to \`/help ${PRINTS_ALIASES_COMMAND}\`**.\n\n
+      Abilities can be specified by full name (e.g. "strength") or by alias, such as "str" or "dhaste". **For a full list of available aliases, refer to \`/help ${PRINTS_ALIASES_COMMAND}\`**.\n\n
       Use \`/prints page\` to view your full collection. Pages are 10 entries long.\n
       Use \`/prints for adventurer <query>\` or \`/prints for element <weapon>\` to filter through your collection.\n
       Note that abilities with no restriction are not considered when looking for viable prints so as to not clutter the results.\n

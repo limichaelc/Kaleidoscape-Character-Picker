@@ -140,47 +140,55 @@ const SLOT_2_ABILITY_TYPES = [
 ];
 
 const ABILITY_NAMES = {
-  [ABILITY_TYPE.STRENGTH]: ['strength', 'str'],
-  [ABILITY_TYPE.SKILL_DAMAGE]: ['skilldamage', 'skill_damage', 'skdam'],
+  [ABILITY_TYPE.STRENGTH]: ['strength', 'str', 's'],
+  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'sd'],
   [ABILITY_TYPE.CRITICAL_RATE]: [
+    'critical rate',
     'criticalrate',
     'critical_rate',
     'crit_rate',
     'critrate',
     'crate',
+    'cr',
   ],
   [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force'],
   [ABILITY_TYPE.HP]: ['hp'],
-  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragondamage', 'dragon_damage', 'ddamage', 'ddam'],
-  [ABILITY_TYPE.DRAGON_HASTE]: ['dragonhaste', 'dragon_haste', 'dhaste'],
+  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragon damage', 'dragondamage', 'dragon_damage', 'ddamage', 'ddam', 'dd'],
+  [ABILITY_TYPE.DRAGON_HASTE]: ['dragon haste', 'dragonhaste', 'dragon_haste', 'dhaste', 'dh'],
   [ABILITY_TYPE.SKILL_HASTE]: [
+    'skill haste',
     'skillhaste',
     'skill_haste',
     'shaste',
     'skhaste',
+    'sh',
   ],
   [ABILITY_TYPE.SKILL_PREP]: ['skillprep', 'skill_prep', 'prep', 'skprep'],
   [ABILITY_TYPE.DEFENSE]: ['defense', 'def'],
   [ABILITY_TYPE.CRITICAL_DAMAGE]: [
+    'critical damage',
     'criticaldamage',
     'critical_damage',
     'crit_dam',
     'critdam',
     'cdam',
+    'cd',
   ],
   [ABILITY_TYPE.RECOVERY_POTENCY]: [
+    'recovery potency',
     'recoverypotency',
     'recovery_potency',
     'recovery',
     'potency',
     'rec',
     'recpot',
+    'r',
   ],
-  [ABILITY_TYPE.DRAGON_TIME]: ['dragontime', 'dragon_time', 'time', 'dtime'],
-  [ABILITY_TYPE.STEADY_HITTER]: ['steadyhitter', 'steady_hitter', 'steady'],
-  [ABILITY_TYPE.EASY_HITTER]: ['easyhitter', 'easy_hitter', 'easy'],
-  [ABILITY_TYPE.LUCKY_HITTER]: ['luckyhitter', 'lucky_hitter', 'lucky'],
-  [ABILITY_TYPE.HASTY_HITTER]: ['hastyhitter', 'hasty_hitter', 'hasty'],
+  [ABILITY_TYPE.DRAGON_TIME]: ['dragon time', 'dragontime', 'dragon_time', 'time', 'dtime', 'dt'],
+  [ABILITY_TYPE.STEADY_HITTER]: ['steady hitter', 'steadyhitter', 'steady_hitter', 'steady'],
+  [ABILITY_TYPE.EASY_HITTER]: ['easy hitter', 'easyhitter', 'easy_hitter', 'easy'],
+  [ABILITY_TYPE.LUCKY_HITTER]: ['lucky hitter', 'luckyhitter', 'lucky_hitter', 'lucky'],
+  [ABILITY_TYPE.HASTY_HITTER]: ['hasty hitter', 'hastyhitter', 'hasty_hitter', 'hasty'],
 };
 
 function isHitterAbility(type) {
@@ -193,7 +201,7 @@ function isHitterAbility(type) {
 }
 
 function parseAbility(str, index) {
-  var [typeStr, valueStr] = str.toLowerCase().trim().split(' ');
+  var [typeStr, valueStr] = str.toLowerCase().split(' ');
   if (valueStr == null && !isHitterAbility(typeStr)) {
     valueStr = typeStr.replace(/[^0-9]/gi, '');
     typeStr = typeStr.replace(/[^a-z]/gi, '');
@@ -340,7 +348,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
   const prints = printStrs
     .split(';')
     .map((print) => {
-      const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability, index));
+      const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability.replaceAll(' ', ''), index));
       if (ability1.error != null || ability2.error != null) {
         return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print.trim()}*")`;
       }
