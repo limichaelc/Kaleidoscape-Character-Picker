@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
-const {sql} = require('./db');
+const {sql, logCommand} = require('./db');
 const {pluralize, allWeaponOptions} = require('./utils');
 const {ALL_ELEMENTS, COLORS} = require('./consts')
 
@@ -266,13 +266,15 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
     WHERE userid = ${userID}
     AND (
       ability1_element = ${element}
+      AND (
+        ability1_weapon = ${weapon}
+        OR ability1_weapon IS NULL
+      )
       OR ability2_element = ${element}
-    )
-    AND (
-      ability1_weapon = ${weapon}
-      OR ability1_weapon IS NULL
-      OR ability2_weapon = ${weapon}
-      OR ability2_weapon IS NULL
+      AND (
+        OR ability2_weapon = ${weapon}
+        OR ability2_weapon IS NULL
+      )
     )
   `;
   return (prints.length === 0)
@@ -392,6 +394,7 @@ const PRINTS_COMMAND_GROUPS = {
 const PRINTS_SUBCOMMANDS = {
   ADD: 'add',
   ADVENTURER: 'adventurer',
+  DELETE: 'delete',
   ELEMENT: 'element',
   PAGE: 'page',
 }
@@ -448,6 +451,16 @@ const printsCommand = {
             .setDescription('The page of your print collection to view. Each page is 10 entries long')
             .setRequired(false)
         )
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName(PRINTS_SUBCOMMANDS.DELETE)
+        .setDescription('Delete prints from you print collection')
+        .addStringOption(option =>
+          option.setName('ids')
+            .setDescription('The ids of the prints you want to delete, comma separated')
+            .setRequired(true)
+        )
     ),
   execute: async (interaction, _) => {
     await interaction.deferReply();
@@ -455,6 +468,7 @@ const printsCommand = {
     if (subcommand === PRINTS_SUBCOMMANDS.ADD) {
       const adventurer = interaction.options.getString('adventurer');
       const printStrs = interaction.options.getString('prints');
+      await logCommand(interaction, 'prints add', adventurer + ' ' + printStrs);
       const {errors, successes} = await genAddPrints(interaction.user.id, adventurer, printStrs);
       const errorEmbed = errors.length > 0
         ? {
@@ -477,7 +491,8 @@ const printsCommand = {
         interaction.editReply({embeds: [errorEmbed]});
       }
     } else if (subcommand === PRINTS_SUBCOMMANDS.PAGE) {
-      var page = interaction.options.getInteger('number');
+      var page = interaction.options.getInteger('page');
+      await logCommand(interaction, 'prints page', page);
       if (page == null && subcommand == 'page') {
         page = 1;
       }
@@ -501,12 +516,29 @@ const printsCommand = {
         "fields": fieldifyPrints(prints),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+    } else if (subcommand === PRINTS_SUBCOMMANDS.DELETE) {
+      var ids = interaction.options.getString('ids').split(',').map(id => parseInt(id));
+      await logCommand(interaction, 'prints delete', ids);
+      const removed = await sql`
+        WITH rows AS (
+          DELETE FROM prints
+          WHERE userid = ${interaction.user.id} AND id in ${ids}
+          RETURNING *
+        )
+        SELECT * FROM rows
+      `;
+      const embed = {
+        "title": `Successfully deleted ${removed.length} print${removed.length > 1 ? 's' : ''}:`,
+        "fields": fieldifyPrints(removed),
+      };
+      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
         switch (subcommand) {
           case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
+            await logCommand(interaction, 'prints for adventurer', query);
             const nameElementWeapon = await genNameElementWeapon(query);
             if (nameElementWeapon.error != null) {
               return interaction.editReply({
@@ -526,6 +558,7 @@ const printsCommand = {
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
+            await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : '');
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",

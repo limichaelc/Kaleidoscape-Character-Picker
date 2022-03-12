@@ -230,7 +230,7 @@ const leaderboardCommand = {
         .setName('page')
         .setDescription('Shows leaderboard by clears for all users of the bot, 10 entries at a time.')
       .addIntegerOption(option =>
-        option.setName('number')
+        option.setName('page')
           .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
         ),
     ),
@@ -280,7 +280,7 @@ const leaderboardCommand = {
       return base;
     });
     const subcommand = interaction.options.getSubcommand();
-    var page = interaction.options.getInteger('number');
+    var page = interaction.options.getInteger('page');
     if (page == null && subcommand == 'page') {
       page = 1;
     }
