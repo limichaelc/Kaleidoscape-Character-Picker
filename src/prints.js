@@ -307,7 +307,7 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
 async function genNameElementWeapon(adventurer) {
   const results = await sql`
     SELECT name, element, weapon FROM adventurers
-    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR name = ${adventurer}
+    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR LOWER(name) = ${adventurer}
   `;
   if (results.length == 0) {
     return {error: `Could not find adventurer for query "${adventurer}"`};
