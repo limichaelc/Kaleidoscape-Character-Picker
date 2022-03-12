@@ -299,14 +299,14 @@ async function genAddPrints(userID, adventurer, printStrs) {
       return {
         userid: userID,
         adventurer: name,
-        abitily1_type: ability1.type,
-        abitily1_value: ability1.value,
-        abitily1_element: ability1.restriction !== RESTRICTIONS.NONE ? element : null,
-        abitily1_weapon: ability1.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
-        abitily2_type: ability2.type,
-        abitily2_value: ability2.value,
-        abitily2_element: ability2.restriction !== RESTRICTIONS.NONE ? element : null,
-        abitily2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
+        ability1_type: ability1.type,
+        ability1_value: ability1.value,
+        ability1_element: ability1.restriction !== RESTRICTIONS.NONE ? element : null,
+        ability1_weapon: ability1.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
+        ability2_type: ability2.type,
+        ability2_value: ability2.value,
+        ability2_element: ability2.restriction !== RESTRICTIONS.NONE ? element : null,
+        ability2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
       };
     });
   const errors = prints.filter(print => print.error != null);
@@ -403,7 +403,7 @@ const printsCommand = {
       const successField = successes.length > 0
         ? {
             name: `Successfully added ${successes.length} prints:`,
-            value: prints.map(print => formatPrint(print)).join('\n'),
+            value: successes.map(print => formatPrint(print)).join('\n'),
           }
         : null;
 
