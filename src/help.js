@@ -11,6 +11,16 @@ const COMMAND_CATEGORIES = {
   LIST_MANAGEMENT: 'List Management',
 }
 
+const PRINTS_ALIASES_COMMAND = 'prints aliases';
+const PRINTS_ALIASES_EMBED = new MessageEmbed()
+  .setTitle(`Print Ability Aliases`)
+  .setFields(Object.keys(ABILITY_NAMES).map(name => {
+    return {
+      name,
+      value: ABILITY_NAMES[name].join(', '),
+    };
+  }));
+
 const supportedCommands = [
   {
     names: ['any'],
@@ -63,7 +73,7 @@ const supportedCommands = [
       \`add\` and \`remove\` take in a query string that supports a comma-separated list of adventurers.\n
       If an exact name match is found, the corresponding adventurer will be added/removed from the respective list.
     `,
-    usage: 'manage <list> <add|remove> <query>`, `manage <list> clear',
+    usage: 'manage <list> <add|remove> <query>`, `/manage <list> clear',
     example: 'manage completed add xainfried, aurien, the prince`, `/manage blocked clear',
   },
   {
@@ -177,16 +187,6 @@ const supportedCommands = [
     example: 'prints add gmym skdam40, steady; fs50`, `/prints page 2`, `/prints for gleon`, `/prints for flame`, `/prints for water sword',
   },
 ];
-
-const PRINTS_ALIASES_COMMAND = 'prints aliases';
-const PRINTS_ALIASES_EMBED = new MessageEmbed()
-  .setTitle(`Print Ability Aliases`)
-  .setFields(Object.keys(ABILITY_NAMES).map(name => {
-    return {
-      name,
-      value: ABILITY_NAMES[name].join(', '),
-    };
-  }));
 
 const commandNameReducer = (previousValue, currentValue) => previousValue.concat(currentValue.names);
 const allCommandNames = supportedCommands.reduce(commandNameReducer, []);
