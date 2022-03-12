@@ -116,6 +116,28 @@ const TRADEOFF_VALUES = {
   },
 };
 
+const SLOT_1_ABILITY_TYPES = [
+  ABILITY_TYPE.STRENGTH,
+  ABILITY_TYPE.SKILL_DAMAGE,
+  ABILITY_TYPE.CRITICAL_RATE,
+  ABILITY_TYPE.FORCE_STRIKE,
+  ABILITY_TYPE.HP,
+  ABILITY_TYPE.DRAGON_DAMAGE,
+];
+
+const SLOT_2_ABILITY_TYPES = [
+  ABILITY_TYPE.SKILL_HASTE,
+  ABILITY_TYPE.SKILL_PREP,
+  ABILITY_TYPE.DEFENSE,
+  ABILITY_TYPE.CRITICAL_DAMAGE,
+  ABILITY_TYPE.RECOVERY_POTENCY,
+  ABILITY_TYPE.DRAGON_TIME,
+  ABILITY_TYPE.STEADY_HITTER,
+  ABILITY_TYPE.EASY_HITTER,
+  ABILITY_TYPE.LUCKY_HITTER,
+  ABILITY_TYPE.HASTY_HITTER,
+];
+
 const ABILITY_NAMES = {
   [ABILITY_TYPE.STRENGTH]: ['strength', 'str'],
   [ABILITY_TYPE.SKILL_DAMAGE]: ['skilldamage', 'skill_damage', 'skdam'],
@@ -169,12 +191,24 @@ function isHitterAbility(type) {
     ].includes(type);
 }
 
-function parseAbility(str) {
-  const [typeStr, valueStr] = str.trim().split(' ');
-  const type = find(ABILITY_NAMES, typeStr.toLowerCase());
+function parseAbility(str, index) {
+  var [typeStr, valueStr] = str.toLowerCase().trim().split(' ');
+  if (valueStr == null && !isHitterAbility(typeStr)) {
+    valueStr = typeStr.replace(/[^0-9]/gi, '');
+    typeStr = typeStr.replace(/[^a-z]/gi, '');
+  }
+  const type = find(ABILITY_NAMES, typeStr);
 
   if (type == null) {
     return {error: `Could not find matching ability for ${str}`};
+  }
+
+  if (index === 0 && !SLOT_1_ABILITY_TYPES.includes(type)) {
+    return {error: `${type} is not a slot 1 ability (${str})`};
+  }
+
+  if (index === 1 && !SLOT_2_ABILITY_TYPES.includes(type)) {
+    return {error: `${type} is not a slot 2 ability (${str})`};
   }
 
   if (isHitterAbility(type)) {
@@ -187,12 +221,12 @@ function parseAbility(str) {
 
   const value = parseInt(valueStr);
   if (value == NaN) {
-    return {error: `Invalid value of ${valueStr} for ability for ${type}`};
+    return {error: `Invalid value of ${valueStr} for ability for ${type} (${str})`};
   }
 
   const restriction = find(VALUE_THRESHOLDS[type], value);
   if (restriction == null) {
-    return {error: `Invalid value of ${valueStr} for ability for ${type}`};
+    return {error: `Invalid value of ${valueStr} for ability for ${type} (${str})`};
   }
 
   return { type, value, restriction };
@@ -292,9 +326,9 @@ async function genAddPrints(userID, adventurer, printStrs) {
   const prints = printStrs
     .split(';')
     .map((print) => {
-      const [ability1, ability2] = print.split(',').map((ability) => parseAbility(ability));
+      const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability, index));
       if (ability1.error != null || ability2.error != null) {
-        return [ability1?.error, ability2?.error].filter(Boolean).join('\n');
+        return [ability1?.error, ability2?.error].filter(Boolean).join(', ') + ` (${print})`;
       }
       return {
         userid: userID,
@@ -311,7 +345,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
     });
   const errors = prints.filter(print => print.userid == null);
   const filtered = prints.filter(print => print.userid != null);
-  console.log(filtered);
+
   const successes = (filtered.length > 0)
     ? await sql`
       WITH rows AS (
@@ -344,6 +378,7 @@ const PRINTS_SUBCOMMANDS = {
   ADD: 'add',
   ADVENTURER: 'adventurer',
   ELEMENT: 'element',
+  PAGE: 'page',
 }
 
 const printsCommand = {
@@ -388,6 +423,16 @@ const printsCommand = {
             .setDescription('Print descriptions as "hp 15, prep 40". Separate multiples with ";". See `/help prints` for more')
             .setRequired(true)
         )
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName(PRINTS_SUBCOMMANDS.PAGE)
+        .setDescription('View your print collection')
+        .addStringOption(option =>
+          option.setName('page')
+            .setDescription('The page of your print collection to view. Each page is 10 entries long')
+            .setRequired(false)
+        )
     ),
   execute: async (interaction, _) => {
     await interaction.deferReply();
@@ -404,7 +449,7 @@ const printsCommand = {
         : null;
       const successField = successes.length > 0
         ? {
-            name: `Successfully added ${successes.length} prints:`,
+            name: `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
             value: successes.map(print => formatPrint(print)).join('\n'),
           }
         : null;
@@ -412,6 +457,28 @@ const printsCommand = {
       const embed = {
         "type": "rich",
         "fields": [successField, errorField].filter(Boolean),
+      };
+      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+    } else if (subcommand === PRINTS_SUBCOMMANDS.PAGE) {
+      var page = interaction.options.getInteger('number');
+      if (page == null && subcommand == 'page') {
+        page = 1;
+      }
+      const [count] = await sql`
+        SELECT COUNT(*) from prints
+        WHERE userid = ${interaction.user.id}
+      `;
+      const totalPages = Math.ceil(count / 10)
+      const prints = await sql`
+        SELECT * from prints
+        WHERE userid = ${interaction.user.id}
+        OFFSET ${page * 10}
+        LIMIT 10
+      `;
+      const embed = {
+        "type": "rich",
+        "title": `${interaction.member?.nickname ?? interaction.user.username}'s Print Collection (Page ${page} of ${totalPages})`,
+        "fields": prints.map(print => formatPrint(print)).join('\n'),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
