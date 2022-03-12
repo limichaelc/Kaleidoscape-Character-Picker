@@ -1,8 +1,9 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {sql, logCommand} = require('./db');
 const {capitalize, pluralize, allWeaponOptions} = require('./utils');
-const {ALL_ELEMENTS, COLORS} = require('./consts')
+const {ALL_ELEMENTS, COLORS} = require('./consts');
 
+const MAX_LENGTH = 1024;
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
   SKILL_DAMAGE: 'Skill Damage',
@@ -515,12 +516,26 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
-  return Object.keys(map).map(type => {
+  const fields = [];
+  Object.keys(map).forEach(type => {
     const prints = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
-    return {
-      name: type,
-      value: prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer)).join('\n'),
-    };
+    var value = '';
+    const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer));
+    var counter = -1;
+    while (printStrs.length > 0) {
+      const next = printStrs.shift();
+      while ((value.length + next.length + 1) < MAX_LENGTH) {
+        value += next + '\n';
+      }
+      counter++;
+      const pageStr = counter > 0
+        ? ` (${counter})`
+        : '';
+      fields.push({
+        name: type + pageStr,
+        value: value.trim(),
+      });
+    }
   });
 }
 
