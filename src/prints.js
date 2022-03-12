@@ -163,7 +163,7 @@ const ABILITY_NAMES = {
     'skhaste',
     'sh',
   ],
-  [ABILITY_TYPE.SKILL_PREP]: ['skillprep', 'skill_prep', 'prep', 'skprep'],
+  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sp'],
   [ABILITY_TYPE.DEFENSE]: ['defense', 'def'],
   [ABILITY_TYPE.CRITICAL_DAMAGE]: [
     'critical damage',
