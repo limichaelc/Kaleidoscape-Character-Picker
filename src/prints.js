@@ -97,25 +97,6 @@ const VALUE_THRESHOLDS = {
   },
 };
 
-const TRADEOFF_VALUES = {
-  [ABILITY_TYPE.STEADY_HITTER]: {
-    [ABILITY_TYPE.SKILL_DAMAGE]: 40,
-    [ABILITY_TYPE.CRITICAL_DAMAGE]: -25,
-  },
-  [ABILITY_TYPE.EASY_HITTER]: {
-    [ABILITY_TYPE.STRENGTH]: 20,
-    [ABILITY_TYPE.FORCE_STRIKE]: -50,
-  },
-  [ABILITY_TYPE.LUCKY_HITTER]: {
-    [ABILITY_TYPE.CRITICAL_RATE]: 15,
-    [ABILITY_TYPE.DRAGON_DAMAGE]: -18,
-  },
-  [ABILITY_TYPE.HASTY_HITTER]: {
-    [ABILITY_TYPE.SKILL_HASTE]: 15,
-    [ABILITY_TYPE.SKILL_DAMAGE]: -40,
-  },
-};
-
 const SLOT_1_ABILITY_TYPES = [
   ABILITY_TYPE.STRENGTH,
   ABILITY_TYPE.SKILL_DAMAGE,
@@ -192,6 +173,68 @@ function isHitterAbility(type) {
     ].includes(type);
 }
 
+function effectiveTypes(hitterAbility) {
+  switch (hitterAbility) {
+    case ABILITY_TYPE.STEADY_HITTER:
+      return [ABILITY_TYPE.SKILL_DAMAGE, ABILITY_TYPE.CRITICAL_DAMAGE];
+    case ABILITY_TYPE.EASY_HITTER:
+      return [ABILITY_TYPE.STRENGTH, ABILITY_TYPE.FORCE_STRIKE];
+    case ABILITY_TYPE.LUCKY_HITTER:
+      return [ABILITY_TYPE.CRITICAL_RATE, ABILITY_TYPE.DRAGON_DAMAGE];
+    case ABILITY_TYPE.HASTY_HITTER:
+      return [ABILITY_TYPE.SKILL_HASTE, ABILITY_TYPE.SKILL_DAMAGE];
+  }
+}
+
+function getValueForTradeoff(hitterAbility, ability) {
+  switch (hitterAbility) {
+    case ABILITY_TYPE.STEADY_HITTER:
+      switch (ability) {
+        case ABILITY_TYPE.SKILL_DAMAGE:
+          return 40;
+        case ABILITY_TYPE.CRITICAL_DAMAGE:
+          return -25;
+      }
+    case ABILITY_TYPE.EASY_HITTER:
+      switch (ability) {
+        case ABILITY_TYPE.STRENGTH:
+          return 20;
+        case ABILITY_TYPE.FORCE_STRIKE:
+          return -50;
+      }
+    case ABILITY_TYPE.LUCKY_HITTER:
+      switch (ability) {
+        case ABILITY_TYPE.CRITICAL_RATE:
+          return 15;
+        case ABILITY_TYPE.DRAGON_DAMAGE:
+          return -18;
+      }
+    case ABILITY_TYPE.HASTY_HITTER:
+      switch (ability) {
+        case ABILITY_TYPE.SKILL_HASTE:
+          return 15;
+        case ABILITY_TYPE.SKILL_DAMAGE:
+          return -40;
+      }
+  }
+  return 0;
+};
+
+function effectiveValue(print, ability) {
+  var value = 0;
+  const type1 = print.ability1_type;
+  const type2 = print.ability2_type;
+  if (type1 === ability) {
+    value = print.ability1_value;
+  }
+  if (type2 === ability) {
+    value = print.ability2_value;
+  } else if (isHitterAbility(type2)) {
+    value += getValueForTradeoff(type2, ability)
+  }
+  return value;
+}
+
 function parseAbility(str, index) {
   var [typeStr, valueStr] = str.toLowerCase().trim().split(' ');
   if (valueStr == null && !isHitterAbility(typeStr)) {
@@ -265,11 +308,39 @@ function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, a
   }
 }
 
-function formatPrint(print, element, weapon) {
-  const ability2Str = print.ability2_type != null
-      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value, isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon)))
-      : ''
-  return `ID ${print.id}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value, isAbilityCompatible(print.ability1_element, print.ability1_weapon, element, weapon))}${ability2Str}`;
+function formatPrint(print, sortBy, element, weapon, adventurer) {
+  var ability2Str = '';
+  if (print.ability2_type != null) {
+    const base = formatAbility(
+      print.ability2_element,
+      print.ability2_weapon,
+      print.ability2_type,
+      print.ability2_value,
+      isAbilityCompatible(
+        print.ability2_element,
+        print.ability2_weapon,
+        element,
+        weapon,
+      ),
+    );
+    ability2Str = ' / ' + base;
+  }
+  const ability1Str = formatAbility(
+    print.ability1_element,
+    print.ability1_weapon,
+    print.ability1_type,
+    print.ability1_value,
+    isAbilityCompatible(
+      print.ability1_element,
+      print.ability1_weapon,
+      element,
+      weapon,
+    ),
+  );
+  if (sortBy === SORTING_OPTIONS.ADVENTURER) {
+    return `ID ${print.id}: ${ability1Str}${ability2Str}`;
+  }
+  return `${ability1Str}${ability2Str} (ID ${print.id}, ${adventurer})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
@@ -384,20 +455,62 @@ async function genAddPrints(userID, adventurer, printStrs) {
   return {errors, successes};
 }
 
-function fieldifyPrints(prints, element = null, weapon = null) {
+const SORTING_OPTIONS = {
+  ABILITY: 'ability',
+  ADVENTURER: 'adventurer',
+};
+
+function fieldifyPrints(prints, sortBy, element = null, weapon = null) {
   const map = {};
+  if (sortBy === SORTING_OPTIONS.ADVENTURER) {
+    prints.forEach(print => {
+      if (map[print.adventurer] == null) {
+        map[print.adventurer] = [];
+      }
+      map[print.adventurer].push(print);
+    });
+    return Object.keys(map).map(adventurer => {
+      const prints = map[adventurer];
+      return {
+        name: adventurer,
+        value: prints.map(print => formatPrint(print, sortyBy, element, weapon, adventurer)).join('\n'),
+      };
+    });
+  }
   prints.forEach(print => {
-    if (map[print.adventurer] == null) {
-      map[print.adventurer] = [];
+    const type1 = print.ability1_type;
+    const type2 = print.ability2_type;
+    if (type1 !== null) {
+      if (map[type1] == null) {
+        map[type1] = [];
+      }
+      map[type1].push({
+        print,
+        effectiveValue: effectiveValue(print, type1),
+      });
+      if (type2 !== null) {
+        var types = [type2];
+        if (isHitterAbility(type2)) {
+          types = effectiveTypes(type2)
+        }
+        types.forEach(type => {
+          if (map[type] == null) {
+            map[type] = [];
+          }
+          map[type].push({
+            print,
+            effectiveValue: effectiveValue(print, type),
+          });
+        });
+      }
     }
-    map[print.adventurer].push(print);
   });
-  return Object.keys(map).map(adventurer => {
-    const prints = map[adventurer];
+  return Object.keys(map).map(type => {
+    const prints = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
     return {
-      name: adventurer,
-      value: prints.map(print => formatPrint(print, element, weapon)).join('\n'),
-    };;
+      name: type,
+      value: prints.map(print => formatPrint(print, sortyBy, element, weapon, adventurer)).join('\n'),
+    };
   });
 }
 
@@ -577,7 +690,7 @@ const printsCommand = {
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",
-              "title": `Prints suitable for ${capitalize(element)} ${pluralize(weapon) ?? ''}`,
+              "title": `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`,
               "fields": printsField,
               "description": printsField == null ? 'No prints found' : null,
               "color": COLORS[element.toUpperCase()],
