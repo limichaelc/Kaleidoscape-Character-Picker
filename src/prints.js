@@ -151,7 +151,7 @@ const ABILITY_NAMES = {
     'crate',
     'cr',
   ],
-  [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force'],
+  [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force', 'f'],
   [ABILITY_TYPE.HP]: ['hp', 'h'],
   [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragon damage', 'dragondamage', 'dragon_damage', 'ddamage', 'ddam', 'dd'],
   [ABILITY_TYPE.DRAGON_HASTE]: ['dragon haste', 'dragonhaste', 'dragon_haste', 'dhaste', 'dh'],
@@ -163,7 +163,7 @@ const ABILITY_NAMES = {
     'skhaste',
     'sh',
   ],
-  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sp'],
+  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sp', 'p'],
   [ABILITY_TYPE.DEFENSE]: ['defense', 'def', 'd'],
   [ABILITY_TYPE.CRITICAL_DAMAGE]: [
     'critical damage',
