@@ -455,7 +455,7 @@ const printsCommand = {
     .addSubcommand(subcommand =>
       subcommand
         .setName(PRINTS_SUBCOMMANDS.DELETE)
-        .setDescription('Delete prints from you print collection')
+        .setDescription('Delete prints from your print collection')
         .addStringOption(option =>
           option.setName('ids')
             .setDescription('The ids of the prints you want to delete, comma separated')
@@ -517,12 +517,13 @@ const printsCommand = {
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else if (subcommand === PRINTS_SUBCOMMANDS.DELETE) {
-      var ids = interaction.options.getString('ids').split(',').map(id => parseInt(id));
+      const ids = interaction.options.getString('ids').split(',').map(id => parseInt(id));
+      console.log(ids);
       await logCommand(interaction, 'prints delete', ids);
       const removed = await sql`
         WITH rows AS (
           DELETE FROM prints
-          WHERE userid = ${interaction.user.id} AND id in ${ids}
+          WHERE userid = ${interaction.user.id} AND id in ${sql(ids)}
           RETURNING *
         )
         SELECT * FROM rows
