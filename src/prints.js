@@ -266,9 +266,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
     WHERE userid = ${userID}
     AND (
       ability1_element = ${element}
-      OR ability1_element IS NULL
       OR ability2_element = ${element}
-      OR ability2_element IS NULL
     )
     AND (
       ability1_weapon = ${weapon}
@@ -531,7 +529,7 @@ const printsCommand = {
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",
-              "title": `Prints suitable for ${element} ${pluralize(weapon)}`,
+              "title": `Prints suitable for ${capitalize(element)} ${pluralize(weapon) ?? ''}`,
               "fields": printsField,
               "description": printsField == null ? 'No prints found' : null,
               "color": COLORS[element.toUpperCase()],
