@@ -309,8 +309,8 @@ async function genAddPrints(userID, adventurer, printStrs) {
         ability2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
       };
     });
-  const errors = prints.filter(print => print.error != null);
-  const filtered = prints.filter(print => print.error == null);
+  const errors = prints.filter(print => print.userid == null);
+  const filtered = prints.filter(print => print.userid != null);
   console.log(filtered);
   const successes = (filtered.length > 0)
     ? await sql`
