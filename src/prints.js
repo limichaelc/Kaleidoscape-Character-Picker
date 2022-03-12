@@ -367,7 +367,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
-            return interaction.reply({embeds: [embed]});
+            return interaction.editReply({embeds: [embed]});
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
@@ -375,9 +375,9 @@ const printsCommand = {
             const prints = await genPrintsForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",
-              "title": `Prints suitable for ${nameElementWeapon.element} ${pluralize(nameElementWeapon.weapon)}`,
+              "title": `Prints suitable for ${element} ${pluralize(weapon)}`,
               "description": prints.join('\n'),
-              "color": COLORS[nameElementWeapon.element.toUpperCase()],
+              "color": COLORS[element.toUpperCase()],
             }
             return interaction.editReply({embeds: [embed]});
         }
