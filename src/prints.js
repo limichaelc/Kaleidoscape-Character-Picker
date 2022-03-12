@@ -123,6 +123,7 @@ const SLOT_1_ABILITY_TYPES = [
   ABILITY_TYPE.FORCE_STRIKE,
   ABILITY_TYPE.HP,
   ABILITY_TYPE.DRAGON_DAMAGE,
+  ABILITY_TYPE.DRAGON_HASTE,
 ];
 
 const SLOT_2_ABILITY_TYPES = [
@@ -469,10 +470,11 @@ const printsCommand = {
         WHERE userid = ${interaction.user.id}
       `;
 
-      const totalPages = Math.ceil(count / 10)
+      const totalPages = Math.ceil(count.count / 10)
       const prints = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
+        ORDER BY id
         OFFSET ${(page - 1) * 10}
         LIMIT 10
       `;
