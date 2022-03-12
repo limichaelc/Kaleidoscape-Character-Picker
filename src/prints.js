@@ -237,7 +237,7 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
   `;
   const results = prints.map(print => {
     const ability2Str = print.ability2_type != null
-      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.abilit2y_value))
+      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value))
       : ''
     return `${print.adventurer}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`
   });
@@ -270,7 +270,7 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
 async function genNameElementWeapon(adventurer) {
   const results = await sql`
     SELECT name, element, weapon FROM adventurers
-    WHERE CONCAT(', ', aliases, ',') LIKE CONCAT('%, ', 'gleo', ',%') OR name = ${adventurer}
+    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}, ',%') OR name = ${adventurer}
   `;
   if (results.length == 0) {
     return {error: `Could not find adventurer for query "${adventurer}"`};
@@ -346,6 +346,7 @@ const printsCommand = {
         )
     ),
   execute: async (interaction, _) => {
+    interaction.deferReply();
     const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
     switch (group) {
@@ -355,7 +356,7 @@ const printsCommand = {
             const query = interaction.options.getString('query');
             const nameElementWeapon = await genNameElementWeapon(query);
             if (nameElementWeapon.error != null) {
-              return interaction.reply({
+              return interaction.editReply({
                 content: nameElementWeapon.error,
               })
             }
@@ -366,7 +367,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
-            return interaction.reply({embeds: [embed]});
+            return interaction.editReply({embeds: [embed]});
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
@@ -378,7 +379,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[element.toUpperCase()],
             }
-            return interaction.reply({embeds: [embed]});
+            return interaction.editReply({embeds: [embed]});
         }
     }
   }
