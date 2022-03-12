@@ -314,8 +314,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
   console.log(filtered);
   const successes = await sql`
     WITH rows AS (
-      INSERT INTO prints
-      VALUES ${sql(
+      INSERT INTO prints ${sql(
         filtered,
         'userid',
         'adventurer',
