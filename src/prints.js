@@ -258,7 +258,7 @@ function formatPrint(print) {
   return `ID ${print.id}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`;
 }
 
-async function genPrintsForElementWeapon(interaction, elementWeapon) {
+async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
   const userID = interaction.user.id;
   const {element, weapon} = elementWeapon;
   const prints = await sql`
@@ -277,10 +277,9 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
       OR ability2_weapon IS NULL
     )
   `;
-  const results = prints.map(print => formatPrint(print));
   return (results.length === 0)
-    ? ['No prints found']
-    : results;
+    ? null
+    : fieldifyPrints(prints);
 }
 
 // function comparePrints(print1, print2) {
@@ -516,11 +515,12 @@ const printsCommand = {
                 content: nameElementWeapon.error,
               }).catch(onRejected => console.error(onRejected));
             }
-            const prints = await genPrintsForElementWeapon(interaction, nameElementWeapon);
+            const printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon);
             const embed = {
               "type": "rich",
               "title": `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`,
-              "description": prints.join('\n'),
+              "fields": printsField,
+              "description": printsField == null ? 'No prints found' : null,
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
             return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
@@ -528,11 +528,12 @@ const printsCommand = {
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
-            const prints = await genPrintsForElementWeapon(interaction, {element, weapon});
+            const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",
               "title": `Prints suitable for ${element} ${pluralize(weapon)}`,
-              "description": prints.join('\n'),
+              "fields": printsField,
+              "description": printsField == null ? 'No prints found' : null,
               "color": COLORS[element.toUpperCase()],
             }
             return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
