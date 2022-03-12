@@ -374,7 +374,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
   `;
   return (prints.length === 0)
     ? null
-    : fieldifyPrints(prints, element, weapon);
+    : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon);
 }
 
 // function comparePrints(print1, print2) {
@@ -470,7 +470,7 @@ const SORTING_OPTIONS = {
   ADVENTURER: 'adventurer',
 };
 
-function fieldifyPrints(prints, sortBy, element = null, weapon = null) {
+function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null) {
   const map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     prints.forEach(print => {
