@@ -1,6 +1,6 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {sql, logCommand} = require('./db');
-const {pluralize, allWeaponOptions} = require('./utils');
+const {capitalize, pluralize, allWeaponOptions} = require('./utils');
 const {ALL_ELEMENTS, COLORS} = require('./consts')
 
 const ABILITY_TYPE = {
