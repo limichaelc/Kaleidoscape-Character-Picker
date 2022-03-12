@@ -18,6 +18,13 @@ const {
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
+const {printsCommand} = require('./prints');
+const {
+  allWeaponOptions,
+  capitalize,
+  pluralize,
+  formatCounts,
+} = require('./utils');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -150,18 +157,11 @@ const searchCommand = {
   },
 };
 
-
 const allElementOptions = option =>
   option.setName('element')
     .setDescription('Specify the character element')
     .setRequired(false)
     .addChoices(ALL_ELEMENTS.map(element => [element, element]));
-
-const allWeaponOptions = option =>
-  option.setName('weapon')
-    .setDescription('Specify the character weapon type')
-    .setRequired(false)
-    .addChoices(ALL_WEAPONS.map(weapon => [weapon, weapon]));
 
 const popularityCommand = {
   data: new SlashCommandBuilder()
@@ -238,7 +238,7 @@ const leaderboardCommand = {
         .setName('page')
         .setDescription('Shows leaderboard by clears for all users of the bot, 10 entries at a time.')
       .addIntegerOption(option =>
-        option.setName('number')
+        option.setName('page')
           .setDescription('The page of the leaderboard to view. Each page is 10 entries long')
         ),
     ),
@@ -288,7 +288,7 @@ const leaderboardCommand = {
       return base;
     });
     const subcommand = interaction.options.getSubcommand();
-    var page = interaction.options.getInteger('number');
+    var page = interaction.options.getInteger('page');
     if (page == null && subcommand == 'page') {
       page = 1;
     }
@@ -310,7 +310,7 @@ const addQueryOption = option =>
 const manageCommand = {
   data: new SlashCommandBuilder()
     .setName('manage')
-    .setDescription('Managed your personal adventurer database, including your completed and block lists')
+    .setDescription('Manage your personal adventurer database, including your completed and block lists')
     .addSubcommandGroup(subcommandGroup =>
       subcommandGroup
         .setName(MANAGE_COMMAND_GROUPS.COMPLETED)
@@ -675,31 +675,6 @@ const historyCommand = {
   },
 };
 
-function capitalize(input) {
-  if (input == null) {
-    return null;
-  }
-  return input.charAt(0).toUpperCase() + input.slice(1);
-}
-
-function pluralize(input) {
-  if (input == null) {
-    return null;
-  }
-  if (input.toLowerCase() === 'staff') {
-    return 'Staves'
-  }
-  return input + 's';
-}
-
-function formatPercentage(numerator, denominator) {
-  return `${(numerator / denominator * 100).toFixed(2)}%`;
-}
-
-function formatCounts(completedCount, totalCount, isCompleted = false) {
-  return `${completedCount}/${totalCount} (${formatPercentage(completedCount, totalCount)})` + (parseInt(completedCount) == parseInt(totalCount) && isCompleted ? ' 🎖' : '');
-}
-
 [
   simpleCommand(
     'any',
@@ -766,6 +741,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   popularityCommand,
   historyCommand,
   helpCommand,
+  printsCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
@@ -774,4 +750,5 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
 module.exports = {
   commands,
   commandArray,
+  pluralize,
 }
