@@ -377,7 +377,7 @@ function fieldifyPrints(prints) {
     if (map[print.adventurer] == null) {
       map[print.adventurer] = [];
     }
-    map[print.adventurer].append(print);
+    map[print.adventurer].push(print);
   });
   return Object.keys(map).map(adventurer => {
     const prints = map[adventurer];
