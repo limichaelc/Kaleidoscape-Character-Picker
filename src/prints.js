@@ -373,7 +373,7 @@ const printsCommand = {
     )
     .addSubcommand(subcommand =>
       subcommand
-        .setName(PRINTS_COMMAND_GROUPS.ADD)
+        .setName(PRINTS_SUBCOMMANDS.ADD)
         .setDescription('Add prints to your collection')
         .addStringOption(option =>
           option.setName('adventurer')
