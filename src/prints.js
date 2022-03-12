@@ -383,7 +383,7 @@ function fieldifyPrints(prints) {
     const prints = map[adventurer];
     return {
       name: adventurer,
-      value: prints.map(print => formatPrint(print).join('\n')),
+      value: prints.map(print => formatPrint(print)).join('\n'),
     };;
   });
 }
