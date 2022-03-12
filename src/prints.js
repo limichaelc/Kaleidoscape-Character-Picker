@@ -409,7 +409,7 @@ const printsCommand = {
 
       const embed = {
         "type": "rich",
-        "fields": [successField, errorField],
+        "fields": [successField, errorField].filter(Boolean),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
