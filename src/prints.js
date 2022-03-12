@@ -272,7 +272,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
       )
       OR ability2_element = ${element}
       AND (
-        OR ability2_weapon = ${weapon}
+        ability2_weapon = ${weapon}
         OR ability2_weapon IS NULL
       )
     )
