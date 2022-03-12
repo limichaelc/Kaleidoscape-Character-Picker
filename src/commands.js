@@ -18,6 +18,7 @@ const {
   logCommand,
 } = require('./db');
 const {helpCommand} = require('./help');
+const {printsCommand} = require('./prints');
 
 const commands = new Collection(); // Where the bot (slash) commands will be stored.
 const commandArray = []; // Array to store commands for sending to the REST API.
@@ -302,7 +303,7 @@ const addQueryOption = option =>
 const manageCommand = {
   data: new SlashCommandBuilder()
     .setName('manage')
-    .setDescription('Managed your personal adventurer database, including your completed and block lists')
+    .setDescription('Manage your personal adventurer database, including your completed and block lists')
     .addSubcommandGroup(subcommandGroup =>
       subcommandGroup
         .setName(MANAGE_COMMAND_GROUPS.COMPLETED)
@@ -759,6 +760,7 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
   popularityCommand,
   historyCommand,
   helpCommand,
+  printsCommand,
 ].map(command => {
   commands.set(command.data.name, command);
   commandArray.push(command.data.toJSON());
@@ -767,4 +769,6 @@ function formatCounts(completedCount, totalCount, isCompleted = false) {
 module.exports = {
   commands,
   commandArray,
+  allWeaponOptions,
+  pluralize,
 }
