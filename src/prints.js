@@ -277,7 +277,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
       OR ability2_weapon IS NULL
     )
   `;
-  return (results.length === 0)
+  return (prints.length === 0)
     ? null
     : fieldifyPrints(prints);
 }
