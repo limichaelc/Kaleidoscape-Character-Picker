@@ -282,7 +282,9 @@ function formatPrint(print, element, weapon) {
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
   const userID = interaction.user.id;
-  const {element, weapon} = elementWeapon;
+  var {element, weapon} = elementWeapon;
+  element = capitalize(element);
+  weapon = capitalize(weapon);
   const prints = await sql`
     SELECT * from prints
     WHERE userid = ${userID}
