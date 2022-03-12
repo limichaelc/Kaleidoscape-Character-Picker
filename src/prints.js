@@ -498,12 +498,12 @@ const printsCommand = {
           }
         : null;
       if (successEmbed != null) {
-        interaction.editReply({embeds: [successEmbed]});
+        await interaction.editReply({embeds: [successEmbed]});
         if (errorEmbed != null) {
-          interaction.followUp({embeds: [errorEmbed]});
+          await interaction.followUp({embeds: [errorEmbed]});
         }
       } else if (errorEmbed != null) {
-        interaction.editReply({embeds: [errorEmbed]});
+        await interaction.editReply({embeds: [errorEmbed]});
       }
     } else if (subcommand === PRINTS_SUBCOMMANDS.PAGE) {
       var page = interaction.options.getInteger('page');
