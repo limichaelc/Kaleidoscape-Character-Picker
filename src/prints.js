@@ -537,6 +537,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       });
     }
   });
+  return fields;
 }
 
 const PRINTS_COMMAND_GROUPS = {
