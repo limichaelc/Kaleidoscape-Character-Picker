@@ -5,7 +5,7 @@ const {ALL_ELEMENTS, COLORS} = require('./consts')
 
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
-  SKILL_DAMAGE: 'Skill Damange',
+  SKILL_DAMAGE: 'Skill Damage',
   CRITICAL_RATE: 'Critical Rate',
   FORCE_STRIKE: 'Force Strike',
   HP: 'HP',
