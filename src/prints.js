@@ -470,7 +470,7 @@ const SORTING_OPTIONS = {
   ADVENTURER: 'adventurer',
 };
 
-function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null) {
+function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null,) {
   const map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     prints.forEach(print => {
@@ -519,7 +519,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const prints = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
     return {
       name: type,
-      value: prints.map(print => formatPrint(print, sortBy, element, weapon, adventurer)).join('\n'),
+      value: prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer)).join('\n'),
     };
   });
 }
