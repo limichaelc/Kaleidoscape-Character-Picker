@@ -382,7 +382,7 @@ const printsCommand = {
         )
         .addStringOption(option =>
           option.setName('prints')
-            .setDescription('Print descriptions, format is "hp 15, prep 40". Separate multiple prints with ";". See the `/help prints` command for more')
+            .setDescription('Print descriptions as "hp 15, prep 40". Separate multiples with ";". See `/help prints` for more')
             .setRequired(true)
         )
     ),
