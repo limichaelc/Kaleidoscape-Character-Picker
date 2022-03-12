@@ -151,7 +151,7 @@ const ABILITY_NAMES = {
   ],
   [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force'],
   [ABILITY_TYPE.HP]: ['hp'],
-  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragondamage', 'dragon_damage', 'ddamage'],
+  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragondamage', 'dragon_damage', 'ddamage', 'ddam'],
   [ABILITY_TYPE.DRAGON_HASTE]: ['dragonhaste', 'dragon_haste', 'dhaste'],
   [ABILITY_TYPE.SKILL_HASTE]: [
     'skillhaste',
@@ -342,7 +342,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
     .map((print) => {
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability, index));
       if (ability1.error != null || ability2.error != null) {
-        return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print}*")`;
+        return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print.trim()}*")`;
       }
       return {
         userid: userID,
