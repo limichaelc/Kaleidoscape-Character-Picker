@@ -1,7 +1,7 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {sql} = require('./db');
-const {pluralize} = require('./commands');
-const {ALL_ELEMENTS, ALL_WEAPONS, COLORS} = require('./consts')
+const {pluralize, allWeaponOptions} = require('./utils');
+const {ALL_ELEMENTS, COLORS} = require('./consts')
 
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
@@ -342,11 +342,7 @@ const printsCommand = {
                 .setDescription('Specify the character element')
                 .setRequired(true)
                 .addChoices(ALL_ELEMENTS.map(element => [element, element])))
-            .addStringOption(option =>
-              option.setName('weapon')
-                .setDescription('Specify the character weapon type')
-                .setRequired(false)
-                .addChoices(ALL_WEAPONS.map(weapon => [weapon, weapon])))
+            .addStringOption(allWeaponOptions)
         )
     ),
   execute: async (interaction, _) => {
