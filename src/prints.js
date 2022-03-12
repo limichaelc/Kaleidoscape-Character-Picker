@@ -523,7 +523,7 @@ const printsCommand = {
       const removed = await sql`
         WITH rows AS (
           DELETE FROM prints
-          WHERE userid = ${interaction.user.id} AND id in ${sql(ids)}
+          WHERE userid = ${interaction.user.id} AND id in ${sql.array(ids)}
           RETURNING *
         )
         SELECT * FROM rows
