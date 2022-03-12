@@ -346,7 +346,7 @@ const printsCommand = {
         )
     ),
   execute: async (interaction, _) => {
-    interaction.deferReply();
+    await interaction.deferReply();
     const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
     switch (group) {
