@@ -201,6 +201,10 @@ const helpCommand = {
   execute: async (interaction, _) => {
     const specificCommand = interaction.options.getString('command');
     await logCommand(interaction, 'help', specificCommand);
+    if (specificCommand === PRINTS_ALIASES_COMMAND) {
+      return interaction.reply({ embeds: [PRINTS_ALIASES_EMBED]});
+    }
+
     if (specificCommand == null || !allCommandNames.includes(specificCommand)) {
       const fields = Object.keys(COMMAND_CATEGORIES).map(key => {
         const name = COMMAND_CATEGORIES[key];
@@ -213,10 +217,6 @@ const helpCommand = {
         .setDescription('I support the following commands. Type `/<command>`.\nYou can also do `/help <command>` to learn more about a specific command.\n\nI usually use `/daily` to get a list of 3 adventurers for my daily skips, marking them completed with the buttons that show up for each result when I finish, and then `/leaderboard` and `/completed` to see how I stack up against others.\n\nYou can also use any of the adventurer generation commands to get a random adventurer from a more specific pool, or use the `/manage` command to do batch editing of your completed and block lists.')
         .setFields(fields);
       return interaction.reply({ embeds: [embed] });
-    }
-
-    if (specificCommand === PRINTS_ALIASES_COMMAND) {
-      return interaction.reply({ embeds: [PRINTS_ALIASES_EMBED]});
     }
 
     const commandFamily = supportedCommands.find(command => command.names.includes(specificCommand));

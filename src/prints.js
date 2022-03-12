@@ -533,7 +533,6 @@ const printsCommand = {
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else if (subcommand === PRINTS_SUBCOMMANDS.DELETE) {
       const ids = interaction.options.getString('ids').split(',').map(id => parseInt(id));
-      console.log(ids);
       await logCommand(interaction, 'prints delete', ids);
       const removed = await sql`
         WITH rows AS (
