@@ -209,11 +209,11 @@ function find(haystack, needle) {
 function formatAbility(element, weapon, type, value) {
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
-    : `(${[element, weapon].join(' & ')})`;
+    : `(${[element, weapon].filter(Boolean).join(' & ')})`;
   const base = `${prefix} ${type} `;
   return isHitterAbility(type)
     ? base + 'I'
-    : base + `${value}%`;
+    : base + `+${value}%`;
 }
 
 function formatPrint(print) {
@@ -286,7 +286,7 @@ async function genNameElementWeapon(adventurer) {
 async function genAddPrints(userID, adventurer, printStrs) {
   const elementWeapon = await genNameElementWeapon(adventurer);
   if (elementWeapon.error != null) {
-    return elementWeapon.error;
+    return {errors: [elementWeapon.error], successes: []};
   }
   const {name, element, weapon} = elementWeapon;
   const prints = printStrs
