@@ -235,12 +235,15 @@ async function genPrintsForElementWeapon(interaction, elementWeapon) {
       OR ability2_weapon IS NULL
     )
   `;
-  return prints.map(print => {
+  const results = prints.map(print => {
     const ability2Str = print.ability2_type != null
       ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.abilit2y_value))
       : ''
     return `${print.adventurer}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`
   });
+  return (results.length === 0)
+    ? ['No prints found']
+    : results;
 }
 
 // function comparePrints(print1, print2) {
@@ -306,12 +309,12 @@ async function genNameElementWeapon(adventurer) {
 // }
 
 const PRINTS_COMMAND_GROUPS = {
-  FOR: 'FOR',
+  FOR: 'for',
 };
 
 const PRINTS_SUBCOMMANDS = {
-  ADVENTURER: 'ADVENTURER',
-  ELEMENT: 'ELEMENT',
+  ADVENTURER: 'adventurer',
+  ELEMENT: 'element',
 }
 
 const printsCommand = {
