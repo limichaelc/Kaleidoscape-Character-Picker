@@ -470,7 +470,7 @@ const SORTING_OPTIONS = {
   ADVENTURER: 'adventurer',
 };
 
-function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null,) {
+function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null) {
   const map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     prints.forEach(print => {
