@@ -427,7 +427,8 @@ const printsCommand = {
             .setDescription('Find prints from your collection suitable for a given adventurer')
             .addStringOption(option =>
               option.setName('query')
-                .setDescription('The search query, single name, fuzzy match'))
+                .setDescription('The search query, single name, fuzzy match')
+                .setRequired(true))
         )
         .addSubcommand(subcommand =>
           subcommand
@@ -591,4 +592,5 @@ const printsCommand = {
 
 module.exports = {
   printsCommand,
+  ABILITY_NAMES,
 }

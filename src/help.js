@@ -3,6 +3,7 @@
 const {Collection, MessageActionRow, MessageButton, MessageEmbed} = require('discord.js'); // Define Client, Intents, and Collection.
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {logCommand} = require('./db');
+const {ABILITY_NAMES} = require('./prints');
 
 const COMMAND_CATEGORIES = {
   GENERAL: 'General',
@@ -158,7 +159,34 @@ const supportedCommands = [
     usage: '<flame|water|wind|light|shadow> <sword|blade|dagger|axe|lance|wand|bow|staff|manacaster> <allow_completed>',
     example: 'flame`, `/light blade`, `/shadow dagger true',
   },
-]
+  {
+    names: ['prints'],
+    category: COMMAND_CATEGORIES.LIST_MANAGEMENT,
+    description: `
+      This is a group of commands you can use to manage your print collection.\n
+      Use \`/prints add <adventurer> <prints>\` to add prints to your collection. You can specify the adventurer by alias (e.g. "gmym") or by their full name (e.g. "Ayaha & Otoha").\n
+      Prints are specified as a semi-colon separated list, e.g. "print1; print2", and the individual abilities are specified as a comma separated list, e.g. "hp15, def7".\n
+      Abilities can be specified by full name (e.g. "strength"). If there is a space in the ability, remove it or replace it with an underscore (e.g. "criticaldamage" or "skill_haste").\n
+      Abilities can also be specified by alias, such as "str" or "dhaste". **For a full list of available aliases, refer to \`/help ${PRINTS_ALIASES_COMMAND}\`**.\n\n
+      Use \`/prints page\` to view your full collection. Pages are 10 entries long.\n
+      Use \`/prints for adventurer <query>\` or \`/prints for element <weapon>\` to filter through your collection.\n
+      Note that abilities with no restriction are not considered when looking for viable prints so as to not clutter the results.\n
+      Use \`/prints delete <ids>\` if you ever need to remove prints from your collection. Pass in \`ids\` as a comma separated list, using the IDs shown next to each print.
+    `,
+    usage: 'prints add <adventurer> <prints>`, `/prints page <page>`, `/prints for adventurer <adventurer>`, `/prints for element <element> <weapon>`, `/prints delete <ids>',
+    example: 'prints add gmym skdam40, steady; fs50`, `/prints page 2`, `/prints for gleon`, `/prints for flame`, `/prints for water sword',
+  },
+];
+
+const PRINTS_ALIASES_COMMAND = 'prints aliases';
+const PRINTS_ALIASES_EMBED = new MessageEmbed()
+  .setTitle(`Print Ability Aliases`)
+  .setFields(Object.keys(ABILITY_NAMES).map(name => {
+    return {
+      name,
+      value: ABILITY_NAMES[name].join(', '),
+    };
+  }));
 
 const commandNameReducer = (previousValue, currentValue) => previousValue.concat(currentValue.names);
 const allCommandNames = supportedCommands.reduce(commandNameReducer, []);
@@ -185,6 +213,10 @@ const helpCommand = {
         .setDescription('I support the following commands. Type `/<command>`.\nYou can also do `/help <command>` to learn more about a specific command.\n\nI usually use `/daily` to get a list of 3 adventurers for my daily skips, marking them completed with the buttons that show up for each result when I finish, and then `/leaderboard` and `/completed` to see how I stack up against others.\n\nYou can also use any of the adventurer generation commands to get a random adventurer from a more specific pool, or use the `/manage` command to do batch editing of your completed and block lists.')
         .setFields(fields);
       return interaction.reply({ embeds: [embed] });
+    }
+
+    if (specificCommand === PRINTS_ALIASES_COMMAND) {
+      return interaction.reply({ embeds: [PRINTS_ALIASES_EMBED]});
     }
 
     const commandFamily = supportedCommands.find(command => command.names.includes(specificCommand));
