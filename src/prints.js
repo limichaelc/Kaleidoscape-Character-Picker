@@ -349,7 +349,7 @@ const printsCommand = {
     switch (group) {
       case PRINTS_COMMAND_GROUPS.FOR:
         switch (subcommand) {
-          case PRINTS_SUBCOMMANDS.ADVENTURER:
+          case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
             const nameElementWeapon = await genNameElementWeapon(query);
             if (nameElementWeapon.error != null) {
@@ -366,6 +366,7 @@ const printsCommand = {
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
             return interaction.editReply({embeds: [embed]});
+          }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
