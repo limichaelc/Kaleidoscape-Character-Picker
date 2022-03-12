@@ -204,11 +204,11 @@ function parseAbility(str, index) {
   }
 
   if (index === 0 && !SLOT_1_ABILITY_TYPES.includes(type)) {
-    return {error: `${type} is not a slot 1 ability (${str})`};
+    return {error: `${type} is not a slot 1 ability`};
   }
 
   if (index === 1 && !SLOT_2_ABILITY_TYPES.includes(type)) {
-    return {error: `${type} is not a slot 2 ability (${str})`};
+    return {error: `${type} is not a slot 2 ability`};
   }
 
   if (isHitterAbility(type)) {
@@ -221,12 +221,12 @@ function parseAbility(str, index) {
 
   const value = parseInt(valueStr);
   if (value == NaN) {
-    return {error: `Invalid value of ${valueStr} for ability for ${type} (${str})`};
+    return {error: `Invalid value of ${valueStr} for ability for ${type}`};
   }
 
   const restriction = find(VALUE_THRESHOLDS[type], value);
   if (restriction == null) {
-    return {error: `Invalid value of ${valueStr} for ability for ${type} (${str})`};
+    return {error: `Invalid value of ${valueStr} for ability for ${type}`};
   }
 
   return { type, value, restriction };
@@ -328,7 +328,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
     .map((print) => {
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability, index));
       if (ability1.error != null || ability2.error != null) {
-        return [ability1?.error, ability2?.error].filter(Boolean).join(', ') + ` (${print})`;
+        return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` (${print})`;
       }
       return {
         userid: userID,
@@ -473,7 +473,7 @@ const printsCommand = {
       const prints = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
-        OFFSET ${page * 10}
+        OFFSET ${(page - 1) * 10}
         LIMIT 10
       `;
       console.log(prints);
