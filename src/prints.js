@@ -310,11 +310,13 @@ async function genAddPrints(userID, adventurer, printStrs) {
       };
     });
   const errors = prints.filter(print => print.error != null);
+  const filtered = prints.filter(print => print.error == null);
+  console.log(filtered);
   const successes = await sql`
     WITH rows AS (
       INSERT INTO prints
       VALUES ${sql(
-        prints.filter(print => print.error == null),
+        filtered,
         'userid',
         'adventurer',
         'ability1_type',
