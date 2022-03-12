@@ -346,7 +346,7 @@ const printsCommand = {
         )
     ),
   execute: async (interaction, _) => {
-    interaction.deferReply({ephemeral: true});
+    interaction.deferReply();
     const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
     switch (group) {
@@ -358,7 +358,6 @@ const printsCommand = {
             if (nameElementWeapon.error != null) {
               return interaction.editReply({
                 content: nameElementWeapon.error,
-                ephemeral: true,
               })
             }
             const prints = await genPrintsForElementWeapon(interaction, nameElementWeapon);
@@ -368,7 +367,7 @@ const printsCommand = {
               "description": prints.join('\n'),
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
             }
-            return interaction.editReply({embeds: [embed]});
+            return interaction.reply({embeds: [embed]});
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
