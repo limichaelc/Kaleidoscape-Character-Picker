@@ -461,7 +461,7 @@ const printsCommand = {
       subcommand
         .setName(PRINTS_SUBCOMMANDS.PAGE)
         .setDescription('View your print collection')
-        .addStringOption(option =>
+        .addIntegerOption(option =>
           option.setName('page')
             .setDescription('The page of your print collection to view. Each page is 10 entries long')
             .setRequired(false)
