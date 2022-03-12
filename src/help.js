@@ -60,9 +60,31 @@ const supportedCommands = [
     description: `
       This command shows the leaderboard in terms of unique characters completed by all users of the bot.\n
       For people in the server the command is used, it will show their nickname, otherwise, their Discord username.
+      The leaderboard is split into pages of 10 by default, and you can use the \`page\` subcommand to navigate. Alternatively, you can use the \`full\` subcommand to see the entire list.
     `,
-    usage: 'leaderboard',
+    usage: 'leaderboard <page|full> <page>',
     example: 'leaderboard',
+  },
+  {
+    names: ['history'],
+    category: COMMAND_CATEGORIES.GENERAL,
+    description: `
+      This command shows the last day of completes by all users of the bot.\n
+      For people in the server the command is used, it will show their nickname, otherwise, their Discord username.
+    `,
+    usage: 'history',
+    example: 'history',
+  },
+  {
+    names: ['popularity'],
+    category: COMMAND_CATEGORIES.GENERAL,
+    description: `
+      This command shows how popular adventurers are in term of completes.\n
+      The popularity ranking is split into pages of 25 by default, and you can use the \`page\` subcommand to navigate.\n
+      You can also use the \`ordering\` subcommand to reverse the order.
+    `,
+    usage: 'popularity <page> <ordering>',
+    example: 'popularity`, `/popularity 2`, `/popularity ascending',
   },
   {
     names: ['manage'],
@@ -77,14 +99,15 @@ const supportedCommands = [
     example: 'manage completed add xainfried, aurien, the prince`, `/manage blocked clear',
   },
   {
-    names: ['completed', 'blocked'],
+    names: ['completed', 'blocked', 'incomplete'],
     category: COMMAND_CATEGORIES.GENERAL,
     description: `
-      This command displays all the adventurers on your completed/blocked lists.\n
+      This command displays all the adventurers on your completed/blocked/incomplete lists.\n
       By default, the bot's response will be in messages only visible to you, but you can pass in a \`visibility\` option to make it show up for everyone as well.
+      For \`/completed\` and \`/incomplete\`, the stats will be calculated taking your block list into consideration, but you can also provide a \`allow_blocked\` option to bypass that.
     `,
-    usage: '<completed|blocked> <visibility>',
-    example: 'completed everyone`, `/blocked me',
+    usage: '<completed|blocked|incomplete> <visibility> <allow_blocked>',
+    example: 'completed everyone`, , `incomplete true`, `/blocked me',
   },
   {
     names: ['perma', 'limited'],
@@ -176,8 +199,7 @@ const supportedCommands = [
       This is a group of commands you can use to manage your print collection.\n
       Use \`/prints add <adventurer> <prints>\` to add prints to your collection. You can specify the adventurer by alias (e.g. "gmym") or by their full name (e.g. "Ayaha & Otoha").\n
       Prints are specified as a semi-colon separated list, e.g. "print1; print2", and the individual abilities are specified as a comma separated list, e.g. "hp15, def7".\n
-      Abilities can be specified by full name (e.g. "strength"). If there is a space in the ability, remove it or replace it with an underscore (e.g. "criticaldamage" or "skill_haste").\n
-      Abilities can also be specified by alias, such as "str" or "dhaste". **For a full list of available aliases, refer to \`/help ${PRINTS_ALIASES_COMMAND}\`**.\n\n
+      Abilities can be specified by full name (e.g. "strength") or by alias, such as "str" or "dhaste". **For a full list of available aliases, refer to \`/help ${PRINTS_ALIASES_COMMAND}\`**.\n\n
       Use \`/prints page\` to view your full collection. Pages are 10 entries long.\n
       Use \`/prints for adventurer <query>\` or \`/prints for element <weapon>\` to filter through your collection.\n
       Note that abilities with no restriction are not considered when looking for viable prints so as to not clutter the results.\n

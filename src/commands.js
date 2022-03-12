@@ -190,7 +190,15 @@ const popularityCommand = {
     const entries = await popularity(interaction, weapon, element);
     var previousPrefix = null;
     var previousCount = null;
-    var fields = entries.sort().map((entry, index) => {
+    var fields = entries.sort((a, b) => {
+      if (a.count < b.count) {
+        return 1;
+      } else if (a.count > b.count) {
+        return -1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    }).map((entry, index) => {
       var prefix = `(${index + 1})`;
       if (entry.count === previousCount) {
         prefix = previousPrefix;
@@ -288,7 +296,7 @@ const leaderboardCommand = {
       fields = fields.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     }
     const embed = new MessageEmbed()
-      .setTitle('Leaderboard')
+      .setTitle(`Leaderboard (${entries.length} competitors)`)
       .setDescription([selfEntry, fields.join('\n')].join('\n\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
@@ -662,7 +670,6 @@ const historyCommand = {
       return base;
     });
     const embed = new MessageEmbed()
-      .setTitle(`History`)
       .setDescription(fields.join('\n'));
     interaction.editReply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   },
