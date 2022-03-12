@@ -185,10 +185,10 @@ const ABILITY_NAMES = {
     'r',
   ],
   [ABILITY_TYPE.DRAGON_TIME]: ['dragon time', 'dragontime', 'dragon_time', 'time', 'dtime', 'dt'],
-  [ABILITY_TYPE.STEADY_HITTER]: ['steady hitter', 'steadyhitter', 'steady_hitter', 'steady'],
-  [ABILITY_TYPE.EASY_HITTER]: ['easy hitter', 'easyhitter', 'easy_hitter', 'easy'],
-  [ABILITY_TYPE.LUCKY_HITTER]: ['lucky hitter', 'luckyhitter', 'lucky_hitter', 'lucky'],
-  [ABILITY_TYPE.HASTY_HITTER]: ['hasty hitter', 'hastyhitter', 'hasty_hitter', 'hasty'],
+  [ABILITY_TYPE.STEADY_HITTER]: ['steady hitter', 'steadyhitter', 'steady_hitter', 'steady', 'sth'],
+  [ABILITY_TYPE.EASY_HITTER]: ['easy hitter', 'easyhitter', 'easy_hitter', 'easy', 'eh'],
+  [ABILITY_TYPE.LUCKY_HITTER]: ['lucky hitter', 'luckyhitter', 'lucky_hitter', 'lucky', 'luck', 'lh'],
+  [ABILITY_TYPE.HASTY_HITTER]: ['hasty hitter', 'hastyhitter', 'hasty_hitter', 'hasty', 'hh'],
 };
 
 function isHitterAbility(type) {
