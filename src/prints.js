@@ -328,7 +328,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
     .map((print) => {
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability, index));
       if (ability1.error != null || ability2.error != null) {
-        return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` (${print})`;
+        return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print}*")`;
       }
       return {
         userid: userID,
@@ -468,7 +468,7 @@ const printsCommand = {
         SELECT COUNT(*) from prints
         WHERE userid = ${interaction.user.id}
       `;
-      console.log(count);
+
       const totalPages = Math.ceil(count / 10)
       const prints = await sql`
         SELECT * from prints
@@ -476,11 +476,11 @@ const printsCommand = {
         OFFSET ${(page - 1) * 10}
         LIMIT 10
       `;
-      console.log(prints);
+
       const embed = {
         "type": "rich",
         "title": `${interaction.member?.nickname ?? interaction.user.username}'s Print Collection (Page ${page} of ${totalPages})`,
-        "fields": prints.map(print => formatPrint(print)).join('\n'),
+        "description": prints.map(print => formatPrint(print)).join('\n'),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
