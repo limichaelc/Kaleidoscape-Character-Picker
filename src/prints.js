@@ -241,21 +241,35 @@ function find(haystack, needle) {
   });
 }
 
-function formatAbility(element, weapon, type, value) {
+function formatAbility(element, weapon, type, value, isCompatible = true) {
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
   const base = `${prefix} ${type} `;
-  return isHitterAbility(type)
+  const ret = isHitterAbility(type)
     ? base + 'I'
     : base + `+${value}%`;
+  return isCompatible ? ret : `*~~${ret}~~*`;
 }
 
-function formatPrint(print) {
+function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon) {
+  if (adventurerElement == null || adventurerWeapon == null) {
+    return true;
+  }
+  if (abilityElement !== adventurerElement) {
+    return false;
+  } else if (abilityWeapon == null) {
+    return true;
+  } else if (abilityWeapon !== adventurerWeapon) {
+    return false;
+  }
+}
+
+function formatPrint(print, element, weapon) {
   const ability2Str = print.ability2_type != null
-      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value))
+      ? (' / ' + formatAbility(print.ability2_element, print.ability2_weapon, print.ability2_type, print.ability2_value, isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon)))
       : ''
-  return `ID ${print.id}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value)}${ability2Str}`;
+  return `ID ${print.id}: ${formatAbility(print.ability1_element, print.ability1_weapon, print.ability1_type, print.ability1_value, isAbilityCompatible(print.ability1_element, print.ability1_weapon, element, weapon))}${ability2Str}`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
@@ -279,7 +293,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
   `;
   return (prints.length === 0)
     ? null
-    : fieldifyPrints(prints);
+    : fieldifyPrints(prints, element, weapon);
 }
 
 // function comparePrints(print1, print2) {
@@ -370,7 +384,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
   return {errors, successes};
 }
 
-function fieldifyPrints(prints) {
+function fieldifyPrints(prints, element = null, weapon = null) {
   const map = {};
   prints.forEach(print => {
     if (map[print.adventurer] == null) {
@@ -382,7 +396,7 @@ function fieldifyPrints(prints) {
     const prints = map[adventurer];
     return {
       name: adventurer,
-      value: prints.map(print => formatPrint(print)).join('\n'),
+      value: prints.map(print => formatPrint(print, element, weapon)).join('\n'),
     };;
   });
 }
