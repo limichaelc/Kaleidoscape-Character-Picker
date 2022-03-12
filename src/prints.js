@@ -294,7 +294,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
     .map((print) => {
       const [ability1, ability2] = print.split(',').map((ability) => parseAbility(ability));
       if (ability1.error != null || ability2.error != null) {
-        return {error: [ability1.error, ability2.error].join('\n')};
+        return {error: [ability1?.error, ability2?.error].filter(Boolean).join('\n')};
       }
       return {
         userid: userID,
