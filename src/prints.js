@@ -558,7 +558,7 @@ const printsCommand = {
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
-            await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : '');
+            await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             const embed = {
               "type": "rich",
