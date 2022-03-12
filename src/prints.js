@@ -388,40 +388,8 @@ const printsCommand = {
     ),
   execute: async (interaction, _) => {
     await interaction.deferReply();
-    const group = interaction.options.getSubcommandGroup();
     const subcommand = interaction.options.getSubcommand();
-    if (group === PRINTS_COMMAND_GROUPS.FOR) {
-      switch (subcommand) {
-        case PRINTS_SUBCOMMANDS.ADVENTURER: {
-          const query = interaction.options.getString('query');
-          const nameElementWeapon = await genNameElementWeapon(query);
-          if (nameElementWeapon.error != null) {
-            return interaction.editReply({
-              content: nameElementWeapon.error,
-            }).catch(onRejected => console.error(onRejected));
-          }
-          const prints = await genPrintsForElementWeapon(interaction, nameElementWeapon);
-          const embed = {
-            "type": "rich",
-            "title": `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`,
-            "description": prints.join('\n'),
-            "color": COLORS[nameElementWeapon.element.toUpperCase()],
-          }
-          return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
-        }
-        case PRINTS_SUBCOMMANDS.ELEMENT:
-          const element = interaction.options.getString('element');
-          const weapon = interaction.options.getString('weapon');
-          const prints = await genPrintsForElementWeapon(interaction, {element, weapon});
-          const embed = {
-            "type": "rich",
-            "title": `Prints suitable for ${element} ${pluralize(weapon)}`,
-            "description": prints.join('\n'),
-            "color": COLORS[element.toUpperCase()],
-          }
-          return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
-      }
-    } else if (subcommand === PRINTS_SUBCOMMANDS.ADD) {
+    if (subcommand === PRINTS_SUBCOMMANDS.ADD) {
       const adventurer = interaction.options.getString('adventurer');
       const printStrs = interaction.options.getString('prints');
       const {errors, successes} = await genAddPrints(interaction.user.id, adventurer, printStrs);
@@ -443,6 +411,40 @@ const printsCommand = {
         "fields": [successField, errorField],
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+    } else {
+      const group = interaction.options.getSubcommandGroup();
+      if (group === PRINTS_COMMAND_GROUPS.FOR) {
+        switch (subcommand) {
+          case PRINTS_SUBCOMMANDS.ADVENTURER: {
+            const query = interaction.options.getString('query');
+            const nameElementWeapon = await genNameElementWeapon(query);
+            if (nameElementWeapon.error != null) {
+              return interaction.editReply({
+                content: nameElementWeapon.error,
+              }).catch(onRejected => console.error(onRejected));
+            }
+            const prints = await genPrintsForElementWeapon(interaction, nameElementWeapon);
+            const embed = {
+              "type": "rich",
+              "title": `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`,
+              "description": prints.join('\n'),
+              "color": COLORS[nameElementWeapon.element.toUpperCase()],
+            }
+            return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
+          }
+          case PRINTS_SUBCOMMANDS.ELEMENT:
+            const element = interaction.options.getString('element');
+            const weapon = interaction.options.getString('weapon');
+            const prints = await genPrintsForElementWeapon(interaction, {element, weapon});
+            const embed = {
+              "type": "rich",
+              "title": `Prints suitable for ${element} ${pluralize(weapon)}`,
+              "description": prints.join('\n'),
+              "color": COLORS[element.toUpperCase()],
+            }
+            return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
+        }
+      }
     }
   }
 }
