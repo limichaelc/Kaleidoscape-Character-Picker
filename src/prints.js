@@ -520,9 +520,11 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   console.log(Object.keys(map));
   const fields = [];
   Object.keys(map).forEach(type => {
-    const prints = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
+    const printsWithValue = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
     var value = '';
-    const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer));
+    const printStrs = printsWithValue.map(printWithValue =>
+      formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
+    );
     var counter = -1;
     while (printStrs.length > 0) {
       var next = printStrs.shift();
