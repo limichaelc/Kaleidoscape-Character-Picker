@@ -767,6 +767,7 @@ async function genHandleWizard(interaction) {
     BEGIN
       FOR r IN SELECT * FROM prints
       WHERE prints.userid = $1
+      AND prints.id in (454, 456, 467)
       LOOP
         RETURN QUERY VALUES(
           r.id,
@@ -804,7 +805,16 @@ async function genHandleWizard(interaction) {
         AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
         AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
         AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-        AND prints.id <> r.id;
+        AND prints.id <> r.id
+        ORDER BY
+          ability1_element,
+          ability1_weapon,
+          ability1_type,
+          ability1_value DESC,
+          ability2_element,
+          ability2_weapon,
+          ability2_type,
+          ability2_value DESC;
         RETURN;
       END LOOP;
     END
