@@ -719,13 +719,13 @@ function chunkifyFields(fields) {
 
 async function genHandleWizard(interaction) {
   await sql`
-    CREATE OR REPLACE FUNCTION getAllDupes() RETURNS SETOF prints AS
+    CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS SETOF prints AS
     $BODY$
     DECLARE
         r prints%rowtype;
     BEGIN
         FOR r IN SELECT * FROM prints
-        WHERE userid = '141276744693972992'
+        WHERE userid = $1
         AND id = 474
         LOOP
             WITH dupes AS (
@@ -740,15 +740,15 @@ async function genHandleWizard(interaction) {
               AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
               AND id <> r.id
             )
-            RETURN SELECT * FROM dupes UNION ALL SELECT *, null as basisId FROM r;
+            RETURN SELECT * FROM dupes;
         END LOOP;
-        RETURN;
+        RETURN SELECT *, null as basisId FROM r;
     END
     $BODY$
     LANGUAGE plpgsql;
   `
   const prints = sql`
-    SELECT * FROM getallfoo();
+    SELECT * FROM getallfoo(${interaction.user.id});
   `
   console.log(prints);
   await interaction.editReply('Boo');
