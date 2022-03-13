@@ -545,14 +545,17 @@ function chunkifyFields(fields) {
   if (fields == null || fields.length === 0) {
     return null;
   }
+  console.log('fields.length', fields.length);
   const chunks = [];
   while (fields.length > 0) {
     const currentChunk = [];
     const length = 0;
     const next = fields.shift();
+    console.log('fields.length', fields.length);
     while (length + next.value.length < MAX_FIELD_LENGTH_SUM) {
       currentChunk.push(next);
     }
+    console.log(currentChunk);
     chunks.push(currentChunk);
   }
   return chunks;
@@ -737,7 +740,7 @@ const printsCommand = {
         const editEmbed = {
           "type": "rich",
           "title": baseTitle,
-          "fields": chunkified != null ? chunkified.pop() : null,
+          "fields": chunkified != null ? chunkified.shift() : null,
           "description": chunkified != null ? 'No prints found' : null,
           "color": COLORS[element.toUpperCase()],
         }
@@ -747,7 +750,7 @@ const printsCommand = {
           const embed = {
             "type": "rich",
             "title": baseTitle + ` (${counter})`,
-            "fields": chunkified.pop(),
+            "fields": chunkified.shift(),
             "color": COLORS[element.toUpperCase()],
           }
           counter++;
