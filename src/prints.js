@@ -609,7 +609,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
-      console.log({a: formatPrint(a), b: formatPrint(b)});
+      console.log({a: formatPrint(a.print), b: formatPrint(b.print)});
       const valueCmp = b.effectiveValue - a.effectiveValue;
       console.log({valueCmp});
       if (valueCmp === 0) {
@@ -622,19 +622,25 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           if (a.hitterSubTypeCompatible) {
             // if both are compatible hitters, defer to strCmp
             if (b.hitterSubTypeCompatible) {
+              console.log('returning subTypeCmp: ' + subTypeCmp);
               return subTypeCmp;
             }
+            console.log('returning -1');
             // else only a is a compatible hitter, prioritize
             return -1;
           }
+          console.log('returning 1');
           // else prioritize b
           return 1;
         }
         if (subTypeCmp === 0) {
+          console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
+        console.log(`returning subTypeCmp: ${subTypeCmp}`);
         return subTypeCmp;
       }
+      console.log(`returning valueCmp: ${valueCmp}`);
       return valueCmp;
     });
     const printStrs = printsWithValue.map(printWithValue =>
