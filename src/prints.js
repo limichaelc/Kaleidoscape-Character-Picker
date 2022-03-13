@@ -721,14 +721,7 @@ const printsCommand = {
             }
             const printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon);
             baseTitle = `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`;
-            const embed = {
-              "type": "rich",
-              "title": baseTitle,
-              "fields": printsField,
-              "description": printsField == null ? 'No prints found' : null,
-              "color": COLORS[nameElementWeapon.element.toUpperCase()],
-            }
-            return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
+            break;
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
             const element = interaction.options.getString('element');
@@ -736,26 +729,27 @@ const printsCommand = {
             await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             chunkified = chunkifyFields(printsField);
-            const baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
-            const editEmbed = {
-              "type": "rich",
-              "title": baseTitle,
-              "fields": chunkified != null ? chunkified.pop() : null,
-              "description": chunkified != null ? 'No prints found' : null,
-              "color": COLORS[element.toUpperCase()],
-            }
-            await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
-            var counter = 2;
-            while (chunkified.length > 0) {
-              const embed = {
-                "type": "rich",
-                "title": baseTitle + ` (${counter})`,
-                "fields": chunkified.pop(),
-                "color": COLORS[element.toUpperCase()],
-              }
-              counter++;
-              await interaction.followUp({embeds: [embed]}).catch(onRejected => console.error(onRejected));
-            }
+            baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
+            break;
+        }
+        const editEmbed = {
+          "type": "rich",
+          "title": baseTitle,
+          "fields": chunkified != null ? chunkified.pop() : null,
+          "description": chunkified != null ? 'No prints found' : null,
+          "color": COLORS[element.toUpperCase()],
+        }
+        await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
+        var counter = 2;
+        while (chunkified.length > 0) {
+          const embed = {
+            "type": "rich",
+            "title": baseTitle + ` (${counter})`,
+            "fields": chunkified.pop(),
+            "color": COLORS[element.toUpperCase()],
+          }
+          counter++;
+          await interaction.followUp({embeds: [embed]}).catch(onRejected => console.error(onRejected));
         }
       }
     }
