@@ -703,6 +703,27 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   return fields;
 }
 
+async function chunkifyAndSendFields(interaction, title, fields, color) {
+  const chunkified = chunkifyFields(fields);
+  const editEmbed = {
+    title,
+    'fields': chunkified != null ? chunkified.shift() : null,
+    'description': chunkified != null ? null : 'No prints found',
+    color,
+  }
+  await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
+  var counter = 2;
+  while ((chunkified?.length ?? 0) > 0) {
+    const embed = {
+      'title': baseTitle + ` (${counter})`,
+      'fields': chunkified.shift(),
+      color,
+    }
+    counter++;
+    await interaction.followUp({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+  }
+}
+
 function chunkifyFields(fields) {
   if (fields == null || fields.length === 0) {
     return null;
@@ -825,14 +846,13 @@ async function genHandleWizard(interaction) {
   });
   // console.log({map, basisMap});
   await interaction.editReply('Boo');
-  await Promise.all(Object.keys(map).map(async basisId => {
-    await interaction.followUp({
-      embeds: [{
-        title: formatPrint(basisMap[basisId]),
-        description: map[basisId].map(print => formatPrint(print)).join('\n'),
-      }],
-    });
+  const fields = await Promise.all(Object.keys(map).map(async basisId => {
+    return {
+      name: formatPrint(basisMap[basisId]),
+      value: map[basisId].map(print => formatPrint(print)).join('\n'),
+    };
   }));
+  await chunkifyAndSendFields(interaction, 'Prints you can delete', fields);
   //   SELECT * from prints
   //   WHERE userid = ${userID}
   //   ORDER BY
@@ -1051,26 +1071,7 @@ const printsCommand = {
             baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
             break;
         }
-        const chunkified = chunkifyFields(printsField);
-        const editEmbed = {
-          "type": "rich",
-          "title": baseTitle,
-          "fields": chunkified != null ? chunkified.shift() : null,
-          "description": chunkified != null ? null : 'No prints found',
-          "color": COLORS[element.toUpperCase()],
-        }
-        await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
-        var counter = 2;
-        while ((chunkified?.length ?? 0) > 0) {
-          const embed = {
-            "type": "rich",
-            "title": baseTitle + ` (${counter})`,
-            "fields": chunkified.shift(),
-            "color": COLORS[element.toUpperCase()],
-          }
-          counter++;
-          await interaction.followUp({embeds: [embed]}).catch(onRejected => console.error(onRejected));
-        }
+        await chunkifyAndSendFields(interaction, baseTitle, printsField, COLORS[element.toUpperCase()]);
       }
     }
   }
