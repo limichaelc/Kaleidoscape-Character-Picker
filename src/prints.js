@@ -826,6 +826,7 @@ async function genHandleWizard(interaction) {
   const map = {};
   const basisMap = {};
   const replacementCandidates = {};
+  var count = 0;
   prints.map(print => {
     // basis print record
     if (print.basisid == null) {
@@ -837,6 +838,7 @@ async function genHandleWizard(interaction) {
       basisMap[print.id] = print;
     } else {
       replacementCandidates[print.id] = true;
+      count++;
       if (map[print.basisid] == null) {
         map[print.basisid] = [];
       }
@@ -851,7 +853,7 @@ async function genHandleWizard(interaction) {
       value: map[basisId].map(print => formatPrint(print)).join('\n'),
     };
   }));
-  await chunkifyAndSendFields(interaction, 'Prints you can probably delete', fields);
+  await chunkifyAndSendFields(interaction, `${count} prints you can probably delete`, fields);
   //   SELECT * from prints
   //   WHERE userid = ${userID}
   //   ORDER BY
