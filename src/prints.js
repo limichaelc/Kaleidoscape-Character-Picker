@@ -762,7 +762,7 @@ async function genHandleWizard(interaction) {
             r.ability2_element,
             NULL::int
           );
-          RETURN QUERY SELECT (
+          RETURN QUERY SELECT
             prints.id,
             prints.adventurer,
             prints.userid,
@@ -775,7 +775,7 @@ async function genHandleWizard(interaction) {
             prints.ability2_weapon,
             prints.ability2_element,
             r.id
-          ) FROM prints
+          FROM prints
           WHERE prints.ability1_type = r.ability1_type
           AND prints.ability2_type = r.ability2_type
           AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(r.ability1_element, '') = '')
