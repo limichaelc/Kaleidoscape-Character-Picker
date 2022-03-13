@@ -579,7 +579,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     );
     var counter = 0;
     var next = printStrs.shift();
-    while (printStrs.length > 0) {
+    do {
       var value = '';
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
@@ -593,7 +593,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         name: type + pageStr,
         value: value.trim(),
       });
-    }
+    } while (printStrs.length > 0)
   });
   return fields;
 }
@@ -605,7 +605,7 @@ function chunkifyFields(fields) {
 
   const chunks = [];
   var next = fields.shift();
-  while (fields.length > 0) {
+  do {
     const currentChunk = [];
     var length = 0;
     while (next != null && (length + next.value.length < MAX_FIELD_LENGTH_SUM)) {
@@ -614,7 +614,7 @@ function chunkifyFields(fields) {
       next = fields.shift();
     }
     chunks.push(currentChunk);
-  }
+  } while (fields.length > 0)
   return chunks;
 }
 
