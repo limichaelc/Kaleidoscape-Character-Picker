@@ -737,7 +737,7 @@ async function genHandleWizard(interaction) {
         r prints%rowtype;
     BEGIN
         FOR r IN SELECT * FROM prints
-        WHERE userid = $1
+        WHERE prints.userid = $1
         AND id = 474
         LOOP
             RETURN NEXT;
