@@ -580,12 +580,15 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           types = effectiveTypes(type2)
         }
         types.filter(type => type !== type1).map(type => {
-          if (map[type] == null) {
-            map[type] = [];
+          const typeForMap = type2 === ability
+            ? type2
+            : type;
+          if (map[typeForMap] == null) {
+            map[typeForMap] = [];
           }
           const value = effectiveValue(print, type, element, weapon);
           if (value !== 0) {
-            map[type].push({
+            map[typeForMap].push({
               print,
               effectiveValue: value,
               subType: type1,
