@@ -315,6 +315,7 @@ function formatAbility(element, weapon, type, value, isCompatible = true) {
 }
 
 function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon) {
+  console.log(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon);
   // Didn't specify a restriction
   if (adventurerElement == null || adventurerWeapon == null) {
     return true;
@@ -330,6 +331,7 @@ function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, a
   } else if (abilityWeapon !== adventurerWeapon) {
     return false;
   }
+  return true;
 }
 
 function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritize) {
