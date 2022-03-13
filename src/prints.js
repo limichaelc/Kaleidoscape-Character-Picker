@@ -794,7 +794,19 @@ async function genHandleWizard(interaction) {
   const prints = await sql`
     SELECT * FROM getAllDupes(${interaction.user.id});
   `
-  console.log(prints);
+  const map = {};
+  const basisMap = {};
+  prints.map(print => {
+    if (print.basisid === null) {
+      basisMap[print.id] = print;
+    } else {
+      if (map[print.basisid] == null) {
+        map[print.basisid] = [];
+      }
+      map[print.basisid].push(print);
+    }
+  });
+  console.log({map, basisMap});
   await interaction.editReply('Boo');
   //   SELECT * from prints
   //   WHERE userid = ${userID}
