@@ -434,8 +434,8 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       )
     )
     AND (
-      ability1_type = ANY(ARRAY[${abilityFilter}]::text)
-      OR ability2_type = ANY(ARRAY[${abilityFilter}]::text)
+      ability1_type = ANY(ARRAY[${abilityFilter}]::text[])
+      OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
     AND id in (189, 240, 399)
