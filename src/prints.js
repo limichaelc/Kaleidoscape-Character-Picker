@@ -408,7 +408,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${abilityStrs.filter(Boolean).join(' / ')}`;
   }
-  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer})`;
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
@@ -636,15 +636,15 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         // different sub types
         // deprioritize dead abilities
         // If b's subtype has no effective value
-        console.log({
-          a: formatPrint(a.print),
-          b: formatPrint(b.print),
-          aSubTypeEffectiveValue: a.subTypeEffectiveValue,
-          bSubTypeEffectiveValue: b.subTypeEffectiveValue,
-          aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
-          bHasCompatibleHitterSubType: b.hasCompatibleHitterSubType,
-          subTypeCmp,
-        })
+        // console.log({
+        //   a: formatPrint(a.print),
+        //   b: formatPrint(b.print),
+        //   aSubTypeEffectiveValue: a.subTypeEffectiveValue,
+        //   bSubTypeEffectiveValue: b.subTypeEffectiveValue,
+        //   aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
+        //   bHasCompatibleHitterSubType: b.hasCompatibleHitterSubType,
+        //   subTypeCmp,
+        // })
         if (b.subTypeEffectiveValue === 0) {
           // ... and a's subtype also has no effective value
           if (a.subTypeEffectiveValue === 0) {
@@ -744,48 +744,58 @@ async function genHandleWizard(interaction) {
     DECLARE
         r prints%rowtype;
     BEGIN
-        FOR r IN SELECT * FROM prints
-        WHERE prints.userid = $1
-        LOOP
-          RETURN QUERY VALUES(
-            r.id,
-            r.adventurer,
-            r.userid,
-            r.ability1_type,
-            r.ability1_value,
-            r.ability2_type,
-            r.ability2_value,
-            r.ability1_weapon,
-            r.ability1_element,
-            r.ability2_weapon,
-            r.ability2_element,
-            NULL::int
-          );
-          RETURN QUERY SELECT
-            prints.id,
-            prints.adventurer,
-            prints.userid,
-            prints.ability1_type,
-            prints.ability1_value,
-            prints.ability2_type,
-            prints.ability2_value,
-            prints.ability1_weapon,
-            prints.ability1_element,
-            prints.ability2_weapon,
-            prints.ability2_element,
-            r.id
-          FROM prints
-          WHERE prints.ability1_type = r.ability1_type
-          AND prints.ability2_type = r.ability2_type
-          AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(prints.ability1_element, '') = '')
-          AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(prints.ability2_element, '') = '')
-          AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(prints.ability1_weapon, '') = '')
-          AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
-          AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
-          AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-          AND prints.id <> r.id;
-        END LOOP;
-        RETURN;
+      FOR r IN SELECT * FROM prints
+      WHERE prints.userid = $1
+      AND id in (454, 456, 467)
+      LOOP
+        RETURN QUERY VALUES(
+          r.id,
+          r.adventurer,
+          r.userid,
+          r.ability1_type,
+          r.ability1_value,
+          r.ability2_type,
+          r.ability2_value,
+          r.ability1_weapon,
+          r.ability1_element,
+          r.ability2_weapon,
+          r.ability2_element,
+          NULL::int
+        );
+        RETURN QUERY SELECT
+          prints.id,
+          prints.adventurer,
+          prints.userid,
+          prints.ability1_type,
+          prints.ability1_value,
+          prints.ability2_type,
+          prints.ability2_value,
+          prints.ability1_weapon,
+          prints.ability1_element,
+          prints.ability2_weapon,
+          prints.ability2_element,
+          r.id
+        FROM prints
+        WHERE prints.ability1_type = r.ability1_type
+        AND prints.ability2_type = r.ability2_type
+        AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(prints.ability1_element, '') = '')
+        AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(prints.ability2_element, '') = '')
+        AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(prints.ability1_weapon, '') = '')
+        AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
+        AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
+        AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
+        AND prints.id <> r.id;
+      END LOOP;
+      ORDER BY
+      ability1_element,
+      ability1_weapon,
+      ability1_type,
+      ability1_value DESC,
+      ability2_element,
+      ability2_weapon,
+      ability2_type,
+      ability2_value DESC;
+      RETURN;
     END
     $BODY$
     LANGUAGE plpgsql;
@@ -795,10 +805,18 @@ async function genHandleWizard(interaction) {
   `
   const map = {};
   const basisMap = {};
+  const replacementCandidates = {};
   prints.map(print => {
+    // basis print record
     if (print.basisid == null) {
+      // skip if it is already flagged as a candidate for replacement
+      // i.e. for A > B > C, skip B as basis
+      if (replacementCandidates[print.id]) {
+        return;
+      }
       basisMap[print.id] = print;
     } else {
+      replacementCandidates[print.id] = true;
       if (map[print.basisid] == null) {
         map[print.basisid] = [];
       }
@@ -810,8 +828,8 @@ async function genHandleWizard(interaction) {
   await Promise.all(Object.keys(map).map(async basisId => {
     await interaction.followUp({
       embeds: [{
-        title: formatPrint(basisMap[basisId], SORTING_OPTIONS.ADVENTURER),
-        description: map[basisId].map(print => formatPrint(print, SORTING_OPTIONS.ADVENTURER)).join('\n'),
+        title: formatPrint(basisMap[basisId]),
+        description: map[basisId].map(print => formatPrint(print)).join('\n'),
       }],
     });
   }));
