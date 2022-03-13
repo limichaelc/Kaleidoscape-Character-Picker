@@ -745,7 +745,7 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
-  await sql`DROP FUNCTION getalldupes(text)`
+  // await sql`DROP FUNCTION getalldupes(text)`
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
       id int,
@@ -804,16 +804,7 @@ async function genHandleWizard(interaction) {
         AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
         AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
         AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-        AND prints.id <> r.id
-        ORDER BY
-          ability1_element,
-          ability1_weapon,
-          ability1_type,
-          ability1_value DESC,
-          ability2_element,
-          ability2_weapon,
-          ability2_type,
-          ability2_value DESC;
+        AND prints.id <> r.id;
         RETURN;
       END LOOP;
     END
