@@ -564,15 +564,15 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printsWithValue = map[type].sort((a, b) => {
       console.log(formatPrint(a.print), formatPrint(b.print));
       const valueCmp = b.effectiveValue - a.effectiveValue;
-      console.log(valueCmp);
+      console.log({valueCmp});
       if (valueCmp === 0) {
-        console.log(b.subTypeEffectiveValue);
+        console.log('subTypeEffectiveValues', a.subTypeEffectiveValue, b.subTypeEffectiveValue);
         // If the second ability is dead, automatically place it last
-        if (b.subTypeEffectiveValue === 0) {
+        if (a.subTypeEffectiveValue === 0) {
           return -1;
         }
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        console.log(subTypeCmp);
+        console.log({subTypeCmp});
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
