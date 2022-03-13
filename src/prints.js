@@ -845,12 +845,15 @@ async function genHandleWizard(interaction) {
   // console.log({map, basisMap});
   await interaction.editReply('Boo');
   const fields = await Promise.all(Object.keys(map).map(async basisId => {
+    if (map[basisId].length === 0) {
+      return null;
+    }
     return {
       name: formatPrint(basisMap[basisId]),
       value: map[basisId].map(print => formatPrint(print)).join('\n'),
     };
   }));
-  await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete`, fields);
+  await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete`, fields.filter(Boolean));
   //   SELECT * from prints
   //   WHERE userid = ${userID}
   //   ORDER BY
