@@ -685,7 +685,10 @@ const PRINTS_SUBCOMMANDS = {
 const abilityOption = option =>
   option.setName('ability')
     .setDescription('Only find prints that affect this ability, both positively and negatively')
-    .addChoices(Object.keys(ABILITY_TYPE).map((key, value) => [value, value]));
+    .addChoices(Object.keys(ABILITY_TYPE).map((key) => {
+      const name = ABILITY_TYPE[key];
+      return [name, name];
+    }));
 
 const printsCommand = {
   data: new SlashCommandBuilder()
