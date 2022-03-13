@@ -241,10 +241,12 @@ function effectiveValue(print, ability, element, weapon) {
   if (type1 === ability && element1 === element && weapon1 === weapon) {
     value = print.ability1_value;
   }
-  if (type2 === ability && element2 === element && weapon2 === weapon) {
-    value = print.ability2_value;
-  } else if (isHitterAbility(type2)) {
-    value += getValueForTradeoff(type2, ability)
+  if (element2 === element && weapon2 === weapon) {
+    if (type2 === ability) {
+      value = print.ability2_value;
+    } else if (isHitterAbility(type2)) {
+      value += getValueForTradeoff(type2, ability)
+    }
   }
   return value;
 }
@@ -512,7 +514,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         if (isHitterAbility(type2)) {
           types = effectiveTypes(type2)
         }
-        types.forEach(type => {
+        types.filter(type => type !== type1).forEach(type => {
           if (map[type] == null) {
             map[type] = [];
           }
@@ -527,7 +529,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
-  console.log(Object.keys(map));
   const fields = [];
   Object.keys(map).forEach(type => {
     const printsWithValue = map[type].sort((a, b) => b.effectiveValue - a.effectiveValue);
@@ -752,6 +753,8 @@ const printsCommand = {
             break;
         }
         const chunkified = chunkifyFields(printsField);
+        console.log(chunkified.length);
+        console.log(chunkified[0]);
         const editEmbed = {
           "type": "rich",
           "title": baseTitle,
