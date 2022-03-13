@@ -434,8 +434,8 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       )
     )
     AND (
-      ability1_type = ANY(ARRAY[${abilityFilter}])
-      OR ability2_type = ANY(ARRAY[${abilityFilter}])
+      ability1_type = ANY(ARRAY[${abilityFilter}]::text)
+      OR ability2_type = ANY(ARRAY[${abilityFilter}]::text)
       OR ${abilityFilter.length === 0}
     )
     AND id in (189, 240, 399)
@@ -614,7 +614,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       console.log({valueCmp});
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue});
+        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aHitterSubTypeCompatible: a.hitterSubTypeCompatible, bHitterSubTypeCompatible: b.hitterSubTypeCompatible});
         // If the second ability is dead...
         if (a.subTypeEffectiveValue === 0) {
           // effective value of 0 means either dead or hitter
@@ -622,7 +622,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           if (a.hitterSubTypeCompatible) {
             // if both are compatible hitters, defer to strCmp
             if (b.hitterSubTypeCompatible) {
-              console.log('returning subTypeCmp: ' + subTypeCmp);
+              console.log('returning subTypeCmp1: ' + subTypeCmp);
               return subTypeCmp;
             }
             console.log('returning -1');
@@ -637,7 +637,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
-        console.log(`returning subTypeCmp: ${subTypeCmp}`);
+        console.log(`returning subTypeCmp2: ${subTypeCmp}`);
         return subTypeCmp;
       }
       console.log(`returning valueCmp: ${valueCmp}`);
