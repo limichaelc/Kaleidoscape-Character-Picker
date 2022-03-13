@@ -332,39 +332,52 @@ function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, a
   }
 }
 
-function formatPrint(print, sortBy, element, weapon, adventurer) {
-  const ability1Str = formatAbility(
+function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritize) {
+  const type1 = print.ability1_type;
+  const type2 = print.ability2_type;
+  const type1Compatible = isAbilityCompatible(
     print.ability1_element,
     print.ability1_weapon,
-    print.ability1_type,
-    print.ability1_value,
-    isAbilityCompatible(
-      print.ability1_element,
-      print.ability1_weapon,
-      element,
-      weapon,
-    ),
+    element,
+    weapon,
   );
+  const type2Compatible = isAbilityCompatible(
+    print.ability2_element,
+    print.ability2_weapon,
+    element,
+    weapon,
+  );
+
+  var ability1Str = formatAbility(
+    print.ability1_element,
+    print.ability1_weapon,
+    type1,
+    print.ability1_value,
+    type1Compatible,
+  );
+  if (type1 === typeToPrioritize ** type1Compatible) {
+    ability1Str = '**' + ability1Str + '**';
+  }
   var ability2Str = '';
-  if (print.ability2_type != null) {
-    const base = formatAbility(
+  if (type2 != null) {
+    ability2Str = formatAbility(
       print.ability2_element,
       print.ability2_weapon,
-      print.ability2_type,
+      type2,
       print.ability2_value,
-      isAbilityCompatible(
-        print.ability2_element,
-        print.ability2_weapon,
-        element,
-        weapon,
-      ),
+      type2Compatible,
     );
-    ability2Str = ' / ' + base;
+    if (type2 === typeToPrioritize && type2Compatible) {
+      ability2Str = '**' + ability2Str + '**';
+    }
   }
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${ability1Str}${ability2Str}`;
   }
-  return `${ability1Str}${ability2Str} (ID ${print.id}, ${adventurer})`;
+  const abilityStrs = type2 === typeToPrioritize
+    ? [ability2Str, ability1Str]
+    : [ability1Str, ability2Str];
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
@@ -561,7 +574,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       return valueCmp;
     });
     const printStrs = printsWithValue.map(printWithValue =>
-      formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
+      formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer, type),
     );
     var counter = -1;
     var next = printStrs.shift();
