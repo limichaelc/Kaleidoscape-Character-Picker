@@ -843,9 +843,8 @@ async function genHandleWizard(interaction) {
     }
   });
   // console.log({map, basisMap});
-  await interaction.editReply('Boo');
   const fields = await Promise.all(Object.keys(map).map(async basisId => {
-    if (map[basisId].length === 0) {
+    if (basisMap[basisId] == null) {
       return null;
     }
     return {
