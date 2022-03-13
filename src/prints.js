@@ -730,7 +730,7 @@ async function genHandleWizard(interaction) {
       ability2_type text,
       ability2_element text,
       ability2_weapon text,
-      ability2_value int,
+      ability2_value int
     ) AS
     $BODY$
     DECLARE
