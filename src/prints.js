@@ -797,7 +797,7 @@ async function genHandleWizard(interaction) {
   const map = {};
   const basisMap = {};
   prints.map(print => {
-    if (print.basisid === null) {
+    if (print.basisid == null) {
       basisMap[print.id] = print;
     } else {
       if (map[print.basisid] == null) {
