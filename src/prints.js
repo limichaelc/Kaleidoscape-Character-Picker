@@ -367,15 +367,16 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
     );
-    console.log(type2, typeToPrioritize, getValueForTradeoff(type2, typeToPrioritize));
-    if ((type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible) {
+    const prioritize2 = (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible;
+    console.log(type2, typeToPrioritize, getValueForTradeoff(type2, typeToPrioritize), type2Compatible);
+    if (prioritize2) {
       ability2Str = '**' + ability2Str + '**';
     }
   }
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${ability1Str}${ability2Str}`;
   }
-  const abilityStrs = type2 === typeToPrioritize
+  const abilityStrs = prioritize2
     ? [ability2Str, ability1Str]
     : [ability1Str, ability2Str];
   return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer})`;
