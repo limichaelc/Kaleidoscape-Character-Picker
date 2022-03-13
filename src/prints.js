@@ -387,6 +387,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
+    AND ability1_type = 'Dragon Haste'
   `;
   return (prints.length === 0)
     ? null
@@ -489,7 +490,7 @@ const SORTING_OPTIONS = {
 function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null) {
   const map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
-    prints.forEach(print => {
+    prints.map(print => {
       if (map[print.adventurer] == null) {
         map[print.adventurer] = [];
       }
@@ -503,7 +504,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       };
     });
   }
-  prints.forEach(print => {
+  prints.map(print => {
     const type1 = print.ability1_type;
     const type2 = print.ability2_type;
     if (type1 !== null) {
@@ -525,7 +526,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         if (isHitterAbility(type2)) {
           types = effectiveTypes(type2)
         }
-        types.filter(type => type !== type1).forEach(type => {
+        types.filter(type => type !== type1).map(type => {
           if (map[type] == null) {
             map[type] = [];
           }
@@ -543,7 +544,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     }
   });
   const fields = [];
-  Object.keys(map).forEach(type => {
+  Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
@@ -564,8 +565,8 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
     );
     var counter = -1;
+    var next = printStrs.shift();
     while (printStrs.length > 0) {
-      var next = printStrs.shift();
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
         next = printStrs.shift();
@@ -590,10 +591,10 @@ function chunkifyFields(fields) {
   }
 
   const chunks = [];
+  var next = fields.shift();
   while (fields.length > 0) {
     const currentChunk = [];
     var length = 0;
-    var next = fields.shift();
     while (next != null && (length + next.value.length < MAX_FIELD_LENGTH_SUM)) {
       length += next.value.length;
       currentChunk.push(next);
