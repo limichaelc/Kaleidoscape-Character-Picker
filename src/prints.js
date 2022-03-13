@@ -748,24 +748,49 @@ async function genHandleWizard(interaction) {
         WHERE prints.userid = $1
         AND prints.id = 474
         LOOP
-            RETURN QUERY VALUES(r.id, r.adventurer, r.userid, r.ability1_type, r.ability1_value, r.ability2_type, r.ability2_value, r.ability1_weapon, r.ability1_element, r.ability2_weapon, r.ability2_element, NULL::int);
+          RETURN QUERY VALUES(
+            r.id,
+            r.adventurer,
+            r.userid,
+            r.ability1_type,
+            r.ability1_value,
+            r.ability2_type,
+            r.ability2_value,
+            r.ability1_weapon,
+            r.ability1_element,
+            r.ability2_weapon,
+            r.ability2_element,
+            NULL::int
+          );
+          RETURN QUERY SELECT (
+            prints.id,
+            prints.adventurer,
+            prints.userid,
+            prints.ability1_type,
+            prints.ability1_value,
+            prints.ability2_type,
+            prints.ability2_value,
+            prints.ability1_weapon,
+            prints.ability1_element,
+            prints.ability2_weapon,
+            prints.ability2_element,
+            r.id,
+          ) from prints
+          WHERE prints.ability1_type = r.ability1_type
+          AND prints.ability2_type = r.ability2_type
+          AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(r.ability1_element, '') = '')
+          AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(r.ability2_element, '') = '')
+          AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(r.ability1_weapon, '') = '')
+          AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(r.ability2_weapon, '') = '')
+          AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
+          AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
+          AND prints.id <> r.id;
         END LOOP;
         RETURN;
     END
     $BODY$
     LANGUAGE plpgsql;
   `
-  // RETURN QUERY
-  //           SELECT *, r.id as basisId from prints
-  //           WHERE prints.ability1_type = r.ability1_type
-  //           AND prints.ability2_type = r.ability2_type
-  //           AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(r.ability1_element, '') = '')
-  //           AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(r.ability2_element, '') = '')
-  //           AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(r.ability1_weapon, '') = '')
-  //           AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(r.ability2_weapon, '') = '')
-  //           AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
-  //           AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-  //           AND prints.id <> r.id;
   const prints = await sql`
     SELECT * FROM getAllDupes(${interaction.user.id});
   `
