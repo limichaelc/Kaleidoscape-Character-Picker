@@ -230,14 +230,18 @@ function getValueForTradeoff(hitterAbility, ability) {
   return 0;
 };
 
-function effectiveValue(print, ability) {
+function effectiveValue(print, ability, element, weapon) {
   var value = 0;
   const type1 = print.ability1_type;
+  const element1 = print.ability1_element ?? element;
+  const weapon1 = print.ability1_weapon ?? weapon;
   const type2 = print.ability2_type;
-  if (type1 === ability) {
+  const element2 = print.ability2_element ?? element;
+  const weapon2 = print.ability2_weapon ?? weapon;
+  if (type1 === ability && element1 === element && weapon1 === weapon) {
     value = print.ability1_value;
   }
-  if (type2 === ability) {
+  if (type2 === ability && element2 === element && weapon2 === weapon) {
     value = print.ability2_value;
   } else if (isHitterAbility(type2)) {
     value += getValueForTradeoff(type2, ability)
@@ -498,7 +502,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
       map[type1].push({
         print,
-        effectiveValue: effectiveValue(print, type1),
+        effectiveValue: effectiveValue(print, type1, element, weapon),
       });
       if (type2 !== null) {
         var types = [type2];
@@ -511,7 +515,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           }
           map[type].push({
             print,
-            effectiveValue: effectiveValue(print, type),
+            effectiveValue: effectiveValue(print, type, element, weapon),
           });
         });
       }
@@ -520,7 +524,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   console.log(Object.keys(map));
   const fields = [];
   Object.keys(map).forEach(type => {
-    const printsWithValue = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
+    const printsWithValue = map[type].sort((a, b) => b.effectiveValue - a.effectiveValue);
     var value = '';
     const printStrs = printsWithValue.map(printWithValue =>
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
