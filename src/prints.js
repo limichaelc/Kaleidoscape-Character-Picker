@@ -656,7 +656,8 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               return 1;
             }
             if (a.hasCompatibleHitterSubType) {
-              return 1;
+              console.log('returning -1 since a.hasCompatible');
+              return -1;
             }
             // defer to strCmp
             return subTypeCmp;
@@ -724,7 +725,7 @@ async function genHandleWizard(interaction) {
         r prints%rowtype;
     BEGIN
         FOR r IN SELECT * FROM prints
-        WHERE userid = ${interaction.user.id}
+        WHERE userid = '141276744693972992'
         AND id = 474
         LOOP
             WITH dupes AS (
