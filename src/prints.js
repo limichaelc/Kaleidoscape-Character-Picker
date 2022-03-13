@@ -718,7 +718,20 @@ function chunkifyFields(fields) {
 
 async function genHandleWizard(interaction) {
   await sql`
-    CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS SETOF prints AS
+    CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
+      id int,
+      basisId int,
+      adventurer text,
+      userid text,
+      ability1_type text,
+      ability1_element text,
+      ability1_weapon text,
+      ability1_value int,
+      ability2_type text,
+      ability2_element text,
+      ability2_weapon text,
+      ability2_value int,
+    ) AS
     $BODY$
     DECLARE
         r prints%rowtype;
