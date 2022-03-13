@@ -438,6 +438,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}])
       OR ${abilityFilter.length === 0}
     )
+    AND id in (189, 240, 399)
   `;
 
   return (prints.length === 0)
@@ -608,9 +609,12 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
+      console.log({a: formatPrint(a), b: formatPrint(b)});
       const valueCmp = b.effectiveValue - a.effectiveValue;
+      console.log({valueCmp});
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
+        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue});
         // If the second ability is dead...
         if (a.subTypeEffectiveValue === 0) {
           // effective value of 0 means either dead or hitter
