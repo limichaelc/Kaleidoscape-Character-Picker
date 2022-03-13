@@ -315,7 +315,6 @@ function formatAbility(element, weapon, type, value, isCompatible = true) {
 }
 
 function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon) {
-  console.log(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon);
   // Didn't specify a restriction
   if (adventurerElement == null || adventurerWeapon == null) {
     return true;
@@ -561,6 +560,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     }
   });
   const fields = [];
+  console.log(map);
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
       const valueCmp = b.effectiveValue - a.effectiveValue;
@@ -592,10 +592,12 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       const pageStr = counter > 1
         ? ` (${counter})`
         : '';
-      fields.push({
-        name: type + pageStr,
-        value: value.trim(),
-      });
+      if (value !== '') {
+        fields.push({
+          name: type + pageStr,
+          value: value.trim(),
+        });
+      }
     } while (printStrs.length > 0)
   });
   return fields;
