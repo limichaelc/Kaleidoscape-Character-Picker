@@ -403,7 +403,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
-    AND id in (488, 464, 462, 461, 366)
+    AND id in (366, 462, 461)
   `;
   return (prints.length === 0)
     ? null
@@ -560,16 +560,19 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     }
   });
   const fields = [];
-  console.log(map);
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
+      console.log(formatPrint(a.print), formatPrint(b.print));
       const valueCmp = b.effectiveValue - a.effectiveValue;
+      console.log(valueCmp);
       if (valueCmp === 0) {
+        console.log(b.subTypeEffectiveValue);
         // If the second ability is dead, automatically place it last
         if (b.subTypeEffectiveValue === 0) {
           return -1;
         }
         const subTypeCmp = a.subType.localeCompare(b.subType);
+        console.log(subTypeCmp);
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
