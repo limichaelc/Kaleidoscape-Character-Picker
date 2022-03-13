@@ -438,6 +438,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
+    AND id in (189, 240, 399, 384, 466, 452, 72)
   `;
 
   return (prints.length === 0)
@@ -614,18 +615,18 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         const subTypeCmp = a.subType.localeCompare(b.subType);
         // same sub type, compare effective value
         if (subTypeCmp === 0) {
-          // console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
+          console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
 
         // different sub types
         // deprioritize dead abilities
-        // console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aIsIncompatibleHitterSubType: a.isIncompatibleHitterSubType, bIsIncompatibleHitterSubType: b.isIncompatibleHitterSubType});
+        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aIsIncompatibleHitterSubType: a.isIncompatibleHitterSubType, bIsIncompatibleHitterSubType: b.isIncompatibleHitterSubType});
         // If b's subtype is an incompatible hitter
         if (b.isIncompatibleHitterSubType) {
           // ... and a's subtype is also an incompatible hitter
           if (a.isIncompatibleHitterSubType) {
-            // console.log('returning subTypeCmp1: ' + subTypeCmp);
+            console.log('returning subTypeCmp1: ' + subTypeCmp);
             // defer to strCmp
             return subTypeCmp;
           }
@@ -634,10 +635,10 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         } else if (a.isIncompatibleHitterSubType) {
           return 1;
         }
-        // console.log(`returning subTypeCmp2: ${subTypeCmp}`);
+        console.log(`returning subTypeCmp2: ${subTypeCmp}`);
         return subTypeCmp;
       }
-      // console.log(`returning valueCmp: ${valueCmp}`);
+      console.log(`returning valueCmp: ${valueCmp}`);
       return valueCmp;
     });
     const printStrs = printsWithValue.map(printWithValue =>
