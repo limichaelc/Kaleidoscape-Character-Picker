@@ -800,8 +800,8 @@ async function genHandleWizard(interaction) {
         AND prints.ability2_type = r.ability2_type
         AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(prints.ability1_element, '') = '')
         AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(prints.ability2_element, '') = '')
-        AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(prints.ability1_weapon, '') = '')
-        AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
+        AND (coalesce(prints.ability1_weapon, '') = coalesce(r.ability1_weapon, '')
+        AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '')
         AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
         AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
         AND prints.id <> r.id
