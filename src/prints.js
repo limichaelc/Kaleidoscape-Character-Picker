@@ -500,10 +500,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       if (map[type1] == null) {
         map[type1] = [];
       }
-      map[type1].push({
-        print,
-        effectiveValue: effectiveValue(print, type1, element, weapon),
-      });
+      const value1 = effectiveValue(print, type1, element, weapon);
+      if (value1 !== 0) {
+        map[type1].push({
+          print,
+          effectiveValue: value1,
+        });
+      }
       if (type2 !== null) {
         var types = [type2];
         if (isHitterAbility(type2)) {
@@ -513,10 +516,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           if (map[type] == null) {
             map[type] = [];
           }
-          map[type].push({
-            print,
-            effectiveValue: effectiveValue(print, type, element, weapon),
-          });
+          const value = effectiveValue(print, type, element, weapon);
+          if (value !== 0) {
+            map[type].push({
+              print,
+              effectiveValue: value,
+            });
+          }
         });
       }
     }
