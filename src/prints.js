@@ -438,7 +438,6 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
-    AND id in (189, 240, 399, 384, 466, 452, 72)
   `;
 
   return (prints.length === 0)
@@ -572,7 +571,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           effectiveValue: value1,
           subType: type2 ?? '',
           subTypeEffectiveValue: value2,
-          isIncompatibleHitterSubType: isHitterAbility(type2) && !isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon),
         });
       }
       if (type2 !== null) {
@@ -594,7 +592,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               effectiveValue: value,
               subType: type1,
               subTypeEffectiveValue: value1,
-              isIncompatibleHitterSubType: false,
             });
           }
         });
@@ -609,36 +606,23 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
-      console.log({a: formatPrint(a.print), b: formatPrint(b.print)});
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        // same sub type, compare effective value
         if (subTypeCmp === 0) {
-          console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
 
-        // different sub types
-        // deprioritize dead abilities
-        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aIsIncompatibleHitterSubType: a.isIncompatibleHitterSubType, bIsIncompatibleHitterSubType: b.isIncompatibleHitterSubType});
-        // If b's subtype is an incompatible hitter
         if (b.subTypeEffectiveValue === 0) {
-          // ... and a's subtype is also an incompatible hitter
           if (a.subTypeEffectiveValue === 0) {
-            console.log('returning subTypeCmp1: ' + subTypeCmp);
-            // defer to strCmp
             return subTypeCmp;
           }
-          // otherwise only b is an incompatible hitter, deprioritize
           return -1;
         } else if (a.subTypeEffectiveValue === 0) {
           return 1;
         }
-        console.log(`returning subTypeCmp2: ${subTypeCmp}`);
         return subTypeCmp;
       }
-      console.log(`returning valueCmp: ${valueCmp}`);
       return valueCmp;
     });
     const printStrs = printsWithValue.map(printWithValue =>
