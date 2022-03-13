@@ -413,6 +413,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
   element = capitalize(element);
   weapon = capitalize(weapon);
   const abilityFilter = expandedTypes(ability);
+  console.log(abilityFilter);
   const prints = await sql`
     SELECT * from prints
     WHERE userid = ${userID}
