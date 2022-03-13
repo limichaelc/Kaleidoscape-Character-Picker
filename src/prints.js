@@ -411,7 +411,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer})`;
 }
 
-async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability) {
+async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
   const userID = interaction.user.id;
   var {element, weapon} = elementWeapon;
   element = capitalize(element);
@@ -441,7 +441,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
 
   return (prints.length === 0)
     ? null
-    : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability);
+    : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability, strict);
 }
 
 // function comparePrints(print1, print2) {
@@ -537,7 +537,7 @@ const SORTING_OPTIONS = {
   ADVENTURER: 'adventurer',
 };
 
-function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null, ability = null) {
+function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null, ability = null, strict = false) {
   var map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     prints.map(print => {
@@ -558,6 +558,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   prints.map(print => {
     const type1 = print.ability1_type;
     const type2 = print.ability2_type;
+    const compatible2 = isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon);
+    if (strict) {
+      const compatible1 = isAbilityCompatible(print.ability1_element, print.ability1_weapon, element, weapon);
+      if (!(compatible1 && compatible2)) {
+        continue;
+      }
+    }
     if (type1 !== null) {
       const value1 = effectiveValue(print, type1, element, weapon);
       const value2 = isHitterAbility(type2) ? 0 : effectiveValue(print, type2, element, weapon);
@@ -570,7 +577,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           effectiveValue: value1,
           subType: type2 ?? '',
           subTypeEffectiveValue: value2,
-          hasCompatibleHitterSubType: isHitterAbility(type2) && isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon),
+          hasCompatibleHitterSubType: isHitterAbility(type2) && compatible2,
         });
       }
       if (type2 !== null) {
@@ -711,6 +718,10 @@ const abilityOption = option =>
       return [name, name];
     }));
 
+const strictOption = option =>
+  options.setName('strict')
+    .setDescription('Whether to only show prints where both effects are compatible. True by default');
+
 const printsCommand = {
   data: new SlashCommandBuilder()
     .setName('prints')
@@ -728,6 +739,7 @@ const printsCommand = {
                 .setDescription('The search query, single name, fuzzy match')
                 .setRequired(true))
             .addStringOption(abilityOption)
+            .addBooleanOption(strictOption)
         )
         .addSubcommand(subcommand =>
           subcommand
@@ -740,6 +752,7 @@ const printsCommand = {
                 .addChoices(ALL_ELEMENTS.map(element => [element, element])))
             .addStringOption(allWeaponOptions)
             .addStringOption(abilityOption)
+            .addBooleanOption(strictOption)
         )
     )
     .addSubcommand(subcommand =>
@@ -854,6 +867,7 @@ const printsCommand = {
         var printsField;
         var element = '';
         const ability = interaction.options.getString('ability');
+        const strict = interaction.options.getBoolean('strict') ?? true;
         switch (subcommand) {
           case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
@@ -865,7 +879,7 @@ const printsCommand = {
               }).catch(onRejected => console.error(onRejected));
             }
             element = nameElementWeapon.element;
-            printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon, ability);
+            printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon, ability, strict);
             baseTitle = `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`;
             break;
           }
@@ -873,7 +887,7 @@ const printsCommand = {
             element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
             await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
-            printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon}, ability);
+            printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon}, ability, strict);
             baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
             break;
         }
