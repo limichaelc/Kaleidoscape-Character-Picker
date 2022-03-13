@@ -738,7 +738,7 @@ async function genHandleWizard(interaction) {
     BEGIN
         FOR r IN SELECT * FROM prints
         WHERE prints.userid = $1
-        AND id = 474
+        AND prints.id = 474
         LOOP
             RETURN NEXT;
             RETURN QUERY
