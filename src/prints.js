@@ -635,6 +635,8 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         // deprioritize dead abilities
         // If b's subtype has no effective value
         console.log({
+          a: formatPrint(a.print),
+          b: formatPrint(b.print),
           aSubTypeEffectiveValue: a.subTypeEffectiveValue,
           bSubTypeEffectiveValue: b.subTypeEffectiveValue,
           aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
@@ -715,6 +717,7 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
+  console.log(interaction.user.id);
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes() RETURNS SETOF prints AS
     $BODY$
@@ -722,7 +725,7 @@ async function genHandleWizard(interaction) {
         r prints%rowtype;
     BEGIN
         FOR r IN SELECT *, null as basisId FROM prints
-        WHERE userid = ${interaction.user.id}
+        WHERE userid = ${interaction.user.id}::text
         AND id = 474
         LOOP
             WITH dupes AS (
