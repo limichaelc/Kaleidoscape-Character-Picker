@@ -427,19 +427,22 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
         OR ability2_weapon IS NULL
       )
     )
-    AND ability1_type in (
-      CASE
-        WHEN ${abilityFilter != null} THEN (${abilityFilter})
-        ELSE (ability1_type)
-      END
+    AND (
+      ability1_type in (
+        CASE
+          WHEN ${abilityFilter != null} THEN (${abilityFilter})
+          ELSE (ability1_type)
+        END
+      )
+      OR ability2_type in (
+        CASE
+          WHEN ${abilityFilter != null} THEN (${abilityFilter})
+          ELSE (ability2_type)
+        END
+      )
     )
-    OR ability2_type in (
-      CASE
-        WHEN ${abilityFilter != null} THEN (${abilityFilter})
-        ELSE (ability2_type)
-      END
-    )
-    AND id = 15
+    AND id in (15)
+    LIMIT 1
   `;
   console.log(prints.length);
   console.log(prints);
