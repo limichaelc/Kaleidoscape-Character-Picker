@@ -587,19 +587,17 @@ function chunkifyFields(fields) {
   if (fields == null || fields.length === 0) {
     return null;
   }
-  console.log('fields.length', fields.length);
+
   const chunks = [];
   while (fields.length > 0) {
     const currentChunk = [];
     var length = 0;
     var next = fields.shift();
-    console.log('fields.length', fields.length);
     while (next != null && (length + next.value.length < MAX_FIELD_LENGTH_SUM)) {
       length += next.value.length;
       currentChunk.push(next);
       next = fields.shift();
     }
-    console.log(currentChunk);
     chunks.push(currentChunk);
   }
   return chunks;
@@ -781,7 +779,6 @@ const printsCommand = {
             break;
         }
         const chunkified = chunkifyFields(printsField);
-        console.log(chunkified.length);
         const editEmbed = {
           "type": "rich",
           "title": baseTitle,
