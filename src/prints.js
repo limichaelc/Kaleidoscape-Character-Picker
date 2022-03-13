@@ -259,6 +259,7 @@ function effectiveValue(print, ability, element, weapon) {
   const type2 = print.ability2_type;
   const element2 = print.ability2_element ?? element;
   const weapon2 = print.ability2_weapon ?? weapon;
+  console.log({ability, element, weapon, type1, element1, weapon1, type2, element2, weapon2});
   if (type1 === ability && element1 === element && weapon1 === weapon) {
     value = print.ability1_value;
   }
@@ -438,7 +439,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
         ELSE (ability2_type)
       END
     )
-    LIMIT 20
+    AND id = 15
   `;
   console.log(prints.length);
   console.log(prints);
@@ -566,6 +567,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         map[type1] = [];
       }
       const value1 = effectiveValue(print, type1, element, weapon);
+      console.log({value1});
       const value2 = isHitterAbility(type2) ? 0 : effectiveValue(print, type2, element, weapon);
       if (value1 !== 0) {
         map[type1].push({
