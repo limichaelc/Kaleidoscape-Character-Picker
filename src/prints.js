@@ -517,6 +517,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
+  console.log(Object.keys(map));
   const fields = [];
   Object.keys(map).forEach(type => {
     const prints = map[type].sort((a, b) => a.effectiveValue - b.effectiveValue);
@@ -524,9 +525,10 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer));
     var counter = -1;
     while (printStrs.length > 0) {
-      const next = printStrs.shift();
+      var next = printStrs.shift();
       while ((value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
+        next = printStrs.shift();
       }
       counter++;
       const pageStr = counter > 0
