@@ -741,8 +741,8 @@ async function genHandleWizard(interaction) {
               AND id <> r.id
             )
             RETURN SELECT * FROM dupes;
+            RETURN SELECT *, null as basisId FROM r;
         END LOOP;
-        RETURN SELECT *, null as basisId FROM r;
     END
     $BODY$
     LANGUAGE plpgsql;
