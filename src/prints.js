@@ -355,7 +355,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
     print.ability1_value,
     type1Compatible,
   );
-  if (type1 === typeToPrioritize ** type1Compatible) {
+  if (type1 === typeToPrioritize && type1Compatible) {
     ability1Str = '**' + ability1Str + '**';
   }
   var ability2Str = '';
@@ -367,7 +367,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
     );
-    if (type2 === typeToPrioritize && type2Compatible) {
+    if ((type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible) {
       ability2Str = '**' + ability2Str + '**';
     }
   }
@@ -565,7 +565,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         if (b.subTypeEffectiveValue === 0) {
           return -1;
         }
-        const subTypeCmp = b.subType.localeCompare(a.subType);
+        const subTypeCmp = a.subType.localeCompare(b.subType);
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
@@ -576,7 +576,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printStrs = printsWithValue.map(printWithValue =>
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer, type),
     );
-    var counter = -1;
+    var counter = 0;
     var next = printStrs.shift();
     while (printStrs.length > 0) {
       var value = '';
@@ -586,7 +586,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         console.log(printStrs.length);
       }
       counter++;
-      const pageStr = counter > 0
+      const pageStr = counter > 1
         ? ` (${counter})`
         : '';
       fields.push({
