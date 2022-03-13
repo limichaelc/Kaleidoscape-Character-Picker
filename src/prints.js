@@ -808,7 +808,7 @@ async function genHandleWizard(interaction) {
   });
   console.log({map, basisMap});
   await interaction.editReply('Boo');
-  Promise.all(Object.keys(map).map(basisId => {
+  await Promise.all(Object.keys(map).map(async basisId => {
     await interaction.followUp({
       embeds: [{
         title: formatPrint(basisMap[basisId]),
