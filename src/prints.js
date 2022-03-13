@@ -124,7 +124,7 @@ const SLOT_2_ABILITY_TYPES = [
 
 const ABILITY_NAMES = {
   [ABILITY_TYPE.STRENGTH]: ['strength', 'str', 's'],
-  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'sd'],
+  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'skdmg', 'sd'],
   [ABILITY_TYPE.CRITICAL_RATE]: [
     'critical rate',
     'criticalrate',
@@ -136,7 +136,7 @@ const ABILITY_NAMES = {
   ],
   [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force', 'f'],
   [ABILITY_TYPE.HP]: ['hp', 'h'],
-  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragon damage', 'dragondamage', 'dragon_damage', 'ddamage', 'ddam', 'dd'],
+  [ABILITY_TYPE.DRAGON_DAMAGE]: ['dragon damage', 'dragondamage', 'dragon_damage', 'ddamage', 'ddam', 'ddmg', 'dd'],
   [ABILITY_TYPE.DRAGON_HASTE]: ['dragon haste', 'dragonhaste', 'dragon_haste', 'dhaste', 'dh'],
   [ABILITY_TYPE.SKILL_HASTE]: [
     'skill haste',
@@ -155,6 +155,7 @@ const ABILITY_NAMES = {
     'crit_dam',
     'critdam',
     'cdam',
+    'cdmg',
     'cd',
   ],
   [ABILITY_TYPE.RECOVERY_POTENCY]: [
