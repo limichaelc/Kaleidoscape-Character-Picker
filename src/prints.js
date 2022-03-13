@@ -312,7 +312,12 @@ function formatAbility(element, weapon, type, value, isCompatible = true) {
 }
 
 function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon) {
+  // Didn't specify a restriction
   if (adventurerElement == null || adventurerWeapon == null) {
+    return true;
+  }
+  // Ability has no restriction
+  if (abilityElement == null && abilityWeapon == null) {
     return true;
   }
   if (abilityElement !== adventurerElement) {
@@ -325,6 +330,18 @@ function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, a
 }
 
 function formatPrint(print, sortBy, element, weapon, adventurer) {
+  const ability1Str = formatAbility(
+    print.ability1_element,
+    print.ability1_weapon,
+    print.ability1_type,
+    print.ability1_value,
+    isAbilityCompatible(
+      print.ability1_element,
+      print.ability1_weapon,
+      element,
+      weapon,
+    ),
+  );
   var ability2Str = '';
   if (print.ability2_type != null) {
     const base = formatAbility(
@@ -341,18 +358,6 @@ function formatPrint(print, sortBy, element, weapon, adventurer) {
     );
     ability2Str = ' / ' + base;
   }
-  const ability1Str = formatAbility(
-    print.ability1_element,
-    print.ability1_weapon,
-    print.ability1_type,
-    print.ability1_value,
-    isAbilityCompatible(
-      print.ability1_element,
-      print.ability1_weapon,
-      element,
-      weapon,
-    ),
-  );
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${ability1Str}${ability2Str}`;
   }
@@ -507,6 +512,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         map[type1].push({
           print,
           effectiveValue: value1,
+          subType: type2 ?? '',
         });
       }
       if (type2 !== null) {
@@ -523,6 +529,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
             map[type].push({
               print,
               effectiveValue: value,
+              subType: type1,
             });
           }
         });
@@ -531,7 +538,12 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   });
   const fields = [];
   Object.keys(map).forEach(type => {
-    const printsWithValue = map[type].sort((a, b) => b.effectiveValue - a.effectiveValue);
+    const printsWithValue = map[type].sort((a, b) => {
+      const cmp = b.effectiveValue - a.effectiveValue;
+      return cmp === 0
+        ? b.subType.localeCompare(a.subType)
+        : cmp;
+    });
     var value = '';
     const printStrs = printsWithValue.map(printWithValue =>
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
@@ -759,7 +771,7 @@ const printsCommand = {
           "type": "rich",
           "title": baseTitle,
           "fields": chunkified != null ? chunkified.shift() : null,
-          "description": chunkified != null ? 'No prints found' : null,
+          "description": chunkified != null ? null : 'No prints found',
           "color": COLORS[element.toUpperCase()],
         }
         await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
