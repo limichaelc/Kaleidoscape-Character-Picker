@@ -552,10 +552,11 @@ function chunkifyFields(fields) {
   while (fields.length > 0) {
     const currentChunk = [];
     const length = 0;
-    const next = fields.shift();
+    var next = fields.shift();
     console.log('fields.length', fields.length);
     while (length + next.value.length < MAX_FIELD_LENGTH_SUM) {
       currentChunk.push(next);
+      next = fields.shift();
     }
     console.log(currentChunk);
     chunks.push(currentChunk);
