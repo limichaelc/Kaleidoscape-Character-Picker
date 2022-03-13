@@ -303,14 +303,18 @@ function find(haystack, needle) {
   });
 }
 
-function formatAbility(element, weapon, type, value, isCompatible = true) {
+function formatAbility(element, weapon, type, value, isCompatible = true, shouldPrioritize = false) {
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
   const base = `${prefix} ${type} `;
   const ret = isHitterAbility(type)
-    ? base + 'I'
-    : base + `+${value}%`;
+    ? isCompatible && shouldPrioritize
+      ? `${prefix} **${type} I**`
+      : `${prefix} ${type} I`
+    : isCompatible && shouldPrioritize
+      ? `${prefix} ${type} **+${value}%**`
+      : `${prefix} ${type} +${value}%`;
   return isCompatible ? ret : `*~~${ret}~~*`;
 }
 
@@ -355,24 +359,20 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
     type1,
     print.ability1_value,
     type1Compatible,
+    type1 === typeToPrioritize,
   );
-  if (type1 === typeToPrioritize && type1Compatible) {
-    ability1Str = '__' + ability1Str + '__';
-  }
   var ability2Str = '';
   var prioritize2 = false;
   if (type2 != null) {
+    prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) !== 0) && type2Compatible;
     ability2Str = formatAbility(
       print.ability2_element,
       print.ability2_weapon,
       type2,
       print.ability2_value,
       type2Compatible,
+      prioritize2,
     );
-    prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) !== 0) && type2Compatible;
-    if (prioritize2) {
-      ability2Str = '__' + ability2Str + '__';
-    }
   }
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${ability1Str}${ability2Str}`;
@@ -535,6 +535,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           effectiveValue: value1,
           subType: type2 ?? '',
           subTypeEffectiveValue: value2,
+          hitterSubTypeCompatible: isHitterAbility(type2) && isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon),
         });
       }
       if (type2 !== null) {
@@ -553,6 +554,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               effectiveValue: value,
               subType: type1,
               subTypeEffectiveValue: value1,
+              hitterSubTypeCompatible: false,
             });
           }
         });
@@ -566,12 +568,23 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       const valueCmp = b.effectiveValue - a.effectiveValue;
       console.log({valueCmp});
       if (valueCmp === 0) {
+        const subTypeCmp = a.subType.localeCompare(b.subType);
         console.log('subTypeEffectiveValues', a.subTypeEffectiveValue, b.subTypeEffectiveValue);
         // If the second ability is dead, automatically place it last
         if (a.subTypeEffectiveValue === 0) {
+          // effective value of 0 means either dead or hitter
+          // if a is a compatible hitter...
+          if (a.hitterSubTypeCompatible) {
+            // if both are compatible hitters, defer to strCmp
+            if (b.hitterSubTypeCompatible) {
+              return subTypeCmp;
+            }
+            // else only a is a compatible hitter, prioritize
+            return -1;
+          }
+          // else prioritize b
           return 1;
         }
-        const subTypeCmp = a.subType.localeCompare(b.subType);
         console.log({subTypeCmp});
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
