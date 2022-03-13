@@ -791,7 +791,6 @@ async function genHandleWizard(interaction) {
         AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
         AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
         AND prints.id <> r.id;
-        RETURN;
       END LOOP;
     END
     $BODY$
