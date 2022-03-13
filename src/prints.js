@@ -441,10 +441,9 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
         END
       )
     )
-    AND id in (15)
     LIMIT 1
   `;
-  console.log(prints.length);
+  console.log('prints.length', prints.length);
   console.log(prints);
   return (prints.length === 0)
     ? null
