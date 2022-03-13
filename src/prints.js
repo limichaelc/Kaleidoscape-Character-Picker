@@ -826,7 +826,6 @@ async function genHandleWizard(interaction) {
   const map = {};
   const basisMap = {};
   const replacementCandidates = {};
-  var count = 0;
   prints.map(print => {
     // basis print record
     if (print.basisid == null) {
@@ -838,14 +837,13 @@ async function genHandleWizard(interaction) {
       basisMap[print.id] = print;
     } else {
       replacementCandidates[print.id] = true;
-      count++;
       if (map[print.basisid] == null) {
         map[print.basisid] = [];
       }
       map[print.basisid].push(print);
     }
   });
-  console.log({map, basisMap});
+  // console.log({map, basisMap});
   await interaction.editReply('Boo');
   const fields = await Promise.all(Object.keys(map).map(async basisId => {
     return {
@@ -853,7 +851,7 @@ async function genHandleWizard(interaction) {
       value: map[basisId].map(print => formatPrint(print)).join('\n'),
     };
   }));
-  await chunkifyAndSendFields(interaction, `${count} prints you can probably delete`, fields);
+  await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete`, fields);
   //   SELECT * from prints
   //   WHERE userid = ${userID}
   //   ORDER BY
