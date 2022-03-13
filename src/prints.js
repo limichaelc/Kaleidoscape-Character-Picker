@@ -602,6 +602,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
+  console.log(map);
   if (ability != null) {
     map = {[ability]: map[ability]};
   }
@@ -657,6 +658,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     } while (printStrs.length > 0)
   });
+  console.log(fields);
   return fields;
 }
 
