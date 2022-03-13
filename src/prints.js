@@ -656,7 +656,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               return 1;
             }
             if (a.hasCompatibleHitterSubType) {
-              return -1;
+              return 1;
             }
             // defer to strCmp
             return subTypeCmp;
@@ -717,15 +717,14 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
-  console.log(interaction.user.id);
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes() RETURNS SETOF prints AS
     $BODY$
     DECLARE
         r prints%rowtype;
     BEGIN
-        FOR r IN SELECT *, null as basisId FROM prints
-        WHERE userid = ${interaction.user.id}::text
+        FOR r IN SELECT * FROM prints
+        WHERE userid = ${interaction.user.id}
         AND id = 474
         LOOP
             WITH dupes AS (
@@ -740,7 +739,7 @@ async function genHandleWizard(interaction) {
               AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
               AND id <> r.id
             )
-            RETURN SELECT * FROM dupes UNION ALL r;
+            RETURN SELECT * FROM dupes UNION ALL SELECT *, null as basisId FROM r;
         END LOOP;
         RETURN;
     END
