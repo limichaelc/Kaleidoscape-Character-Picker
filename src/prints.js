@@ -437,7 +437,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
-    AND id in (128, 316)
+    AND id in (128, 316, 257)
   `;
 
   return (prints.length === 0)
@@ -626,10 +626,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        // same sub type, compare effective value
-        if (subTypeCmp === 0) {
-          return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
-        }
         // TODO check IDs 128 316 257
         // different sub types
         // deprioritize dead abilities
@@ -666,6 +662,10 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           return -1;
         } else if (a.subTypeEffectiveValue === 0) {
           return 1;
+        }
+        // same sub type, compare effective value
+        if (subTypeCmp === 0) {
+          return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
         return subTypeCmp;
       }
@@ -741,6 +741,7 @@ async function genHandleWizard(interaction) {
             AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
             AND id <> r.id
         END LOOP;
+        RETURN;
     END
     $BODY$
     LANGUAGE plpgsql;
