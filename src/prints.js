@@ -762,20 +762,7 @@ async function genHandleWizard(interaction) {
             r.ability2_element,
             NULL::int
           );
-          RETURN QUERY SELECT (
-            prints.id,
-            prints.adventurer,
-            prints.userid,
-            prints.ability1_type,
-            prints.ability1_value,
-            prints.ability2_type,
-            prints.ability2_value,
-            prints.ability1_weapon,
-            prints.ability1_element,
-            prints.ability2_weapon,
-            prints.ability2_element,
-            r.id
-          ) from prints
+          FOR candidate IN SELECT * FROM prints
           WHERE prints.ability1_type = r.ability1_type
           AND prints.ability2_type = r.ability2_type
           AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(r.ability1_element, '') = '')
@@ -784,7 +771,23 @@ async function genHandleWizard(interaction) {
           AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(r.ability2_weapon, '') = '')
           AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
           AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-          AND prints.id <> r.id;
+          AND prints.id <> r.id
+          LOOP
+            RETURN QUERY VALUES(
+              candidate.id,
+              candidate.adventurer,
+              candidate.userid,
+              candidate.ability1_type,
+              candidate.ability1_value,
+              candidate.ability2_type,
+              candidate.ability2_value,
+              candidate.ability1_weapon,
+              candidate.ability1_element,
+              candidate.ability2_weapon,
+              candidate.ability2_element,
+              NULL::int
+            );
+          END LOOP;
         END LOOP;
         RETURN;
     END
