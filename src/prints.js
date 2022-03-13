@@ -184,7 +184,7 @@ function isHitterAbility(type) {
     ].includes(type);
 }
 
-function effectiveTypes(hitterAbility) {
+function effectiveTypesForHitter(hitterAbility) {
   switch (hitterAbility) {
     case ABILITY_TYPE.STEADY_HITTER:
       return [ABILITY_TYPE.SKILL_DAMAGE, ABILITY_TYPE.CRITICAL_DAMAGE];
@@ -444,26 +444,41 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
     : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability);
 }
 
-// function comparePrints(print1, print2) {
-//   // same first ability
-//   if (print1.ability1.type === print2.ability1.type) {
-//     const ability1Comparison = print1.ability1.value - print2.ability1.value;
-//     // same second ability
-//     if (print1.ability2.type === print2.ability2.type) {
-//       const ability2Comparison = print1.ability2.value - print2.ability2.value;
-//       if (ability1Comparison > 0 && ability2Comparison > 0) {
-//         return -1;
-//       }
-//       if (ability1Comparison === 0) {
-//         return ability2Comparison;
-//       }
-//       if (ability2Comparison === 0) {
-//         return ability1Comparison;
-//       }
-//     }
-//   }
-//   if (print1.weapon !== print2.weapon)
-// }
+function getRestriction(element, weapon) {
+  return element === null
+    ? RESTRICTIONS.NONE
+    : weapon === null
+      ? RESTRICTIONS.ELEMENT
+      : RESTRICTIONS.ELEMENT_WEAPON;
+}
+
+function comparePrints(a, b) {
+  const aType1 = a.ability1_type;
+  const aType2 = a.ability2_type;
+  const bType1 = b.ability1_type;
+  const bType2 = b.ability2_type;
+  const aType1Restriction = getRestriction(a.ability1_element, a.ability1_weapon);
+  const aType2Restriction = getRestriction(a.ability2_element, a.ability2_weapon);
+  const bType1Restriction = getRestriction(b.ability1_element, b.ability1_weapon);
+  const bType2Restriction = getRestriction(b.ability2_element, b.ability2_weapon);
+  if (aType1 !== bType1 || aType2 !== bType2 || aType1Restriction !== bType1Restriction || aType2Restriction !== bType2Restriction) {
+    return null;
+  }
+
+  const aValue1 = a.ability1_value;
+  const aValue2 = a.ability2_value;
+  const bValue1 = b.ability1_value;
+  const bValue2 = b.ability2_value;
+  if (aValue1 > bValue1 && aValue2 >= bValue2 || aValue1 >= bValue1 && aValue2 > bValue2) {
+    return 1;
+  } else if (aValue1 < bValue1 && aValue2 <= bValue2 || aValue1 <= bValue1 && aValue2 < bValue2) {
+    return -1;
+  } else if (aValue1 === bValue1 && aValue2 === bValue2 || aValue1 === bValue1 && aValue2 === bValue2) {
+    return 0;
+  } else {
+    return null;
+  }
+}
 
 async function genNameElementWeapon(adventurer) {
   const results = await sql`
@@ -576,7 +591,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       if (type2 !== null) {
         var types = [type2];
         if (isHitterAbility(type2)) {
-          types = effectiveTypes(type2)
+          types = effectiveTypesForHitter(type2)
         }
         types.filter(type => type !== type1).map(type => {
           const typeForMap = type2 === ability
@@ -614,7 +629,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
-
+        // TODO check IDs 128 316 257
         // different sub types
         // deprioritize dead abilities
         // If b's subtype has no effective value
@@ -691,6 +706,57 @@ function chunkifyFields(fields) {
   return chunks;
 }
 
+async function genHandleWizard(interaction) {
+  const prints = await sql`
+    CREATE OR REPLACE FUNCTION getAllDupes() RETURNS SETOF prints AS
+    $BODY$
+    DECLARE
+        r prints%rowtype;
+    BEGIN
+        FOR r IN SELECT *, null as basisId FROM prints
+        WHERE userid = ${interaction.user.id}
+        AND id = 474
+        LOOP
+            WITH dupes AS (
+              SELECT *, r.id as basisId from prints
+              WHERE ability1_type = r.ability1_type
+              AND ability2_type = r.ability2_type
+              AND (coalesce(ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(ability1_element, '') = '')
+              AND (coalesce(ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(ability2_element, '') = '')
+              AND (coalesce(ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(ability1_weapon, '') = '')
+              AND (coalesce(ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(ability2_weapon, '') = '')
+              AND coalesce(ability1_value, 0) <= coalesce(r.ability1_value, 0)
+              AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
+              AND id <> r.id
+            )
+            RETURN SELECT * FROM dupes UNION ALL r;
+        END LOOP;
+        RETURN;
+    END
+    $BODY$
+    LANGUAGE plpgsql;
+
+    SELECT * FROM getallfoo();
+  `
+  console.log(prints);
+  await interaction.editReply('Boo');
+  //   SELECT * from prints
+  //   WHERE userid = ${userID}
+  //   ORDER BY
+  //     ability1_element,
+  //     ability1_weapon,
+  //     ability1_type,
+  //     ability1_value DESC,
+  //     ability2_element,
+  //     ability2_weapon,
+  //     ability2_type,
+  //     ability2_value DESC
+  // `;
+  // for (var i = 0; i++; i < prints.length) {
+
+  }
+}
+
 const PRINTS_COMMAND_GROUPS = {
   FOR: 'for',
 };
@@ -701,6 +767,7 @@ const PRINTS_SUBCOMMANDS = {
   DELETE: 'delete',
   ELEMENT: 'element',
   PAGE: 'page',
+  WIZARD: 'wizard',
 }
 
 const abilityOption = option =>
@@ -776,6 +843,11 @@ const printsCommand = {
             .setDescription('The ids of the prints you want to delete, comma separated')
             .setRequired(true)
         )
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName(PRINTS_SUBCOMMANDS.WIZARD)
+        .setDescription('Find prints from your print collection that are safe to delete')
     ),
   execute: async (interaction, _) => {
     await interaction.deferReply();
@@ -847,6 +919,9 @@ const printsCommand = {
         "fields": fieldifyPrints(removed),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+    } else if (subcommand === PRINTS_SUBCOMMANDS.WIZARD) {
+      await logCommand(interaction, 'prints wizard');
+      await genHandleWizard(interaction);
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
