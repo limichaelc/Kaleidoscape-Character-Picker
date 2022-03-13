@@ -755,7 +755,6 @@ async function genHandleWizard(interaction) {
   // `;
   // for (var i = 0; i++; i < prints.length) {
 
-  }
 }
 
 const PRINTS_COMMAND_GROUPS = {
