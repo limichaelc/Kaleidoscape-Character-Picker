@@ -811,8 +811,8 @@ async function genHandleWizard(interaction) {
   await Promise.all(Object.keys(map).map(async basisId => {
     await interaction.followUp({
       embeds: [{
-        title: formatPrint(basisMap[basisId]),
-        description: map[basisId].map(print => formatPrint(print)).join('\n'),
+        title: formatPrint(basisMap[basisId], SORTING_OPTIONS.ADVENTURER),
+        description: map[basisId].map(print => formatPrint(print, SORTING_OPTIONS.ADVENTURER)).join('\n'),
       }],
     });
   }));
