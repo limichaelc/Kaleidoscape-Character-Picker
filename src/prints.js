@@ -658,7 +658,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               return 1;
             }
             if (a.hasCompatibleHitterSubType) {
-              console.log('returning -1 since a.hasCompatible');
               return -1;
             }
             // defer to strCmp
@@ -842,7 +841,7 @@ async function genHandleWizard(interaction) {
       map[print.basisid].push(print);
     }
   });
-  // console.log({map, basisMap});
+
   const fields = await Promise.all(Object.keys(map).map(async basisId => {
     if (basisMap[basisId] == null) {
       return null;
@@ -852,21 +851,7 @@ async function genHandleWizard(interaction) {
       value: map[basisId].map(print => formatPrint(print)).join('\n'),
     };
   }));
-  await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete`, fields.filter(Boolean));
-  //   SELECT * from prints
-  //   WHERE userid = ${userID}
-  //   ORDER BY
-  //     ability1_element,
-  //     ability1_weapon,
-  //     ability1_type,
-  //     ability1_value DESC,
-  //     ability2_element,
-  //     ability2_weapon,
-  //     ability2_type,
-  //     ability2_value DESC
-  // `;
-  // for (var i = 0; i++; i < prints.length) {
-
+  await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete (identical or outclassed by bolded prints)`, fields.filter(Boolean));
 }
 
 const PRINTS_COMMAND_GROUPS = {
