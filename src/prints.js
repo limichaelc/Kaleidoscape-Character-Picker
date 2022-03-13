@@ -719,7 +719,7 @@ const abilityOption = option =>
     }));
 
 const strictOption = option =>
-  options.setName('strict')
+  option.setName('strict')
     .setDescription('Whether to only show prints where both effects are compatible. True by default');
 
 const printsCommand = {
