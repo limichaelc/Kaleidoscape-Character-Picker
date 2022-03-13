@@ -437,7 +437,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
-    AND id in (128, 316, 257)
+    AND id in (128, 316)
   `;
 
   return (prints.length === 0)
@@ -728,20 +728,18 @@ async function genHandleWizard(interaction) {
         WHERE userid = $1
         AND id = 474
         LOOP
-            WITH dupes AS (
-              SELECT *, r.id as basisId from prints
-              WHERE ability1_type = r.ability1_type
-              AND ability2_type = r.ability2_type
-              AND (coalesce(ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(ability1_element, '') = '')
-              AND (coalesce(ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(ability2_element, '') = '')
-              AND (coalesce(ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(ability1_weapon, '') = '')
-              AND (coalesce(ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(ability2_weapon, '') = '')
-              AND coalesce(ability1_value, 0) <= coalesce(r.ability1_value, 0)
-              AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
-              AND id <> r.id
-            )
-            RETURN SELECT * FROM dupes;
-            RETURN SELECT *, null as basisId FROM r;
+            RETURN QUERY SELECT *, null as basisId FROM r;
+            RETURN QUERY
+            SELECT *, r.id as basisId from prints
+            WHERE ability1_type = r.ability1_type
+            AND ability2_type = r.ability2_type
+            AND (coalesce(ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(ability1_element, '') = '')
+            AND (coalesce(ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(ability2_element, '') = '')
+            AND (coalesce(ability1_weapon, '') = coalesce(r.ability1_weapon, '') OR coalesce(ability1_weapon, '') = '')
+            AND (coalesce(ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(ability2_weapon, '') = '')
+            AND coalesce(ability1_value, 0) <= coalesce(r.ability1_value, 0)
+            AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
+            AND id <> r.id
         END LOOP;
     END
     $BODY$
