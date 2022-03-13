@@ -727,7 +727,7 @@ async function genHandleWizard(interaction) {
         WHERE userid = $1
         AND id = 474
         LOOP
-            RETURN QUERY SELECT *, null as basisId FROM r;
+            RETURN NEXT r;
             RETURN QUERY
             SELECT *, r.id as basisId from prints
             WHERE ability1_type = r.ability1_type
@@ -746,7 +746,7 @@ async function genHandleWizard(interaction) {
     LANGUAGE plpgsql;
   `
   const prints = sql`
-    SELECT * FROM getallfoo(${interaction.user.id});
+    SELECT * FROM getAllDupes(${interaction.user.id});
   `
   console.log(prints);
   await interaction.editReply('Boo');
