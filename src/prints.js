@@ -708,7 +708,8 @@ const printsCommand = {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
         var baseTitle = '';
-        var chunkified = [];
+        var printsField;
+        var element = '';
         switch (subcommand) {
           case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
@@ -719,19 +720,20 @@ const printsCommand = {
                 content: nameElementWeapon.error,
               }).catch(onRejected => console.error(onRejected));
             }
-            const printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon);
+            element = nameElementWeapon.element;
+            printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon);
             baseTitle = `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`;
             break;
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
-            const element = interaction.options.getString('element');
+            element = interaction.options.getString('element');
             const weapon = interaction.options.getString('weapon');
             await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
-            const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
-            chunkified = chunkifyFields(printsField);
+            printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
             baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
             break;
         }
+        const chunkified = chunkifyFields(printsField);
         const editEmbed = {
           "type": "rich",
           "title": baseTitle,
