@@ -401,7 +401,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
-    AND id = 488
+    AND id in (488)
   `;
   return (prints.length === 0)
     ? null
@@ -803,7 +803,7 @@ const printsCommand = {
         }
         await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
         var counter = 2;
-        while (chunkified.length > 0) {
+        while ((chunkified?.length ?? 0) > 0) {
           const embed = {
             "type": "rich",
             "title": baseTitle + ` (${counter})`,
