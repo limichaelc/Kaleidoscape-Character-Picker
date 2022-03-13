@@ -548,7 +548,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
         // If the second ability is dead, automatically place it last
-        if (a.subTypeEffectiveValue === 0) {
+        if (b.subTypeEffectiveValue === 0) {
           return -1;
         }
         const subTypeCmp = b.subType.localeCompare(a.subType);
@@ -569,6 +569,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
         next = printStrs.shift();
+        console.log(printStrs.length);
       }
       counter++;
       const pageStr = counter > 0
