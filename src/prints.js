@@ -627,10 +627,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           // ... and a's subtype is also an incompatible hitter
           if (a.isIncompatibleHitterSubType) {
             console.log('returning subTypeCmp1: ' + subTypeCmp);
+            // defer to strCmp
             return subTypeCmp;
           }
           // otherwise only b is an incompatible hitter, deprioritize
           return -1;
+        } else if (a.isIncompatibleHitterSubType) {
+          return 1;
         }
         console.log(`returning subTypeCmp2: ${subTypeCmp}`);
         return subTypeCmp;
