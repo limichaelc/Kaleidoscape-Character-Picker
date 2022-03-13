@@ -199,7 +199,7 @@ function effectiveTypes(hitterAbility) {
 
 function expandedTypes(ability) {
   if (ability == null) {
-    return null;
+    return [];
   }
   switch (ability) {
     case ABILITY_TYPE.SKILL_DAMAGE, ABILITY_TYPE.CRITICAL_DAMAGE:
@@ -429,18 +429,9 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       )
     )
     AND (
-      ability1_type in (
-        CASE
-          WHEN ${abilityFilter != null} THEN (${abilityFilter})
-          ELSE (ability1_type)
-        END
-      )
-      OR ability2_type in (
-        CASE
-          WHEN ${abilityFilter != null} THEN (${abilityFilter})
-          ELSE (ability2_type)
-        END
-      )
+      ability1_type = ANY(ARRAY[${abilityFilter}])
+      OR ability2_type = ANY(ARRAY[${abilityFilter}])
+      OR ${abilityFilter.length === 0}
     )
   `;
 
