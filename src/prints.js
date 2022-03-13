@@ -717,7 +717,6 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
-  await sql`DROP FUNCTION getalldupes(text)`
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
       id int,
@@ -741,7 +740,7 @@ async function genHandleWizard(interaction) {
         WHERE userid = $1
         AND id = 474
         LOOP
-            RETURN NEXT r;
+            RETURN NEXT;
             RETURN QUERY
             SELECT *, r.id as basisId from prints
             WHERE ability1_type = r.ability1_type
