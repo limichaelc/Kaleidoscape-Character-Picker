@@ -560,13 +560,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
       return valueCmp;
     });
-    var value = '';
     const printStrs = printsWithValue.map(printWithValue =>
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer),
     );
     var counter = -1;
     var next = printStrs.shift();
     while (printStrs.length > 0) {
+      var value = '';
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
         next = printStrs.shift();
