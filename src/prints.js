@@ -569,7 +569,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         console.log('subTypeEffectiveValues', a.subTypeEffectiveValue, b.subTypeEffectiveValue);
         // If the second ability is dead, automatically place it last
         if (a.subTypeEffectiveValue === 0) {
-          return -1;
+          return 1;
         }
         const subTypeCmp = a.subType.localeCompare(b.subType);
         console.log({subTypeCmp});
