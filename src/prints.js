@@ -550,8 +550,7 @@ function chunkifyFields(fields) {
     const currentChunk = [];
     const length = 0;
     const next = fields.shift();
-    const nextFieldLength = next.reduce((previousValue, currentValue) => previousValue + currentValue.value.length, 0);
-    while (length + nextFieldLength < MAX_FIELD_LENGTH_SUM) {
+    while (length + next.value.length < MAX_FIELD_LENGTH_SUM) {
       currentChunk.push(next);
     }
     chunks.push(currentChunk);
@@ -708,6 +707,8 @@ const printsCommand = {
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
+        var baseTitle = '';
+        var chunkified = [];
         switch (subcommand) {
           case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
@@ -719,9 +720,10 @@ const printsCommand = {
               }).catch(onRejected => console.error(onRejected));
             }
             const printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon);
+            baseTitle = `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`;
             const embed = {
               "type": "rich",
-              "title": `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`,
+              "title": baseTitle,
               "fields": printsField,
               "description": printsField == null ? 'No prints found' : null,
               "color": COLORS[nameElementWeapon.element.toUpperCase()],
@@ -733,7 +735,7 @@ const printsCommand = {
             const weapon = interaction.options.getString('weapon');
             await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
-            const chunkified = chunkifyFields(printsField);
+            chunkified = chunkifyFields(printsField);
             const baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
             const editEmbed = {
               "type": "rich",
