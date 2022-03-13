@@ -441,7 +441,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
         END
       )
     )
-    LIMIT 1
+    LIMIT 5
   `;
   console.log('prints.length', prints.length);
   console.log(prints);
