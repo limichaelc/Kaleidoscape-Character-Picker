@@ -440,6 +440,8 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
     )
     LIMIT 20
   `;
+  console.log(prints.length);
+  console.log(prints);
   return (prints.length === 0)
     ? null
     : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability);
