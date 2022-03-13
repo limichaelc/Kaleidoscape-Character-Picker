@@ -231,6 +231,9 @@ function getValueForTradeoff(hitterAbility, ability) {
 };
 
 function effectiveValue(print, ability, element, weapon) {
+  if (ability == null) {
+    return 0;
+  }
   var value = 0;
   const type1 = print.ability1_type;
   const element1 = print.ability1_element ?? element;
@@ -508,11 +511,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         map[type1] = [];
       }
       const value1 = effectiveValue(print, type1, element, weapon);
+      const value2 = isHitterAbility(type2) ? 0 : effectiveValue(print, type2, element, weapon);
       if (value1 !== 0) {
         map[type1].push({
           print,
           effectiveValue: value1,
           subType: type2 ?? '',
+          subTypeEffectiveValue: value2,
         });
       }
       if (type2 !== null) {
@@ -530,6 +535,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               print,
               effectiveValue: value,
               subType: type1,
+              subTypeEffectiveValue: value1,
             });
           }
         });
@@ -539,10 +545,15 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).forEach(type => {
     const printsWithValue = map[type].sort((a, b) => {
-      const cmp = b.effectiveValue - a.effectiveValue;
-      return cmp === 0
-        ? b.subType.localeCompare(a.subType)
-        : cmp;
+      const valueCmp = b.effectiveValue - a.effectiveValue;
+      if (valueCmp === 0) {
+        const subTypeCmp = b.subType.localeCompare(a.subType);
+        if (subTypeCmp === 0) {
+          return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
+        }
+        return subTypeCmp;
+      }
+      return valueCmp;
     });
     var value = '';
     const printStrs = printsWithValue.map(printWithValue =>
