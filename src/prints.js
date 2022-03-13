@@ -428,13 +428,13 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
     )
     AND ability1_type in (
       CASE
-        WHEN ${abilityFilter != null} THEN (${sql(abilityFilter)})
+        WHEN ${abilityFilter != null} THEN (${abilityFilter})
         ELSE (ability1_type)
       END
     )
     OR ability2_type in (
       CASE
-        WHEN ${abilityFilter != null} THEN (${sql(abilityFilter)})
+        WHEN ${abilityFilter != null} THEN (${abilityFilter})
         ELSE (ability2_type)
       END
     )
