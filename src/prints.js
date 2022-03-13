@@ -568,6 +568,7 @@ function chunkifyFields(fields) {
     var next = fields.shift();
     console.log('fields.length', fields.length);
     while (next != null && (length + next.value.length < MAX_FIELD_LENGTH_SUM)) {
+      length += next.value.length;
       currentChunk.push(next);
       next = fields.shift();
     }
@@ -754,7 +755,6 @@ const printsCommand = {
         }
         const chunkified = chunkifyFields(printsField);
         console.log(chunkified.length);
-        console.log(chunkified[0]);
         const editEmbed = {
           "type": "rich",
           "title": baseTitle,
