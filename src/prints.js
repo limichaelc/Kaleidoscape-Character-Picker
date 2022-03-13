@@ -621,7 +621,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
 
         // different sub types
         // deprioritize dead abilities
-        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aHitterSubTypeCompatible: a.hitterSubTypeCompatible, bHitterSubTypeCompatible: b.hitterSubTypeCompatible});
+        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aIsIncompatibleHitterSubType: a.isIncompatibleHitterSubType, bIsIncompatibleHitterSubType: b.isIncompatibleHitterSubType});
         // If b's subtype is an incompatible hitter
         if (b.isIncompatibleHitterSubType) {
           // ... and a's subtype is also an incompatible hitter
