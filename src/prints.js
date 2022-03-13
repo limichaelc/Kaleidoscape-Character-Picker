@@ -717,11 +717,11 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
-  // await sql`DROP FUNCTION getalldupes(text)`
+  await sql`DROP FUNCTION getalldupes(text)`
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
       id int,
-      basisId text,
+      basisId varchar(255),
       adventurer text,
       userid text,
       ability1_type text,
@@ -743,7 +743,7 @@ async function genHandleWizard(interaction) {
         LOOP
             RETURN NEXT;
             RETURN QUERY
-            SELECT *, r.id::text as basisId from prints
+            SELECT *, r.id as basisId from prints
             WHERE prints.ability1_type = r.ability1_type
             AND prints.ability2_type = r.ability2_type
             AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(r.ability1_element, '') = '')
