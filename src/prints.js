@@ -370,8 +370,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
     );
-    prioritize2 = (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible;
-    console.log(type2, typeToPrioritize, getValueForTradeoff(type2, typeToPrioritize), type2Compatible);
+    prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) !== 0) && type2Compatible;
     if (prioritize2) {
       ability2Str = '**' + ability2Str + '**';
     }
@@ -405,7 +404,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
-    AND id in (488)
+    AND id in (488, 464, 462, 461, 366)
   `;
   return (prints.length === 0)
     ? null
