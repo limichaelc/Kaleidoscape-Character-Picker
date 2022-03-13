@@ -526,7 +526,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     var counter = -1;
     while (printStrs.length > 0) {
       var next = printStrs.shift();
-      while ((value.length + next.length + 1) < MAX_LENGTH) {
+      while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
         next = printStrs.shift();
       }
@@ -554,7 +554,7 @@ function chunkifyFields(fields) {
     const length = 0;
     var next = fields.shift();
     console.log('fields.length', fields.length);
-    while (length + next.value.length < MAX_FIELD_LENGTH_SUM) {
+    while (next != null && (length + next.value.length < MAX_FIELD_LENGTH_SUM)) {
       currentChunk.push(next);
       next = fields.shift();
     }
