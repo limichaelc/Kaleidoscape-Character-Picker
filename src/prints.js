@@ -259,7 +259,7 @@ function effectiveValue(print, ability, element, weapon) {
   const type2 = print.ability2_type;
   const element2 = print.ability2_element ?? element;
   const weapon2 = print.ability2_weapon ?? weapon;
-  console.log({ability, element, weapon, type1, element1, weapon1, type2, element2, weapon2});
+
   if (type1 === ability && element1 === element && weapon1 === weapon) {
     value = print.ability1_value;
   }
@@ -441,10 +441,8 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
         END
       )
     )
-    LIMIT 20
   `;
-  console.log('prints.length', prints.length);
-  console.log(prints);
+
   return (prints.length === 0)
     ? null
     : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability);
@@ -566,7 +564,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const type2 = print.ability2_type;
     if (type1 !== null) {
       const value1 = effectiveValue(print, type1, element, weapon);
-      console.log({value1});
       const value2 = isHitterAbility(type2) ? 0 : effectiveValue(print, type2, element, weapon);
       if (value1 !== 0) {
         if (map[type1] == null) {
@@ -606,7 +603,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
-  console.log(map);
+
   if (ability != null) {
     map = {[ability]: map[ability]};
   }
@@ -662,7 +659,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     } while (printStrs.length > 0)
   });
-  console.log(fields);
   return fields;
 }
 
