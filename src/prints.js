@@ -768,20 +768,6 @@ async function genHandleWizard(interaction) {
       FOR r IN SELECT * FROM prints
       WHERE prints.userid = $1
       LOOP
-        RETURN QUERY VALUES(
-          r.id,
-          r.adventurer,
-          r.userid,
-          r.ability1_type,
-          r.ability1_value,
-          r.ability2_type,
-          r.ability2_value,
-          r.ability1_weapon,
-          r.ability1_element,
-          r.ability2_weapon,
-          r.ability2_element,
-          NULL::int
-        );
         RETURN QUERY SELECT
           prints.id,
           prints.adventurer,
