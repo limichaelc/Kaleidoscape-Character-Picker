@@ -437,7 +437,6 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
-    AND id in (128, 316, 257)
   `;
 
   return (prints.length === 0)
@@ -739,7 +738,7 @@ async function genHandleWizard(interaction) {
             AND (coalesce(ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(ability2_weapon, '') = '')
             AND coalesce(ability1_value, 0) <= coalesce(r.ability1_value, 0)
             AND coalesce(ability2_value, 0) <= coalesce(r.ability2_value, 0)
-            AND id <> r.id
+            AND id <> r.id;
         END LOOP;
         RETURN;
     END
