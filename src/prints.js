@@ -357,7 +357,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
     type1Compatible,
   );
   if (type1 === typeToPrioritize && type1Compatible) {
-    ability1Str = '**' + ability1Str + '**';
+    ability1Str = '__' + ability1Str + '__';
   }
   var ability2Str = '';
   var prioritize2 = false;
@@ -371,7 +371,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
     );
     prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) !== 0) && type2Compatible;
     if (prioritize2) {
-      ability2Str = '**' + ability2Str + '**';
+      ability2Str = '__' + ability2Str + '__';
     }
   }
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
@@ -403,7 +403,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
-    AND id in (366, 462, 461)
+    LIMIT 20
   `;
   return (prints.length === 0)
     ? null
