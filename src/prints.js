@@ -717,6 +717,7 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
+  await sql`DROP FUNCTION getalldupes(text)`
   await sql`
     CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
       id int,
