@@ -762,7 +762,20 @@ async function genHandleWizard(interaction) {
             r.ability2_element,
             NULL::int
           );
-          RETURN QUERY SELECT * FROM (
+          RETURN QUERY SELECT (
+            t.id,
+            t.adventurer,
+            t.userid,
+            t.ability1_type,
+            t.ability1_value,
+            t.ability2_type,
+            t.ability2_value,
+            t.ability1_weapon,
+            t.ability1_element,
+            t.ability2_weapon,
+            t.ability2_element,
+            t.id
+          ) FROM (
             SELECT (
               prints.id,
               prints.adventurer,
