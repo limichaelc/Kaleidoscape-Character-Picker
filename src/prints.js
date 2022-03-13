@@ -768,6 +768,20 @@ async function genHandleWizard(interaction) {
       FOR r IN SELECT * FROM prints
       WHERE prints.userid = $1
       LOOP
+        RETURN QUERY VALUES(
+          r.id,
+          r.adventurer,
+          r.userid,
+          r.ability1_type,
+          r.ability1_value,
+          r.ability2_type,
+          r.ability2_value,
+          r.ability1_weapon,
+          r.ability1_element,
+          r.ability2_weapon,
+          r.ability2_element,
+          NULL::int
+        );
         RETURN QUERY SELECT
           prints.id,
           prints.adventurer,
@@ -790,7 +804,16 @@ async function genHandleWizard(interaction) {
         AND (coalesce(prints.ability2_weapon, '') = coalesce(r.ability2_weapon, '') OR coalesce(prints.ability2_weapon, '') = '')
         AND coalesce(prints.ability1_value, 0) <= coalesce(r.ability1_value, 0)
         AND coalesce(prints.ability2_value, 0) <= coalesce(r.ability2_value, 0)
-        AND prints.id <> r.id;
+        AND prints.id <> r.id
+        ORDER BY
+          ability1_element,
+          ability1_weapon,
+          ability1_type,
+          ability1_value DESC,
+          ability2_element,
+          ability2_weapon,
+          ability2_type,
+          ability2_value DESC;
       END LOOP;
     END
     $BODY$
