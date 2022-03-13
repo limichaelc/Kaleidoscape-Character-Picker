@@ -437,6 +437,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
       OR ability2_type = ANY(ARRAY[${abilityFilter}]::text[])
       OR ${abilityFilter.length === 0}
     )
+    AND id in (128, 316, 257)
   `;
 
   return (prints.length === 0)
