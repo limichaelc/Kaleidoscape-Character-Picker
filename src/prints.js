@@ -303,14 +303,16 @@ function find(haystack, needle) {
   });
 }
 
-function formatAbility(element, weapon, type, value, isCompatible = true, shouldPrioritize = false) {
+function formatAbility(element, weapon, type, value, isCompatible = true, shouldPrioritize = false, isNegativeTradeoff = false) {
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
   const base = `${prefix} ${type} `;
   const ret = isHitterAbility(type)
     ? isCompatible && shouldPrioritize
-      ? `${prefix} **${type} I**`
+      ? isNegativeTradeoff
+        ? `${prefix} ***${type} I***`
+        : `${prefix} **${type} I**`
       : `${prefix} ${type} I`
     : isCompatible && shouldPrioritize
       ? `${prefix} ${type} **+${value}%**`
@@ -364,7 +366,8 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   var ability2Str = '';
   var prioritize2 = false;
   if (type2 != null) {
-    prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) !== 0) && type2Compatible;
+    const tradeoff = getValueForTradeoff(type2, typeToPrioritize);
+    prioritize2 = type1 !== typeToPrioritize && (type2 === typeToPrioritize || tradeoff !== 0) && type2Compatible;
     ability2Str = formatAbility(
       print.ability2_element,
       print.ability2_weapon,
@@ -372,6 +375,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
       prioritize2,
+      tradeoff < 0,
     );
   }
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
@@ -564,13 +568,10 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
-      console.log(formatPrint(a.print), formatPrint(b.print));
       const valueCmp = b.effectiveValue - a.effectiveValue;
-      console.log({valueCmp});
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        console.log('subTypeEffectiveValues', a.subTypeEffectiveValue, b.subTypeEffectiveValue);
-        // If the second ability is dead, automatically place it last
+        // If the second ability is dead...
         if (a.subTypeEffectiveValue === 0) {
           // effective value of 0 means either dead or hitter
           // if a is a compatible hitter...
@@ -585,7 +586,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           // else prioritize b
           return 1;
         }
-        console.log({subTypeCmp});
         if (subTypeCmp === 0) {
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
         }
