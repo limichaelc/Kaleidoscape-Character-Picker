@@ -367,6 +367,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
     );
+    console.log(type2, typeToPrioritize, getValueForTradeoff(type2, typeToPrioritize));
     if ((type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible) {
       ability2Str = '**' + ability2Str + '**';
     }
@@ -400,7 +401,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon) {
         OR ability2_weapon IS NULL
       )
     )
-    AND ability1_type = 'Dragon Haste'
+    AND id = 488
   `;
   return (prints.length === 0)
     ? null
@@ -583,7 +584,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
         value += next + '\n';
         next = printStrs.shift();
-        console.log(printStrs.length);
       }
       counter++;
       const pageStr = counter > 1
