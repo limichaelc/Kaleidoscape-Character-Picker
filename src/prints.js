@@ -359,6 +359,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
     ability1Str = '**' + ability1Str + '**';
   }
   var ability2Str = '';
+  var prioritize2 = false;
   if (type2 != null) {
     ability2Str = formatAbility(
       print.ability2_element,
@@ -367,7 +368,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
       print.ability2_value,
       type2Compatible,
     );
-    const prioritize2 = (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible;
+    prioritize2 = (type2 === typeToPrioritize || getValueForTradeoff(type2, typeToPrioritize) > 0) && type2Compatible;
     console.log(type2, typeToPrioritize, getValueForTradeoff(type2, typeToPrioritize), type2Compatible);
     if (prioritize2) {
       ability2Str = '**' + ability2Str + '**';
