@@ -722,15 +722,15 @@ async function genHandleWizard(interaction) {
     CREATE OR REPLACE FUNCTION getAllDupes(text) RETURNS TABLE(
       id int,
       basisId varchar(255),
-      adventurer text,
-      userid text,
-      ability1_type text,
-      ability1_element text,
-      ability1_weapon text,
+      adventurer varchar(255),
+      userid varchar(255),
+      ability1_type varchar(255),
+      ability1_element varchar(255),
+      ability1_weapon varchar(255),
       ability1_value int,
-      ability2_type text,
-      ability2_element text,
-      ability2_weapon text,
+      ability2_type varchar(255),
+      ability2_element varchar(255),
+      ability2_weapon varchar(255),
       ability2_value int
     ) AS
     $BODY$
