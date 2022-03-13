@@ -572,7 +572,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
           effectiveValue: value1,
           subType: type2 ?? '',
           subTypeEffectiveValue: value2,
-          hitterSubTypeCompatible: isHitterAbility(type2) && isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon),
+          isIncompatibleHitterSubType: isHitterAbility(type2) && !isAbilityCompatible(print.ability2_element, print.ability2_weapon, element, weapon),
         });
       }
       if (type2 !== null) {
@@ -594,7 +594,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               effectiveValue: value,
               subType: type1,
               subTypeEffectiveValue: value1,
-              hitterSubTypeCompatible: false,
+              isIncompatibleHitterSubType: false,
             });
           }
         });
@@ -611,31 +611,26 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printsWithValue = map[type].sort((a, b) => {
       console.log({a: formatPrint(a.print), b: formatPrint(b.print)});
       const valueCmp = b.effectiveValue - a.effectiveValue;
-      console.log({valueCmp});
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
-        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aHitterSubTypeCompatible: a.hitterSubTypeCompatible, bHitterSubTypeCompatible: b.hitterSubTypeCompatible});
-        // If the second ability is dead...
-        if (a.subTypeEffectiveValue === 0) {
-          // effective value of 0 means either dead or hitter
-          // if a is a compatible hitter...
-          if (a.hitterSubTypeCompatible) {
-            // if both are compatible hitters, defer to strCmp
-            if (b.hitterSubTypeCompatible) {
-              console.log('returning subTypeCmp1: ' + subTypeCmp);
-              return subTypeCmp;
-            }
-            console.log('returning -1');
-            // else only a is a compatible hitter, prioritize
-            return -1;
-          }
-          console.log('returning 1');
-          // else prioritize b
-          return 1;
-        }
+        // same sub type, compare effective value
         if (subTypeCmp === 0) {
           console.log(`returning subTypeEffectiveValue difference: ${b.subTypeEffectiveValue - a.subTypeEffectiveValue}`);
           return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
+        }
+
+        // different sub types
+        // deprioritize dead abilities
+        console.log({subTypeCmp, aSubTypeEffectiveValue: a.subTypeEffectiveValue, bSubTypeEffectiveValue: b.subTypeEffectiveValue, aHitterSubTypeCompatible: a.hitterSubTypeCompatible, bHitterSubTypeCompatible: b.hitterSubTypeCompatible});
+        // If b's subtype is an incompatible hitter
+        if (b.isIncompatibleHitterSubType) {
+          // ... and a's subtype is also an incompatible hitter
+          if (a.isIncompatibleHitterSubType) {
+            console.log('returning subTypeCmp1: ' + subTypeCmp);
+            return subTypeCmp;
+          }
+          // otherwise only b is an incompatible hitter, deprioritize
+          return -1;
         }
         console.log(`returning subTypeCmp2: ${subTypeCmp}`);
         return subTypeCmp;
