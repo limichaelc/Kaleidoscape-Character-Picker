@@ -562,7 +562,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     if (strict) {
       const compatible1 = isAbilityCompatible(print.ability1_element, print.ability1_weapon, element, weapon);
       if (!(compatible1 && compatible2)) {
-        continue;
+        return;
       }
     }
     if (type1 !== null) {
