@@ -4,6 +4,7 @@ const {capitalize, pluralize, allWeaponOptions} = require('./utils');
 const {ALL_ELEMENTS, COLORS} = require('./consts');
 
 const MAX_LENGTH = 1024;
+const MAX_FIELD_LENGTH_SUM = 5500; // 6k embed limit, -500 for buffer
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
   SKILL_DAMAGE: 'Skill Damage',
@@ -540,6 +541,24 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   return fields;
 }
 
+function chunkifyFields(fields) {
+  if (fields == null || fields.length === 0) {
+    return null;
+  }
+  const chunks = [];
+  while (fields.length > 0) {
+    const currentChunk = [];
+    const length = 0;
+    const next = fields.shift();
+    const nextFieldLength = next.reduce((previousValue, currentValue) => previousValue + currentValue.value.length, 0);
+    while (length + nextFieldLength < MAX_FIELD_LENGTH_SUM) {
+      currentChunk.push(next);
+    }
+    chunks.push(currentChunk);
+  }
+  return chunks;
+}
+
 const PRINTS_COMMAND_GROUPS = {
   FOR: 'for',
 };
@@ -714,14 +733,27 @@ const printsCommand = {
             const weapon = interaction.options.getString('weapon');
             await logCommand(interaction, 'prints for element', element + (weapon != null ? ` ${weapon}` : ''));
             const printsField = await genPrintsFieldForElementWeapon(interaction, {element, weapon});
-            const embed = {
+            const chunkified = chunkifyFields(printsField);
+            const baseTitle = `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`;
+            const editEmbed = {
               "type": "rich",
-              "title": `Prints suitable for ${capitalize(element)} ${capitalize(pluralize(weapon)) ?? ''}`,
-              "fields": printsField,
-              "description": printsField == null ? 'No prints found' : null,
+              "title": baseTitle,
+              "fields": chunkified != null ? chunkified.pop() : null,
+              "description": chunkified != null ? 'No prints found' : null,
               "color": COLORS[element.toUpperCase()],
             }
-            return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));;
+            await interaction.editReply({embeds: [editEmbed]}).catch(onRejected => console.error(onRejected));
+            var counter = 2;
+            while (chunkified.length > 0) {
+              const embed = {
+                "type": "rich",
+                "title": baseTitle + ` (${counter})`,
+                "fields": chunkified.pop(),
+                "color": COLORS[element.toUpperCase()],
+              }
+              counter++;
+              await interaction.followUp({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+            }
         }
       }
     }
