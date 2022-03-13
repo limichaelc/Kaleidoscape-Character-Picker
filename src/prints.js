@@ -634,6 +634,13 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         // different sub types
         // deprioritize dead abilities
         // If b's subtype has no effective value
+        console.log({
+          aSubTypeEffectiveValue: a.subTypeEffectiveValue,
+          bSubTypeEffectiveValue: b.subTypeEffectiveValue,
+          aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
+          bHasCompatibleHitterSubType: b.hasCompatibleHitterSubType,
+          subTypeCmp,
+        })
         if (b.subTypeEffectiveValue === 0) {
           // ... and a's subtype also has no effective value
           if (a.subTypeEffectiveValue === 0) {
@@ -708,7 +715,7 @@ function chunkifyFields(fields) {
 }
 
 async function genHandleWizard(interaction) {
-  const prints = await sql`
+  await sql`
     CREATE OR REPLACE FUNCTION getAllDupes() RETURNS SETOF prints AS
     $BODY$
     DECLARE
@@ -736,7 +743,8 @@ async function genHandleWizard(interaction) {
     END
     $BODY$
     LANGUAGE plpgsql;
-
+  `
+  const prints = sql`
     SELECT * FROM getallfoo();
   `
   console.log(prints);
