@@ -442,7 +442,7 @@ async function genPrintsFieldForElementWeapon(interaction, elementWeapon, abilit
   `;
   return (prints.length === 0)
     ? null
-    : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon);
+    : fieldifyPrints(prints, SORTING_OPTIONS.ABILITY, element, weapon, ability);
 }
 
 // function comparePrints(print1, print2) {
@@ -538,8 +538,8 @@ const SORTING_OPTIONS = {
   ADVENTURER: 'adventurer',
 };
 
-function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null) {
-  const map = {};
+function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null, ability = null) {
+  var map = {};
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     prints.map(print => {
       if (map[print.adventurer] == null) {
@@ -555,6 +555,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       };
     });
   }
+
   prints.map(print => {
     const type1 = print.ability1_type;
     const type2 = print.ability2_type;
@@ -596,6 +597,10 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
     }
   });
+  if (ability != null) {
+    map = {[ability]: map[ability]};
+  }
+
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
