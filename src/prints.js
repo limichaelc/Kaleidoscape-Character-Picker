@@ -1035,7 +1035,7 @@ const printsCommand = {
     } else if (subcommand === PRINTS_SUBCOMMANDS.WIZARD) {
       await logCommand(interaction, 'prints wizard');
       await genHandleWizard(interaction);
-    } else if (subcommand === PRINTS_SUBCOMMAND.FEATURING) {
+    } else if (subcommand === PRINTS_SUBCOMMANDS.FEATURING) {
       const query = interaction.options.getString('query');
       await logCommand(interaction, 'prints featuring', query);
       const nameElementWeapon = await genNameElementWeapon(query);
