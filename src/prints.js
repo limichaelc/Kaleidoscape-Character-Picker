@@ -1049,12 +1049,17 @@ const printsCommand = {
         }).catch(onRejected => console.error(onRejected));
       }
       const {name, element, title} = adventurerData;
-      const printsField = await sql`
+      const prints = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
-      await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, printsField, COLORS[element.toUpperCase()]);
+      const embed = {
+        title: `Prints featuring ${name} (${title})`,
+        fields: fieldifyPrints(prints),
+        color: COLORS[element.toUpperCase()],
+      };
+      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
