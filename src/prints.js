@@ -630,14 +630,14 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
+      if (a.weapon != null && b.weapon != null) {
+        const weaponCmp = a.weapon.localeCompare(b.weapon);
+        if (weaponCmp !== 0) {
+          return weaponCmp;
+        }
+      }
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
-        if (a.weapon != null && b.weapon != null) {
-          const weaponCmp = a.weapon.localeCompare(b.weapon);
-          if (weaponCmp !== 0) {
-            return weaponCmp;
-          }
-        }
         const subTypeCmp = a.subType.localeCompare(b.subType);
         // TODO check IDs 128 316 257
         // different sub types
