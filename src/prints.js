@@ -847,7 +847,7 @@ async function genHandleWizard(interaction) {
       return null;
     };
     const values = await Promise.all(map[basisId].map(async print => {
-      const adventurerData = await genAdventurerData(print.adventurer);
+      const adventurerData = await genAdventurerData(print.adventurer.toLowerCase());
       return formatPrint(print, null, null, null, null, null, adventurerData.title);
     }));
     return {
