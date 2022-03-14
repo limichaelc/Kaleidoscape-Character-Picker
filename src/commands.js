@@ -211,7 +211,7 @@ const popularityCommand = {
       return `${prefix}: ${entry.name} (${entry.count.toString()})`;
     });
     const pages = Math.ceil(fields.length / pageSize);
-    var suffix = ` ($Page ${page} of ${pages})`;
+    var suffix = ` (Page ${page} of ${pages})`;
     if (ordering ===  ORDERINGS.ASCENDING) {
       suffix = ' (Reversed)' + suffix;
       fields.reverse();
