@@ -598,15 +598,14 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       if (type2 !== null) {
         var types = [type2];
         if (isHitterAbility(type2)) {
-          types = effectiveTypesForHitter(type2)
-          types.push(type2);
+          types.push(effectiveTypesForHitter(type2));
         }
         types.filter(type => type !== type1).map(type => {
           const typeForMap = type2 === ability
             ? type2
             : type;
           const value = effectiveValue(print, type, element, weapon);
-          if (value !== 0 && !isHitterAbility(type)) {
+          if (value !== 0 || isHitterAbility(type)) {
             if (map[typeForMap] == null) {
               map[typeForMap] = [];
             }
@@ -626,6 +625,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   if (ability != null) {
     map = {[ability]: map[ability]};
   }
+  console.log(map);
 
   const fields = [];
   Object.keys(map).map(type => {
