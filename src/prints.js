@@ -846,12 +846,13 @@ async function genHandleWizard(interaction) {
     if (basisMap[basisId] == null) {
       return null;
     };
+    const values = await Promise.all(map[basisId].map(async print => {
+      const adventurerData = await genAdventurerData(print.adventurer);
+      return formatPrint(print, null, null, null, null, null, adventurerData.title);
+    }));
     return {
       name: formatPrint(basisMap[basisId]),
-      value: map[basisId].map(print => {
-        const adventurerData = await genAdventurerData(print.adventurer);
-        return formatPrint(print, null, null, null, null, null, adventurerData.title);
-      }).join('\n'),
+      value: values.join('\n'),
     };
   }));
   await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete (identical or outclassed by bolded prints)`, fields.filter(Boolean));
