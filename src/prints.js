@@ -704,6 +704,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
 
 async function chunkifyAndSendFields(interaction, title, fields, color) {
   const chunkified = chunkifyFields(fields);
+  console.log(chunkified.length);
   const editEmbed = {
     title,
     'fields': chunkified != null ? chunkified.shift() : null,
@@ -1054,16 +1055,7 @@ const printsCommand = {
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
-<<<<<<< Updated upstream
       await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, printsField, COLORS[element.toUpperCase()]);
-=======
-      const embed = {
-        title: `Prints featuring ${name} (${title})`,
-        fields: prints.length === 0 ? 'No prints found' : fieldifyPrints(prints),
-        color: COLORS[element.toUpperCase()],
-      };
-      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
->>>>>>> Stashed changes
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
