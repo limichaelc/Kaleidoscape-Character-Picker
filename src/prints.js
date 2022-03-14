@@ -473,33 +473,33 @@ function getRestriction(element, weapon) {
       : RESTRICTIONS.ELEMENT_WEAPON;
 }
 
-function comparePrints(a, b) {
-  const aType1 = a.ability1_type;
-  const aType2 = a.ability2_type;
-  const bType1 = b.ability1_type;
-  const bType2 = b.ability2_type;
-  const aType1Restriction = getRestriction(a.ability1_element, a.ability1_weapon);
-  const aType2Restriction = getRestriction(a.ability2_element, a.ability2_weapon);
-  const bType1Restriction = getRestriction(b.ability1_element, b.ability1_weapon);
-  const bType2Restriction = getRestriction(b.ability2_element, b.ability2_weapon);
-  if (aType1 !== bType1 || aType2 !== bType2 || aType1Restriction !== bType1Restriction || aType2Restriction !== bType2Restriction) {
-    return null;
-  }
+// function comparePrints(a, b) {
+//   const aType1 = a.ability1_type;
+//   const aType2 = a.ability2_type;
+//   const bType1 = b.ability1_type;
+//   const bType2 = b.ability2_type;
+//   const aType1Restriction = getRestriction(a.ability1_element, a.ability1_weapon);
+//   const aType2Restriction = getRestriction(a.ability2_element, a.ability2_weapon);
+//   const bType1Restriction = getRestriction(b.ability1_element, b.ability1_weapon);
+//   const bType2Restriction = getRestriction(b.ability2_element, b.ability2_weapon);
+//   if (aType1 !== bType1 || aType2 !== bType2 || aType1Restriction !== bType1Restriction || aType2Restriction !== bType2Restriction) {
+//     return null;
+//   }
 
-  const aValue1 = a.ability1_value;
-  const aValue2 = a.ability2_value;
-  const bValue1 = b.ability1_value;
-  const bValue2 = b.ability2_value;
-  if (aValue1 > bValue1 && aValue2 >= bValue2 || aValue1 >= bValue1 && aValue2 > bValue2) {
-    return 1;
-  } else if (aValue1 < bValue1 && aValue2 <= bValue2 || aValue1 <= bValue1 && aValue2 < bValue2) {
-    return -1;
-  } else if (aValue1 === bValue1 && aValue2 === bValue2 || aValue1 === bValue1 && aValue2 === bValue2) {
-    return 0;
-  } else {
-    return null;
-  }
-}
+//   const aValue1 = a.ability1_value;
+//   const aValue2 = a.ability2_value;
+//   const bValue1 = b.ability1_value;
+//   const bValue2 = b.ability2_value;
+//   if (aValue1 > bValue1 && aValue2 >= bValue2 || aValue1 >= bValue1 && aValue2 > bValue2) {
+//     return 1;
+//   } else if (aValue1 < bValue1 && aValue2 <= bValue2 || aValue1 <= bValue1 && aValue2 < bValue2) {
+//     return -1;
+//   } else if (aValue1 === bValue1 && aValue2 === bValue2 || aValue1 === bValue1 && aValue2 === bValue2) {
+//     return 0;
+//   } else {
+//     return null;
+//   }
+// }
 
 async function genAdventurerData(adventurer) {
   const results = await sql`
@@ -524,6 +524,9 @@ async function genAddPrints(userID, adventurer, printStrs) {
   const prints = printStrs
     .split(';')
     .map((print) => {
+      if (print.trim().length === 0) {
+        return;
+      }
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability.replaceAll(' ', ''), index));
       if (ability1.error != null || ability2.error != null) {
         return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print.trim()}*")`;
@@ -540,7 +543,8 @@ async function genAddPrints(userID, adventurer, printStrs) {
         ability2_element: ability2.restriction !== RESTRICTIONS.NONE ? element : null,
         ability2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
       };
-    });
+    })
+    .filter(Boolean);
   const errors = prints.filter(print => print.userid == null);
   const filtered = prints.filter(print => print.userid != null);
 
