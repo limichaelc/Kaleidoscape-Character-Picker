@@ -432,7 +432,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${abilityStrs.filter(Boolean).join(' / ')}`;
   }
-  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? `, ${title}` : ''})`;
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? `, *${title}*` : ''})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
@@ -622,7 +622,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       if (type2 !== null) {
         var types = [type2];
         if (isHitterAbility(type2)) {
-          types.push(effectiveTypesForHitter(type2));
+          types = types.concat(effectiveTypesForHitter(type2));
         }
         types.filter(type => type !== type1).map(type => {
           const typeForMap = type2 === ability
@@ -639,6 +639,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               subType: type1,
               subTypeEffectiveValue: value1,
               hasCompatibleHitterSubType: false,
+              weapon: isHitterAbility(type) ? print.ability2_weapon : null,
             });
           }
         });
@@ -649,11 +650,16 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   if (ability != null) {
     map = {[ability]: map[ability]};
   }
-  console.log(map);
 
   const fields = [];
   Object.keys(map).map(type => {
     const printsWithValue = map[type].sort((a, b) => {
+      if (a.weapon != null && b.weapon != null) {
+        const weaponCmp = a.weapon.localeCompare(b.weapon);
+        if (weaponCmp !== 0) {
+          return weaponCmp;
+        }
+      }
       const valueCmp = b.effectiveValue - a.effectiveValue;
       if (valueCmp === 0) {
         const subTypeCmp = a.subType.localeCompare(b.subType);
@@ -1073,13 +1079,18 @@ const printsCommand = {
           content: adventurerData.error,
         }).catch(onRejected => console.error(onRejected));
       }
-      const {name, title} = adventurerData;
-      const printsField = await sql`
+      const {name, element, title} = adventurerData;
+      const prints = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
-      await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, printsField, COLORS[element.toUpperCase()]);
+      const embed = {
+        title: `Prints featuring ${name} (${title})`,
+        fields: fieldifyPrints(prints),
+        color: COLORS[element.toUpperCase()],
+      };
+      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
