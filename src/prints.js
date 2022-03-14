@@ -408,7 +408,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${abilityStrs.filter(Boolean).join(' / ')}`;
   }
-  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? `, ${title}` : ''})`;
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? `, *${title}*` : ''})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
@@ -1048,7 +1048,7 @@ const printsCommand = {
           content: adventurerData.error,
         }).catch(onRejected => console.error(onRejected));
       }
-      const {name, title} = adventurerData;
+      const {name, element, title} = adventurerData;
       const printsField = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
