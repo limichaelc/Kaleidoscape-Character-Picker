@@ -355,16 +355,15 @@ function formatAbility(element, weapon, type, value, isCompatible = true, should
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
-  const base = `${prefix} ${emoji(type)} ${type} `;
   const ret = isHitterAbility(type)
     ? isCompatible && shouldPrioritize
       ? isNegativeTradeoff
-        ? `${prefix} ***${type} I***`
-        : `${prefix} **${type} I**`
-      : `${prefix} ${type} I`
+        ? `${prefix} ${emoji(type)} ***${type} I***`
+        : `${prefix} ${emoji(type)} **${type} I**`
+      : `${prefix} ${emoji(type)} ${type} I`
     : isCompatible && shouldPrioritize
-      ? `${prefix} ${type} **+${value}%**`
-      : `${prefix} ${type} +${value}%`;
+      ? `${prefix} ${emoji(type)} ${type} **+${value}%**`
+      : `${prefix} ${emoji(type)} ${type} +${value}%`;
   return isCompatible ? ret : `*~~${ret}~~*`;
 }
 
