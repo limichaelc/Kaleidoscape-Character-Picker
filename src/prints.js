@@ -615,7 +615,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
               subType: type1,
               subTypeEffectiveValue: value1,
               hasCompatibleHitterSubType: false,
-              weapon: isHitterAbility(type) ? weapon : null,
+              weapon: isHitterAbility(type) ? print.ability2_weapon : null,
             });
           }
         });
@@ -632,7 +632,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printsWithValue = map[type].sort((a, b) => {
       if (a.weapon != null && b.weapon != null) {
         const weaponCmp = a.weapon.localeCompare(b.weapon);
-        console.log({weaponCmp, a: a.weapon, b: b.weapon});
         if (weaponCmp !== 0) {
           return weaponCmp;
         }
