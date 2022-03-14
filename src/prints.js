@@ -598,7 +598,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       if (type2 !== null) {
         var types = [type2];
         if (isHitterAbility(type2)) {
-          types.push(effectiveTypesForHitter(type2));
+          types.concat(effectiveTypesForHitter(type2));
         }
         types.filter(type => type !== type1).map(type => {
           const typeForMap = type2 === ability
