@@ -196,7 +196,7 @@ const ABILITY_EMOJI = {
 };
 
 function emoji(type) {
-  return `\\<${ABILITY_EMOJI[type]}>}`;
+  return `<:${ABILITY_EMOJI[type]}:>`;
 }
 
 function isHitterAbility(type) {
