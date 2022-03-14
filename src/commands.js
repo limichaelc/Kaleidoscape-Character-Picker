@@ -210,15 +210,18 @@ const popularityCommand = {
 
       return `${prefix}: ${entry.name} (${entry.count.toString()})`;
     });
+    const pages = Math.ceil(fields.length / pageSize);
+    var suffix = ` ($Page ${page} of ${pages})`;
     if (ordering ===  ORDERINGS.ASCENDING) {
+      suffix = ' (Reversed)' + suffix;
       fields.reverse();
     }
     fields = fields.slice((page - 1) * pageSize, page * pageSize);
-    const suffix = (element != null || weapon != null)
+    const filter = (element != null || weapon != null)
       ? ' for ' + [element, pluralize(weapon) ?? 'Adventurers'].join(' ')
-      : ''
+      : '';
     const embed = new MessageEmbed()
-      .setTitle('Popularity Rankings' + suffix)
+      .setTitle('Popularity Rankings' + filter + suffix)
       .setDescription(fields.join('\n'));
     interaction.reply({ embeds: [embed] }).catch(onRejected => console.error(onRejected));
   }
