@@ -196,7 +196,8 @@ const ABILITY_EMOJI = {
 };
 
 function emoji(type) {
-  return `:${type.replaceAll(' ', '')}:`;
+  return '<:EasyHitter:952974314813141052>';
+  // return `<:${type.replaceAll(' ', '')}:${ABILITY_EMOJI[type]}>`;
 }
 
 function isHitterAbility(type) {
