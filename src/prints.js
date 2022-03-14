@@ -625,7 +625,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   if (ability != null) {
     map = {[ability]: map[ability]};
   }
-  console.log(map);
 
   const fields = [];
   Object.keys(map).map(type => {
