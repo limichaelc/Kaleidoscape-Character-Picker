@@ -363,7 +363,7 @@ function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, a
   return true;
 }
 
-function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritize) {
+function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritize, title) {
   const type1 = print.ability1_type;
   const type2 = print.ability2_type;
   const type1Compatible = isAbilityCompatible(
@@ -408,7 +408,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${abilityStrs.filter(Boolean).join(' / ')}`;
   }
-  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer})`;
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? ` ${title}` : ''})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
@@ -480,9 +480,9 @@ function comparePrints(a, b) {
   }
 }
 
-async function genNameElementWeapon(adventurer) {
+async function genAdventurerData(adventurer) {
   const results = await sql`
-    SELECT name, element, weapon FROM adventurers
+    SELECT name, element, weapon, title FROM adventurers
     WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR LOWER(name) = ${adventurer}
   `;
   if (results.length == 0) {
@@ -495,11 +495,11 @@ async function genNameElementWeapon(adventurer) {
 }
 
 async function genAddPrints(userID, adventurer, printStrs) {
-  const elementWeapon = await genNameElementWeapon(adventurer);
-  if (elementWeapon.error != null) {
-    return {errors: [elementWeapon.error], successes: []};
+  const adventurerData = await genAdventurerData(adventurer);
+  if (adventurerData.error != null) {
+    return {errors: [adventurerData.error], successes: []};
   }
-  const {name, element, weapon} = elementWeapon;
+  const {name, element, weapon} = adventurerData;
   const prints = printStrs
     .split(';')
     .map((print) => {
@@ -845,10 +845,13 @@ async function genHandleWizard(interaction) {
   const fields = await Promise.all(Object.keys(map).map(async basisId => {
     if (basisMap[basisId] == null) {
       return null;
-    }
+    };
     return {
       name: formatPrint(basisMap[basisId]),
-      value: map[basisId].map(print => formatPrint(print)).join('\n'),
+      value: map[basisId].map(print => {
+        const adventurerData = await genAdventurerData(print.adventurer);
+        return formatPrint(print, null, null, null, null, null, adventurerData.title);
+      }).join('\n'),
     };
   }));
   await chunkifyAndSendFields(interaction, `${Object.keys(replacementCandidates).length} prints you can probably delete (identical or outclassed by bolded prints)`, fields.filter(Boolean));
@@ -1038,19 +1041,19 @@ const printsCommand = {
     } else if (subcommand === PRINTS_SUBCOMMANDS.FEATURING) {
       const query = interaction.options.getString('query');
       await logCommand(interaction, 'prints featuring', query);
-      const nameElementWeapon = await genNameElementWeapon(query);
-      if (nameElementWeapon.error != null) {
+      const adventurerData = await genAdventurerData(query);
+      if (adventurerData.error != null) {
         return interaction.editReply({
-          content: nameElementWeapon.error,
+          content: adventurerData.error,
         }).catch(onRejected => console.error(onRejected));
       }
-      const {name} = nameElementWeapon;
+      const {name, title} = adventurerData;
       const printsField = await sql`
         SELECT * from prints
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
-      await chunkifyAndSendFields(interaction, `Prints featuring ${name}`, printsField, COLORS[element.toUpperCase()]);
+      await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, printsField, COLORS[element.toUpperCase()]);
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
@@ -1063,15 +1066,15 @@ const printsCommand = {
           case PRINTS_SUBCOMMANDS.ADVENTURER: {
             const query = interaction.options.getString('query');
             await logCommand(interaction, 'prints for adventurer', query);
-            const nameElementWeapon = await genNameElementWeapon(query);
-            if (nameElementWeapon.error != null) {
+            const adventurerData = await genAdventurerData(query);
+            if (adventurerData.error != null) {
               return interaction.editReply({
-                content: nameElementWeapon.error,
+                content: adventurerData.error,
               }).catch(onRejected => console.error(onRejected));
             }
-            element = nameElementWeapon.element;
-            printsField = await genPrintsFieldForElementWeapon(interaction, nameElementWeapon, ability, strict);
-            baseTitle = `Prints suitable for ${nameElementWeapon.name} (${nameElementWeapon.element} ${nameElementWeapon.weapon})`;
+            element = adventurerData.element;
+            printsField = await genPrintsFieldForElementWeapon(interaction, adventurerData, ability, strict);
+            baseTitle = `Prints suitable for ${adventurerData.name} (${adventurerData.element} ${adventurerData.weapon})`;
             break;
           }
           case PRINTS_SUBCOMMANDS.ELEMENT:
