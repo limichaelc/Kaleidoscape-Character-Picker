@@ -1054,7 +1054,16 @@ const printsCommand = {
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
+<<<<<<< Updated upstream
       await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, printsField, COLORS[element.toUpperCase()]);
+=======
+      const embed = {
+        title: `Prints featuring ${name} (${title})`,
+        fields: prints.length === 0 ? 'No prints found' : fieldifyPrints(prints),
+        color: COLORS[element.toUpperCase()],
+      };
+      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+>>>>>>> Stashed changes
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
