@@ -715,7 +715,7 @@ async function chunkifyAndSendFields(interaction, title, fields, color) {
   var counter = 2;
   while ((chunkified?.length ?? 0) > 0) {
     const embed = {
-      'title': baseTitle + ` (${counter})`,
+      'title': title + ` (${counter})`,
       'fields': chunkified.shift(),
       color,
     }
