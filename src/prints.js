@@ -175,6 +175,30 @@ const ABILITY_NAMES = {
   [ABILITY_TYPE.HASTY_HITTER]: ['hasty hitter', 'hastyhitter', 'hasty_hitter', 'hasty', 'hh'],
 };
 
+const ABILITY_EMOJI = {
+  [ABILITY_TYPE.STRENGTH]: 952974314561486858,
+  [ABILITY_TYPE.SKILL_DAMAGE]: 952974314393698395,
+  [ABILITY_TYPE.CRITICAL_RATE]: 952974313991049286,
+  [ABILITY_TYPE.FORCE_STRIKE]: 952974314121072700,
+  [ABILITY_TYPE.HP]: 952974314167230514,
+  [ABILITY_TYPE.DRAGON_DAMAGE]: 952974314104299560,
+  [ABILITY_TYPE.DRAGON_HASTE]: 952974313668104204,
+  [ABILITY_TYPE.SKILL_HASTE]: 952974314762813490,
+  [ABILITY_TYPE.SKILL_PREP]: 952974314662133790,
+  [ABILITY_TYPE.DEFENSE]: 952974314163015690,
+  [ABILITY_TYPE.CRITICAL_DAMAGE]: 952974314016243712,
+  [ABILITY_TYPE.RECOVERY_POTENCY]: 952974313785536593,
+  [ABILITY_TYPE.DRAGON_TIME]: 952974314079150142,
+  [ABILITY_TYPE.STEADY_HITTER]: 952974314309816351,
+  [ABILITY_TYPE.EASY_HITTER]: 952974314813141052,
+  [ABILITY_TYPE.LUCKY_HITTER]: 952974314125262968,
+  [ABILITY_TYPE.HASTY_HITTER]: 952974313689084025,
+};
+
+function emoji(type) {
+  return `\\<${ABILITY_EMOJI[type]}>}`;
+}
+
 function isHitterAbility(type) {
   return [
       ABILITY_TYPE.STEADY_HITTER,
@@ -331,7 +355,7 @@ function formatAbility(element, weapon, type, value, isCompatible = true, should
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
-  const base = `${prefix} ${type} `;
+  const base = `${prefix} ${emoji(type)} ${type} `;
   const ret = isHitterAbility(type)
     ? isCompatible && shouldPrioritize
       ? isNegativeTradeoff
