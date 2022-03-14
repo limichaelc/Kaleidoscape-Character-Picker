@@ -408,7 +408,7 @@ function formatPrint(print, sortBy, element, weapon, adventurer, typeToPrioritiz
   if (sortBy === SORTING_OPTIONS.ADVENTURER) {
     return `ID ${print.id}: ${abilityStrs.filter(Boolean).join(' / ')}`;
   }
-  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? ` ${title}` : ''})`;
+  return `${abilityStrs.filter(Boolean).join(' / ')} (ID ${print.id}, ${adventurer ?? print.adventurer}${title != null ? `, ${title}` : ''})`;
 }
 
 async function genPrintsFieldForElementWeapon(interaction, elementWeapon, ability, strict) {
