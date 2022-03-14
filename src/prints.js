@@ -599,13 +599,14 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         var types = [type2];
         if (isHitterAbility(type2)) {
           types = effectiveTypesForHitter(type2)
+          types.push(type2);
         }
         types.filter(type => type !== type1).map(type => {
           const typeForMap = type2 === ability
             ? type2
             : type;
           const value = effectiveValue(print, type, element, weapon);
-          if (value !== 0) {
+          if (value !== 0 && !isHitterAbility(type)) {
             if (map[typeForMap] == null) {
               map[typeForMap] = [];
             }
@@ -704,7 +705,6 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
 
 async function chunkifyAndSendFields(interaction, title, fields, color) {
   const chunkified = chunkifyFields(fields);
-  console.log(chunkified.length);
   const editEmbed = {
     title,
     'fields': chunkified != null ? chunkified.shift() : null,
