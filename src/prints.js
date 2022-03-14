@@ -864,6 +864,7 @@ const PRINTS_SUBCOMMANDS = {
   DELETE: 'delete',
   ELEMENT: 'element',
   PAGE: 'page',
+  FEATURING: 'featuring',
   WIZARD: 'wizard',
 }
 
@@ -949,6 +950,15 @@ const printsCommand = {
     )
     .addSubcommand(subcommand =>
       subcommand
+        .setName(PRINTS_SUBCOMMANDS.FEATURING)
+        .setDescription('Find prints from your collection featuring the given adventurer as the portrait')
+        .addStringOption(option =>
+          option.setName('query')
+            .setDescription('The search query, single name, fuzzy match')
+            .setRequired(true))
+    )
+    .addSubcommand(subcommand =>
+      subcommand
         .setName(PRINTS_SUBCOMMANDS.WIZARD)
         .setDescription('Find prints from your print collection that are safe to delete')
     ),
@@ -1025,6 +1035,22 @@ const printsCommand = {
     } else if (subcommand === PRINTS_SUBCOMMANDS.WIZARD) {
       await logCommand(interaction, 'prints wizard');
       await genHandleWizard(interaction);
+    } else if (subcommand === PRINTS_SUBCOMMAND.FEATURING) {
+      const query = interaction.options.getString('query');
+      await logCommand(interaction, 'prints featuring', query);
+      const nameElementWeapon = await genNameElementWeapon(query);
+      if (nameElementWeapon.error != null) {
+        return interaction.editReply({
+          content: nameElementWeapon.error,
+        }).catch(onRejected => console.error(onRejected));
+      }
+      const {name} = nameElementWeapon;
+      const printsField = await sql`
+        SELECT * from prints
+        WHERE userid = ${userID}
+        AND adventurer = ${name}
+      `;
+      await chunkifyAndSendFields(interaction, `Prints featuring ${name}`, printsField, COLORS[element.toUpperCase()]);
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
