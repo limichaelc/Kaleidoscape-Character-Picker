@@ -203,9 +203,11 @@ const supportedCommands = [
       Use \`/prints page\` to view your full collection. Pages are 10 entries long.\n
       Use \`/prints for adventurer <query>\` or \`/prints for element <weapon>\` to filter through your collection.\n
       Note that abilities with no restriction are not considered when looking for viable prints so as to not clutter the results.\n
-      Use \`/prints delete <ids>\` if you ever need to remove prints from your collection. Pass in \`ids\` as a comma separated list, using the IDs shown next to each print.
+      Use \`/prints delete <ids>\` if you ever need to remove prints from your collection. Pass in \`ids\` as a comma separated list, using the IDs shown next to each print.\n
+      Use \`/prints featuring\` to view all prints with a given adventurer as the portrait.\n
+      Use \`/prints wizard\` to get a list of your prints that are likely safe to sell.
     `,
-    usage: 'prints add <adventurer> <prints>`, `/prints page <page>`, `/prints for adventurer <adventurer>`, `/prints for element <element> <weapon>`, `/prints delete <ids>',
+    usage: 'prints add <adventurer> <prints>`, `/prints page <page>`, `/prints for adventurer <adventurer>`, `/prints for element <element> <weapon>`, `/prints delete <ids>`, `/prints featuring <adventurer>`, `/prints wizard',
     example: 'prints add gmym skdam40, steady; fs50`, `/prints page 2`, `/prints for gleon`, `/prints for flame`, `/prints for water sword',
   },
 ];
