@@ -195,12 +195,6 @@ const ABILITY_EMOJI = {
   [ABILITY_TYPE.HASTY_HITTER]: '<:HastyHitter:952974313689084025>',
 };
 
-function emoji(type) {
-  return ABILITY_EMOJI[type];
-  // return '<:EasyHitter:952974314813141052>';
-  // return `<:${type.replaceAll(' ', '')}:${ABILITY_EMOJI[type]}>`;
-}
-
 function isHitterAbility(type) {
   return [
       ABILITY_TYPE.STEADY_HITTER,
@@ -357,16 +351,18 @@ function formatAbility(element, weapon, type, value, isCompatible = true, should
   const prefix = [element, weapon].filter(Boolean).length === 0
     ? ''
     : `(${[element, weapon].filter(Boolean).join(' & ')})`;
+  const emoji = ABILITY_EMOJI[type];
   const ret = isHitterAbility(type)
     ? isCompatible && shouldPrioritize
       ? isNegativeTradeoff
-        ? `${prefix} ${emoji(type)} ***${type} I***`
-        : `${prefix} ${emoji(type)} **${type} I**`
-      : `${prefix} ${emoji(type)} ${type} I`
+        ? `${prefix} ***${type} I***`
+        : `${prefix} **${type} I**`
+      : `${prefix} ${type} I`
     : isCompatible && shouldPrioritize
-      ? `${prefix} ${emoji(type)} ${type} **+${value}%**`
-      : `${prefix} ${emoji(type)} ${type} +${value}%`;
-  return isCompatible ? ret : `*~~${ret}~~*`;
+      ? `${prefix} ${type} **+${value}%**`
+      : `${prefix} ${type} +${value}%`;
+  const withEmoji = emoji + ' ' + ret;
+  return isCompatible ? withEmoji : `*~~${withEmoji}~~*`;
 }
 
 function isAbilityCompatible(abilityElement, abilityWeapon, adventurerElement, adventurerWeapon) {
