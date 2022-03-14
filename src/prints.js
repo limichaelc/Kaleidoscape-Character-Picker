@@ -1047,7 +1047,7 @@ const printsCommand = {
       const {name} = nameElementWeapon;
       const printsField = await sql`
         SELECT * from prints
-        WHERE userid = ${userID}
+        WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
       await chunkifyAndSendFields(interaction, `Prints featuring ${name}`, printsField, COLORS[element.toUpperCase()]);
