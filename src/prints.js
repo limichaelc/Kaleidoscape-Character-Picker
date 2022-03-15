@@ -124,7 +124,7 @@ const SLOT_2_ABILITY_TYPES = [
 
 const ABILITY_NAMES = {
   [ABILITY_TYPE.STRENGTH]: ['strength', 'str', 's'],
-  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'skdmg', 'sd'],
+  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'skdmg', 'sdmg', 'sdam', 'sd'],
   [ABILITY_TYPE.CRITICAL_RATE]: [
     'critical rate',
     'criticalrate',
@@ -146,7 +146,7 @@ const ABILITY_NAMES = {
     'skhaste',
     'sh',
   ],
-  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sp', 'p'],
+  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sprep', 'sp', 'p'],
   [ABILITY_TYPE.DEFENSE]: ['defense', 'def', 'd'],
   [ABILITY_TYPE.CRITICAL_DAMAGE]: [
     'critical damage',
@@ -167,6 +167,7 @@ const ABILITY_NAMES = {
     'rec',
     'recpot',
     'r',
+    'rp',
   ],
   [ABILITY_TYPE.DRAGON_TIME]: ['dragon time', 'dragontime', 'dragon_time', 'time', 'dtime', 'dt'],
   [ABILITY_TYPE.STEADY_HITTER]: ['steady hitter', 'steadyhitter', 'steady_hitter', 'steady', 'sth'],
@@ -502,9 +503,10 @@ function getRestriction(element, weapon) {
 // }
 
 async function genAdventurerData(adventurer) {
+  const query = adventurer.toLowerCase();
   const results = await sql`
     SELECT name, element, weapon, title FROM adventurers
-    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR LOWER(name) = ${adventurer}
+    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${query.replaceAll(' ', '')}::text, ',%') OR LOWER(name) = ${query}
   `;
   if (results.length == 0) {
     return {error: `Could not find adventurer for query "${adventurer}"`};
@@ -528,7 +530,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
         return;
       }
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability.replaceAll(' ', ''), index));
-      if (ability1.error != null || ability2.error != null) {
+      if (ability1?.error != null || ability2?.error != null) {
         return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print.trim()}*")`;
       }
       return {
@@ -649,7 +651,14 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
   });
 
   if (ability != null) {
-    map = {[ability]: map[ability]};
+    const types = [ability].concat(expandedTypes(ability));
+    const filtered = {};
+    Object.keys(map).map(key => {
+      if (types.includes(key)) {
+        filtered[key] = map[key];
+      }
+    });
+    map = filtered;
   }
 
   const fields = [];
@@ -827,7 +836,8 @@ async function genHandleWizard(interaction) {
           prints.ability2_element,
           r.id
         FROM prints
-        WHERE prints.ability1_type = r.ability1_type
+        WHERE prints.userid = $1
+        AND prints.ability1_type = r.ability1_type
         AND prints.ability2_type = r.ability2_type
         AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(prints.ability1_element, '') = '')
         AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(prints.ability2_element, '') = '')

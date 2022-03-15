@@ -206,8 +206,8 @@ async function markCompleted(interaction, adventurer) {
   const userID = interaction.user.id;
   const [name, element, weapon] = adventurer.split(', ');
   const [completed] = await sql`
-    INSERT INTO completed(userid, name, element, weapon)
-    VALUES(${userID}, ${name}, ${element}, ${weapon})
+    INSERT INTO completed(userid, name, element, weapon, timestamp)
+    VALUES(${userID}, ${name}, ${element}, ${weapon}, NOW())
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
@@ -322,8 +322,8 @@ async function batchAddCompleted(interaction) {
   const query = getSearchQuery(interaction);
   const [added] = await sql`
     WITH rows AS (
-      INSERT INTO completed(userid, name, element, weapon)
-      SELECT ${userID}, name, element, weapon FROM adventurers
+      INSERT INTO completed(userid, name, element, weapon, timestamp)
+      SELECT ${userID}, name, element, weapon, NOW() FROM adventurers
       WHERE LOWER(name) = ANY(ARRAY[${query}])
       ON CONFLICT(userid, name, element, weapon)
       DO NOTHING
@@ -467,9 +467,9 @@ async function leaderboard(interaction) {
     GROUP BY userid
     ORDER BY 1 DESC
   `;
-  // const users = await sql`
-  //   SELECT userid, username FROM users
-  // `;
+  const [adventurerCount] = await sql`
+    SELECT COUNT(*) from adventurers
+  `;
   await logCommand(interaction, 'leaderboard');
   const results = await Promise.all(leaderboard.map(async entry => {
     const {count, userid} = entry;
@@ -478,7 +478,7 @@ async function leaderboard(interaction) {
     if (username == null) {
       return null;
     }
-    return {count, username, isSelf: userid === interaction.user.id};
+    return {count, username, isSelf: userid === interaction.user.id, isComplete: count === adventurerCount.count};
   }));
   return results.filter(Boolean);
 }

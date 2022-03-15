@@ -283,7 +283,7 @@ const leaderboardCommand = {
 
       previousCount = entry.count
 
-      var base = `${prefix}: ${entry.username} (${entry.count.toString()})`;
+      var base = `${prefix}: ${entry.username} (${entry.count.toString()}${entry.isComplete ? ' 🏆' : ''})`;
       if (entry.isSelf) {
         selfEntry = `You are rank ${prefix} with a total of ${entry.count.toString()} adventurers`;
         base = '**' + base + '**';
