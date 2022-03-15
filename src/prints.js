@@ -504,7 +504,7 @@ function getRestriction(element, weapon) {
 async function genAdventurerData(adventurer) {
   const results = await sql`
     SELECT name, element, weapon, title FROM adventurers
-    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR LOWER(name) = ${adventurer}
+    WHERE CONCAT(',', aliases, ',') LIKE CONCAT('%,', ${adventurer}::text, ',%') OR LOWER(name) = ${adventurer.toLower()}
   `;
   if (results.length == 0) {
     return {error: `Could not find adventurer for query "${adventurer}"`};
