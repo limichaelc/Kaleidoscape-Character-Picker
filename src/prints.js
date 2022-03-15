@@ -591,6 +591,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer));
     var counter = 0;
     var next = printStrs.shift();
+    const fields = [];
     do {
       var value = '';
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
