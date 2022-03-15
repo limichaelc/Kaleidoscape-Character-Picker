@@ -132,6 +132,7 @@ const ABILITY_NAMES = {
     'crit_rate',
     'critrate',
     'crate',
+    'crit',
     'cr',
   ],
   [ABILITY_TYPE.FORCE_STRIKE]: ['forcestrike', 'force_strike', 'fs', 'force', 'f'],
