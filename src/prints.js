@@ -1029,7 +1029,12 @@ const printsCommand = {
           }
         : null;
       if (successEmbed != null) {
-        await interaction.editReply({embeds: [successEmbed]});
+        await chunkifyAndSendFields(
+          interaction,
+          `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
+          fieldifyPrints(successes),
+          COLORS[element.toUpperCase()],
+        );
         if (errorEmbed != null) {
           await interaction.followUp({embeds: [errorEmbed]});
         }
@@ -1096,12 +1101,7 @@ const printsCommand = {
         WHERE userid = ${interaction.user.id}
         AND adventurer = ${name}
       `;
-      const embed = {
-        title: `Prints featuring ${name} (${title})`,
-        fields: fieldifyPrints(prints),
-        color: COLORS[element.toUpperCase()],
-      };
-      return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
+      await chunkifyAndSendFields(interaction, `Prints featuring ${name} (${title})`, fieldifyPrints(prints), COLORS[element.toUpperCase()]);
     } else {
       const group = interaction.options.getSubcommandGroup();
       if (group === PRINTS_COMMAND_GROUPS.FOR) {
