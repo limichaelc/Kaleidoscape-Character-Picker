@@ -592,24 +592,26 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     var counter = 0;
     var next = printStrs.shift();
     const fields = [];
-    do {
-      var value = '';
-      while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
-        console.log({length: value.length});
-        value += next + '\n';
-        next = printStrs.shift();
-      }
-      counter++;
-      const pageStr = counter > 1
-        ? ` (${counter})`
-        : '';
-      if (value !== '') {
-        fields.push({
-          name: print.adventurer + pageStr,
-          value: value.trim(),
-        });
-      }
-    } while (printStrs.length > 0)
+    Object.keys(map).map(adventurer => {
+      do {
+        var value = '';
+        while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
+          console.log({length: value.length});
+          value += next + '\n';
+          next = printStrs.shift();
+        }
+        counter++;
+        const pageStr = counter > 1
+          ? ` (${counter})`
+          : '';
+        if (value !== '') {
+          fields.push({
+            name: adventurer + pageStr,
+            value: value.trim(),
+          });
+        }
+      } while (printStrs.length > 0)
+    });
     return fields;
   }
 
