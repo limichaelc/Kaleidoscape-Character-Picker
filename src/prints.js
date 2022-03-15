@@ -744,7 +744,9 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
 }
 
 async function chunkifyAndSendFields(interaction, title, fields, color) {
+  console.log(fields);
   const chunkified = chunkifyFields(fields);
+  console.log(chunkified);
   const editEmbed = {
     title,
     'fields': chunkified != null ? chunkified.shift() : null,
