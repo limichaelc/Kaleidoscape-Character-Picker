@@ -3,7 +3,7 @@ const {sql, logCommand} = require('./db');
 const {capitalize, pluralize, allWeaponOptions} = require('./utils');
 const {ALL_ELEMENTS, COLORS} = require('./consts');
 
-const MAX_LENGTH = 1000;
+const MAX_LENGTH = 1024;
 const MAX_FIELD_LENGTH_SUM = 5500; // 6k embed limit, -500 for buffer
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
@@ -577,6 +577,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
 const SORTING_OPTIONS = {
   ABILITY: 'ability',
   ADVENTURER: 'adventurer',
+  INPUT_ORDER: 'input_order',
 };
 
 function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = null, weapon = null, ability = null, strict = false) {
@@ -663,60 +664,62 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
 
   const fields = [];
   Object.keys(map).map(type => {
-    const printsWithValue = map[type].sort((a, b) => {
-      if (a.weapon != null && b.weapon != null) {
-        const weaponCmp = a.weapon.localeCompare(b.weapon);
-        if (weaponCmp !== 0) {
-          return weaponCmp;
-        }
-      }
-      const valueCmp = b.effectiveValue - a.effectiveValue;
-      if (valueCmp === 0) {
-        const subTypeCmp = a.subType.localeCompare(b.subType);
-        // TODO check IDs 128 316 257
-        // different sub types
-        // deprioritize dead abilities
-        // If b's subtype has no effective value
-        // console.log({
-        //   a: formatPrint(a.print),
-        //   b: formatPrint(b.print),
-        //   aSubTypeEffectiveValue: a.subTypeEffectiveValue,
-        //   bSubTypeEffectiveValue: b.subTypeEffectiveValue,
-        //   aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
-        //   bHasCompatibleHitterSubType: b.hasCompatibleHitterSubType,
-        //   subTypeCmp,
-        // })
-        if (b.subTypeEffectiveValue === 0) {
-          // ... and a's subtype also has no effective value
-          if (a.subTypeEffectiveValue === 0) {
-            // ... then if b's effective value is 0 because it has a compatible hitter
-            if (b.hasCompatibleHitterSubType) {
-              // ... and a's effective value is 0 for the same reason
-              if (a.hasCompatibleHitterSubType) {
-                return subTypeCmp;
-              }
-              // else prioritize b
-              return 1;
-            }
-            if (a.hasCompatibleHitterSubType) {
-              return -1;
-            }
-            // defer to strCmp
-            return subTypeCmp;
+    const printsWithValue = sortBy === SORTING_OPTIONS.INPUT_ORDER
+      ? map[type]
+      : map[type].sort((a, b) => {
+        if (a.weapon != null && b.weapon != null) {
+          const weaponCmp = a.weapon.localeCompare(b.weapon);
+          if (weaponCmp !== 0) {
+            return weaponCmp;
           }
-          // otherwise only b is an incompatible hitter, deprioritize
-          return -1;
-        } else if (a.subTypeEffectiveValue === 0) {
-          return 1;
         }
-        // same sub type, compare effective value
-        if (subTypeCmp === 0) {
-          return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
+        const valueCmp = b.effectiveValue - a.effectiveValue;
+        if (valueCmp === 0) {
+          const subTypeCmp = a.subType.localeCompare(b.subType);
+          // TODO check IDs 128 316 257
+          // different sub types
+          // deprioritize dead abilities
+          // If b's subtype has no effective value
+          // console.log({
+          //   a: formatPrint(a.print),
+          //   b: formatPrint(b.print),
+          //   aSubTypeEffectiveValue: a.subTypeEffectiveValue,
+          //   bSubTypeEffectiveValue: b.subTypeEffectiveValue,
+          //   aHasCompatibleHitterSubType: a.hasCompatibleHitterSubType,
+          //   bHasCompatibleHitterSubType: b.hasCompatibleHitterSubType,
+          //   subTypeCmp,
+          // })
+          if (b.subTypeEffectiveValue === 0) {
+            // ... and a's subtype also has no effective value
+            if (a.subTypeEffectiveValue === 0) {
+              // ... then if b's effective value is 0 because it has a compatible hitter
+              if (b.hasCompatibleHitterSubType) {
+                // ... and a's effective value is 0 for the same reason
+                if (a.hasCompatibleHitterSubType) {
+                  return subTypeCmp;
+                }
+                // else prioritize b
+                return 1;
+              }
+              if (a.hasCompatibleHitterSubType) {
+                return -1;
+              }
+              // defer to strCmp
+              return subTypeCmp;
+            }
+            // otherwise only b is an incompatible hitter, deprioritize
+            return -1;
+          } else if (a.subTypeEffectiveValue === 0) {
+            return 1;
+          }
+          // same sub type, compare effective value
+          if (subTypeCmp === 0) {
+            return b.subTypeEffectiveValue - a.subTypeEffectiveValue;
+          }
+          return subTypeCmp;
         }
-        return subTypeCmp;
-      }
-      return valueCmp;
-    });
+        return valueCmp;
+      });
     const printStrs = printsWithValue.map(printWithValue =>
       formatPrint(printWithValue.print, sortBy, element, weapon, printWithValue.print.adventurer, type),
     );
@@ -1025,17 +1028,11 @@ const printsCommand = {
             description: errors.join('\n'),
           }
         : null;
-      const successEmbed = successes.length > 0
-        ? {
-            title: `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
-            fields: fieldifyPrints(successes),
-          }
-        : null;
-      if (successEmbed != null) {
+      if (successes.length > 0) {
         await chunkifyAndSendFields(
           interaction,
           `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
-          fieldifyPrints(successes),
+          fieldifyPrints(successes, SORTING_OPTIONS.INPUT_ORDER),
         );
         if (errorEmbed != null) {
           await interaction.followUp({embeds: [errorEmbed]});
@@ -1082,7 +1079,7 @@ const printsCommand = {
       `;
       const embed = {
         "title": `Successfully deleted ${removed.length} print${removed.length > 1 ? 's' : ''}:`,
-        "fields": fieldifyPrints(removed),
+        "fields": fieldifyPrints(removed, SORTING_OPTIONS.INPUT_ORDER),
       };
       return interaction.editReply({embeds: [embed]}).catch(onRejected => console.error(onRejected));
     } else if (subcommand === PRINTS_SUBCOMMANDS.WIZARD) {
