@@ -244,12 +244,18 @@ async function markIncomplete(interaction, adventurer) {
 
 async function findCompleters(interaction, adventurer, thumbnailUrl) {
   const completers = await sql`
-    SELECT userid
+    SELECT userid, timestamp
     FROM completed
     WHERE name = ${adventurer}
+    ORDER BY timestamp NULLS FIRST
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
-  const names = await Promise.all(completers.map(async completer => await fetchUser(interaction, completer.userid)));
+  const names = await Promise.all(completers.map(async completer => {
+    const {userid, timestamp} = completer;
+    const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
+    const username = await fetchUser(interaction, completer.userid));
+    return `${username} *(${suffix})*`;
+  });
   const embed = {
     'type': 'rich',
     'title': adventurer,
