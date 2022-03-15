@@ -3,7 +3,7 @@ const {sql, logCommand} = require('./db');
 const {capitalize, pluralize, allWeaponOptions} = require('./utils');
 const {ALL_ELEMENTS, COLORS} = require('./consts');
 
-const MAX_LENGTH = 1024;
+const MAX_LENGTH = 1000;
 const MAX_FIELD_LENGTH_SUM = 5500; // 6k embed limit, -500 for buffer
 const ABILITY_TYPE = {
   STRENGTH: 'Strength',
@@ -1033,7 +1033,6 @@ const printsCommand = {
           interaction,
           `Successfully added ${successes.length} print${successes.length > 1 ? 's' : ''}:`,
           fieldifyPrints(successes),
-          COLORS[element.toUpperCase()],
         );
         if (errorEmbed != null) {
           await interaction.followUp({embeds: [errorEmbed]});
