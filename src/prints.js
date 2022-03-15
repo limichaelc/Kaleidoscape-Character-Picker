@@ -167,6 +167,7 @@ const ABILITY_NAMES = {
     'rec',
     'recpot',
     'r',
+    'rp',
   ],
   [ABILITY_TYPE.DRAGON_TIME]: ['dragon time', 'dragontime', 'dragon_time', 'time', 'dtime', 'dt'],
   [ABILITY_TYPE.STEADY_HITTER]: ['steady hitter', 'steadyhitter', 'steady_hitter', 'steady', 'sth'],
