@@ -725,6 +725,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
     do {
       var value = '';
       while (next != null && (value.length + next.length + 1) < MAX_LENGTH) {
+        console.log({length: value.length});
         value += next + '\n';
         next = printStrs.shift();
       }
