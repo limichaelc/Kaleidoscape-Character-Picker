@@ -836,7 +836,8 @@ async function genHandleWizard(interaction) {
           prints.ability2_element,
           r.id
         FROM prints
-        WHERE prints.ability1_type = r.ability1_type
+        WHERE prints.userid = $1
+        AND prints.ability1_type = r.ability1_type
         AND prints.ability2_type = r.ability2_type
         AND (coalesce(prints.ability1_element, '') = coalesce(r.ability1_element, '') OR coalesce(prints.ability1_element, '') = '')
         AND (coalesce(prints.ability2_element, '') = coalesce(r.ability2_element, '') OR coalesce(prints.ability2_element, '') = '')
