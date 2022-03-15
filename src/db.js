@@ -253,7 +253,7 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
   const names = await Promise.all(completers.map(async completer => {
     const {userid, timestamp} = completer;
     const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
-    const username = await fetchUser(interaction, completer.userid));
+    const username = await fetchUser(interaction, completer.userid);
     return `${username} *(${suffix})*`;
   });
   const embed = {
