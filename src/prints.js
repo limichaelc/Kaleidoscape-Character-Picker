@@ -530,7 +530,7 @@ async function genAddPrints(userID, adventurer, printStrs) {
         return;
       }
       const [ability1, ability2] = print.split(',').map((ability, index) => parseAbility(ability.replaceAll(' ', ''), index));
-      if (ability1.error != null || ability2.error != null) {
+      if (ability1?.error != null || ability2?.error != null) {
         return [ability1?.error, ability2?.error].filter(Boolean).join('; ') + ` ("*${print.trim()}*")`;
       }
       return {
