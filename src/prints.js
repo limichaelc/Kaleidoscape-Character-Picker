@@ -124,7 +124,7 @@ const SLOT_2_ABILITY_TYPES = [
 
 const ABILITY_NAMES = {
   [ABILITY_TYPE.STRENGTH]: ['strength', 'str', 's'],
-  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'skdmg', 'sd'],
+  [ABILITY_TYPE.SKILL_DAMAGE]: ['skill damage', 'skilldamage', 'skill_damage', 'skdam', 'skdmg', 'sdmg', 'sdam', 'sd'],
   [ABILITY_TYPE.CRITICAL_RATE]: [
     'critical rate',
     'criticalrate',
@@ -146,7 +146,7 @@ const ABILITY_NAMES = {
     'skhaste',
     'sh',
   ],
-  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sp', 'p'],
+  [ABILITY_TYPE.SKILL_PREP]: ['skill prep', 'skillprep', 'skill_prep', 'prep', 'skprep', 'sprep', 'sp', 'p'],
   [ABILITY_TYPE.DEFENSE]: ['defense', 'def', 'd'],
   [ABILITY_TYPE.CRITICAL_DAMAGE]: [
     'critical damage',
