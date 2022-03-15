@@ -255,7 +255,7 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
     const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
     const username = await fetchUser(interaction, completer.userid);
     return `${username} *(${suffix})*`;
-  });
+  }));
   const embed = {
     'type': 'rich',
     'title': adventurer,
