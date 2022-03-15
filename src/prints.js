@@ -588,7 +588,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
       }
       map[print.adventurer].push(print);
     });
-    const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, adventurer));
+    const printStrs = prints.map(print => formatPrint(print, sortBy, element, weapon, print.adventurer));
     var counter = 0;
     var next = printStrs.shift();
     do {
@@ -604,7 +604,7 @@ function fieldifyPrints(prints, sortBy = SORTING_OPTIONS.ADVENTURER, element = n
         : '';
       if (value !== '') {
         fields.push({
-          name: type + pageStr,
+          name: print.adventurer + pageStr,
           value: value.trim(),
         });
       }
