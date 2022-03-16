@@ -478,7 +478,19 @@ async function leaderboard(interaction) {
     if (username == null) {
       return null;
     }
-    return {count, username, isSelf: userid === interaction.user.id, isComplete: count === adventurerCount.count};
+    const isComplete = count === adventurerCount.count;
+    var completionTime = null;
+    if (isComplete) {
+      const [timestamp] = sql`
+        SELECT timestamp FROM completed
+        WHERE userid = ${userid}
+        AND timestamp IS NOT NULL
+        ORDER BY timestamp DESC
+        LIMIT 1
+      `;
+      completionTime = getRelativeTime(timestamp.timestamp);
+    }
+    return {count, username, isSelf: userid === interaction.user.id, completionTime};
   }));
   return results.filter(Boolean);
 }
