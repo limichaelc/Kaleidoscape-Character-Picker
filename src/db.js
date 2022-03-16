@@ -481,7 +481,7 @@ async function leaderboard(interaction) {
     const isComplete = count === adventurerCount.count;
     var completionTime = null;
     if (isComplete) {
-      const [timestamp] = sql`
+      const [timestamp] = await sql`
         SELECT timestamp FROM completed
         WHERE userid = ${userid}
         AND timestamp IS NOT NULL
