@@ -285,7 +285,7 @@ const leaderboardCommand = {
 
       const completionSuffix = entry.completionTime !== null
         ? ` *(completed ${entry.completionTime})*`
-        : null;
+        : '';
       var base = `${prefix}: ${entry.username} (${entry.count.toString()}${entry.completionTime !== null ? ' 🏆' : ''})${completionSuffix}`;
       if (entry.isSelf) {
         selfEntry = `You are rank ${prefix} with a total of ${entry.count.toString()} adventurers`;
