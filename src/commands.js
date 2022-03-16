@@ -608,7 +608,7 @@ function statsCommand(name, description) {
       }
       interaction.reply({
         content,
-        ephemeral,
+        ephemeral: totalNumerator == totalAdventurers ? false : ephemeral,
       }).catch(onRejected => console.error(onRejected));
       if (totalNumerator == 0) {
         return;
