@@ -246,7 +246,7 @@ const leaderboardCommand = {
         ),
     ),
   execute: async (interaction, _) => {
-    interaction.deferReply();
+    await interaction.deferReply();
     var previousPrefix = null;
     var previousCount = null;
     var selfEntry = null
@@ -665,7 +665,7 @@ const historyCommand = {
     .setName('history')
     .setDescription('Shows completions from the last day by all users of the bot.'),
   execute: async (interaction, _) => {
-    interaction.deferReply();
+    await interaction.deferReply();
     const entries = await history(interaction);
     var fields = entries.map(entry => {
       const name = entry.isSelf ? 'You' : entry.username;

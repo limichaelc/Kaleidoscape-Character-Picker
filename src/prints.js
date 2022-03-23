@@ -541,10 +541,10 @@ async function genAddPrints(userID, adventurer, printStrs) {
         ability1_value: ability1.value,
         ability1_element: ability1.restriction !== RESTRICTIONS.NONE ? element : null,
         ability1_weapon: ability1.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
-        ability2_type: ability2.type,
-        ability2_value: ability2.value,
-        ability2_element: ability2.restriction !== RESTRICTIONS.NONE ? element : null,
-        ability2_weapon: ability2.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
+        ability2_type: ability2?.type,
+        ability2_value: ability2?.value,
+        ability2_element: ability2?.restriction !== RESTRICTIONS.NONE ? element : null,
+        ability2_weapon: ability2?.restriction === RESTRICTIONS.ELEMENT_WEAPON ? weapon : null,
       };
     })
     .filter(Boolean);
