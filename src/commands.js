@@ -58,9 +58,19 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
     footer += `Completed by ${count60.count} people`;
   }
   if (count50.count == 1) {
-    footer += ', taken to 50F by 1 person';
+    if (footer == '') {
+      footer += 'T';
+    } else {
+      footer += ', t';
+    }
+    footer += 'aken to 50F by 1 person';
   }
   if (count50.count > 1) {
+    if (footer == '') {
+      footer += 'T';
+    } else {
+      footer += ', t';
+    }
     footer += `, taken to 50F by ${count50.count} people`;
   }
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;

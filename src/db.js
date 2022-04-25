@@ -212,7 +212,7 @@ async function markCompleted(interaction, adventurer) {
   const [completed] = await sql`
     INSERT INTO completed(userid, name, element, weapon, timestamp, floor)
     VALUES(${userID}, ${name}, ${element}, ${weapon}, NOW(), 60)
-    ON CONFLICT(userid, name, element, weapon)
+    ON CONFLICT(userid, name, floor)
     DO NOTHING
   `
   await logCommand(interaction, ACTION_TYPE.COMPLETE, adventurer);
