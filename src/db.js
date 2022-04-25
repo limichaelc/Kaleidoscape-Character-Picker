@@ -249,6 +249,7 @@ async function markIncomplete(interaction, adventurer) {
 }
 
 async function findCompleters(interaction, adventurer, thumbnailUrl) {
+  await interaction.deferReply();
   const completers50 = await sql`
     SELECT userid, timestamp
     FROM completed
@@ -300,7 +301,7 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
     },
     'url': `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurer)}`,
   };
-  return interaction.reply({embeds: [embed]});
+  return interaction.editReply({embeds: [embed]});
 }
 
 function getSearchQueryRaw(query, addWildcards = false) {
