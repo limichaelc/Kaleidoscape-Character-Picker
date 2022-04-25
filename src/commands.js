@@ -71,7 +71,7 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
     } else {
       footer += ', t';
     }
-    footer += `, taken to 50F by ${count50.count} people`;
+    footer += `aken to 50F by ${count50.count} people`;
   }
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
   const embed = {
