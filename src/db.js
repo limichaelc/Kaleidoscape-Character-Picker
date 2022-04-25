@@ -364,6 +364,7 @@ async function batchAddCompleted(interaction) {
     SELECT COUNT(*)
     FROM completed
     WHERE userID = ${userID}
+    AND floor = 60
   `;
   return interaction.reply({
     content: `Marked ${added.count} new adventurers as complete (${numCompleted.count} completed total)`,
