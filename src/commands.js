@@ -548,7 +548,9 @@ function statsCommand(name, description) {
             sql`
               SELECT COUNT(*), element, weapon
               FROM completed
-              WHERE userid = ${userID} GROUP BY element, weapon
+              WHERE userid = ${userID}
+              AND floor = 60
+              GROUP BY element, weapon
             `
           );
           numeratorNames = await (
@@ -566,6 +568,7 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${userID}
+                AND floor = 60
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
@@ -588,6 +591,7 @@ function statsCommand(name, description) {
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM completed
                 WHERE userid = ${userID}
+                AND floor = 60
                 UNION ALL
                 SELECT CONCAT(name, ', ', element, ', ', weapon)
                 FROM blocked
