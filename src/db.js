@@ -265,13 +265,13 @@ async function findCompleters(interaction, adventurer, thumbnailUrl) {
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
   const names50 = await Promise.all(completers50.map(async completer => {
-    const {userid, timestamp, floor} = completer;
+    const {userid, timestamp} = completer;
     const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
     const username = await fetchUser(interaction, completer.userid);
     return `${username} *(${suffix})*`;
   }));
   const names60 = await Promise.all(completers60.map(async completer => {
-    const {userid, timestamp, floor} = completer;
+    const {userid, timestamp} = completer;
     const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
     const username = await fetchUser(interaction, completer.userid);
     return `${username} *(${suffix})*`;
@@ -353,7 +353,7 @@ async function batchAddCompleted(interaction) {
       INSERT INTO completed(userid, name, element, weapon, timestamp, floor)
       SELECT ${userID}, name, element, weapon, NOW(), 60 FROM adventurers
       WHERE LOWER(name) = ANY(ARRAY[${query}])
-      ON CONFLICT(userid, name, element, weapon, floor)
+      ON CONFLICT(userid, name, floor)
       DO NOTHING
       RETURNING *
     )
