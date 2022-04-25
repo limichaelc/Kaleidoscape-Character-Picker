@@ -37,15 +37,32 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
   }
   const item = concatResult.concat;
   const [id, rarity, adventurerName, element, weapon] = item.split(', ');
-  const [count] = await sql`
-    SELECT COUNT(*) from completed
-    WHERE name = ${adventurerName}
+  const [count50] = await sql`
+      SELECT COUNT(*) from completed
+      WHERE name = ${adventurerName}
+      AND floor = 50
   `;
-  const footer = count.count == 0
-    ? 'Not completed by anyone yet'
-    : count.count === 1
-      ? 'Completed by 1 person'
-      : `Completed by ${count.count} people`;
+  const [count60] = await sql`
+      SELECT COUNT(*) from completed
+      WHERE name = ${adventurerName}
+      AND floor = 60
+  `;
+  var footer = '';
+  if (count50.count == 0 && count60.count == 0) {
+    footer += 'Not completed by anyone yet';
+  }
+  if (count60.count == 1) {
+    footer += 'Completed by 1 person';
+  }
+  if (count60.count > 1) {
+    footer += `Completed by ${count60.count} people`;
+  }
+  if (count50.count == 1) {
+    footer += ', taken to 50F by 1 person';
+  }
+  if (count50.count > 1) {
+    footer += `, taken to 50F by ${count50.count} people`;
+  }
   const wikiURL = `https://dragalialost.wiki/index.php?title=Special:Search&search=${encodeURIComponent(adventurerName)}`;
   const embed = {
     "type": "rich",
@@ -67,13 +84,13 @@ async function sendMessage(interaction, concatResult, isFollowUp = false) {
     .addComponents(
       new MessageButton()
         .setCustomId(ACTION_TYPE.COMPLETE)
-        .setLabel('Mark complete')
+        .setLabel('Mark complete (60F)')
         .setStyle('SECONDARY'),
     )
     .addComponents(
       new MessageButton()
         .setCustomId(ACTION_TYPE.INCOMPLETE)
-        .setLabel('Mark incomplete')
+        .setLabel('Mark incomplete (60F)')
         .setStyle('SECONDARY'),
     )
     .addComponents(
@@ -252,9 +269,13 @@ const leaderboardCommand = {
     var selfEntry = null
     const entries = await leaderboard(interaction);
     var fields = entries.sort((a, b) => {
-      if (a.count < b.count) {
+      if (a.count60 < b.count60) {
         return 1;
-      } else if (a.count > b.count) {
+      } else if (a.count60 > b.count60) {
+        return -1;
+      } else if (a.count50 < b.count50) {
+        return 1;
+      } else if (a.count50 > b.count50) {
         return -1;
       } else {
         return a.username.localeCompare(b.username);
@@ -286,7 +307,7 @@ const leaderboardCommand = {
       const completionSuffix = entry.completionTime !== null
         ? ` *(completed ${entry.completionTime})*`
         : '';
-      var base = `${prefix}: ${entry.username} (${entry.count.toString()}${entry.completionTime !== null ? ' 🏆' : ''})${completionSuffix}`;
+      var base = `${prefix}: ${entry.username} (${entry.count60.toString()} to 60F, ${entry.count60.toString()} to 50F${entry.completionTime !== null ? ' 🏆' : ''})${completionSuffix}`;
       if (entry.isSelf) {
         selfEntry = `You are rank ${prefix} with a total of ${entry.count.toString()} adventurers`;
         base = '**' + base + '**';

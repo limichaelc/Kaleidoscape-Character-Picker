@@ -46,6 +46,10 @@ function getQuery(
           ELSE ${interaction.user.id}
         END
       )
+      AND floor = (
+        CASE
+          WHEN ${allowCompleted} THEN NULL
+          ELSE 60
     )
     SELECT * FROM (
       SELECT CONCAT(id, ', ', rarity, ', ', name, ', ', element, ', ', weapon)
@@ -206,8 +210,8 @@ async function markCompleted(interaction, adventurer) {
   const userID = interaction.user.id;
   const [name, element, weapon] = adventurer.split(', ');
   const [completed] = await sql`
-    INSERT INTO completed(userid, name, element, weapon, timestamp)
-    VALUES(${userID}, ${name}, ${element}, ${weapon}, NOW())
+    INSERT INTO completed(userid, name, element, weapon, timestamp, floor)
+    VALUES(${userID}, ${name}, ${element}, ${weapon}, NOW(), 60)
     ON CONFLICT(userid, name, element, weapon)
     DO NOTHING
   `
@@ -216,6 +220,7 @@ async function markCompleted(interaction, adventurer) {
     SELECT COUNT(*)
     FROM completed
     WHERE userID = ${userID}
+    AND floor = 60
   `
   return interaction.reply({
     content: `Marked ${name} as completed (${numCompleted.count} completed)`,
@@ -228,13 +233,14 @@ async function markIncomplete(interaction, adventurer) {
   const [name, element, weapon] = adventurer.split(', ');
   const [completed] = await sql`
     DELETE FROM completed
-    WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon}
+    WHERE userid = ${userID} AND name = ${name} AND element = ${element} AND weapon = ${weapon} AND floor = 60
   `
   await logCommand(interaction, ACTION_TYPE.INCOMPLETE, adventurer);
   const [numCompleted] = await sql`
     SELECT COUNT(*)
     FROM completed
     WHERE userID = ${userID}
+    AND floor = 60
   `
   return interaction.reply({
     content: `Marked ${name} as incomplete (${numCompleted.count} completed)`,
@@ -243,28 +249,50 @@ async function markIncomplete(interaction, adventurer) {
 }
 
 async function findCompleters(interaction, adventurer, thumbnailUrl) {
-  const completers = await sql`
+  const completers50 = await sql`
     SELECT userid, timestamp
     FROM completed
     WHERE name = ${adventurer}
+    AND floor = 50
+    ORDER BY timestamp NULLS FIRST
+  `;
+  const completers60 = await sql`
+    SELECT userid, timestamp
+    FROM completed
+    WHERE name = ${adventurer}
+    AND floor = 60
     ORDER BY timestamp NULLS FIRST
   `;
   await logCommand(interaction, ACTION_TYPE.COMPLETERS, adventurer);
-  const names = await Promise.all(completers.map(async completer => {
-    const {userid, timestamp} = completer;
+  const names50 = await Promise.all(completers50.map(async completer => {
+    const {userid, timestamp, floor} = completer;
     const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
     const username = await fetchUser(interaction, completer.userid);
     return `${username} *(${suffix})*`;
   }));
+  const names60 = await Promise.all(completers60.map(async completer => {
+    const {userid, timestamp, floor} = completer;
+    const suffix = timestamp == null ? 'before logging was added' : getRelativeTime(timestamp);
+    const username = await fetchUser(interaction, completer.userid);
+    return `${username} *(${suffix})*`;
+  }));
+  const fields = [];
+  if (names60.length > 0) {
+    fields.push(
+      {
+          'name': `Completed by (60F):`,
+          'value': names60.join('\n'),
+        },
+    );
+  }
+  fields.push({
+    'name': `Completed by (50F):`,
+    'value': names50.join('\n'),
+  });
   const embed = {
     'type': 'rich',
     'title': adventurer,
-    'fields': [
-        {
-          'name': `Completed by:`,
-          'value': names.join('\n'),
-        }
-      ],
+    fields,
     'thumbnail': {
       'url': thumbnailUrl,
       'height': 0,
@@ -322,10 +350,10 @@ async function batchAddCompleted(interaction) {
   const query = getSearchQuery(interaction);
   const [added] = await sql`
     WITH rows AS (
-      INSERT INTO completed(userid, name, element, weapon, timestamp)
-      SELECT ${userID}, name, element, weapon, NOW() FROM adventurers
+      INSERT INTO completed(userid, name, element, weapon, timestamp, floor)
+      SELECT ${userID}, name, element, weapon, NOW(), 60 FROM adventurers
       WHERE LOWER(name) = ANY(ARRAY[${query}])
-      ON CONFLICT(userid, name, element, weapon)
+      ON CONFLICT(userid, name, element, weapon, floor)
       DO NOTHING
       RETURNING *
     )
@@ -463,22 +491,34 @@ async function fetchUser(interaction, id) {
 
 async function leaderboard(interaction) {
   const leaderboard = await sql`
-    SELECT COUNT(*), userid FROM completed
-    GROUP BY userid
-    ORDER BY 1 DESC
+    WITH leaderboard50 AS (
+      SELECT COUNT(*) as count, userid FROM completed
+      WHERE floor = 50
+      GROUP BY userid
+      ORDER BY 1 DESC
+    ), leaderboard60 AS (
+      SELECT COUNT(*) as count, userid FROM completed
+      WHERE floor = 60
+      GROUP BY userid
+      ORDER BY 1 DESC
+    )
+    SELECT leaderboard50.count as count50, leaderboard60.count as count60, leaderboard60.userid
+    FROM leaderboard60
+    INNER JOIN leaderboard50 ON leaderboard50.userid = leaderboard60.userid
+    ORDER BY count60 DESC, count50 DESC
   `;
   const [adventurerCount] = await sql`
     SELECT COUNT(*) from adventurers
   `;
   await logCommand(interaction, 'leaderboard');
   const results = await Promise.all(leaderboard.map(async entry => {
-    const {count, userid} = entry;
+    const {count50, count60, userid} = entry;
     // const username = users.find(user => userid == user.userid)?.username;
     const username = await fetchUser(interaction, userid);
     if (username == null) {
       return null;
     }
-    const isComplete = count === adventurerCount.count;
+    const isComplete = count60 === adventurerCount.count;
     var completionTime = null;
     if (isComplete) {
       const [timestamp] = await sql`
@@ -490,7 +530,7 @@ async function leaderboard(interaction) {
       `;
       completionTime = getRelativeTime(timestamp.timestamp);
     }
-    return {count, username, isSelf: userid === interaction.user.id, completionTime};
+    return {count60, count50, username, isSelf: userid === interaction.user.id, completionTime};
   }));
   return results.filter(Boolean);
 }
